@@ -376,17 +376,12 @@ export async function calculateForwardMrp(client, input) {
       const itemKey = keyOf(plantCode, materialCode);
       const stock = inventory.get(itemKey);
       const constraint = plantConstraints.get(itemKey);
-      let projected = Math.max(
-        0,
-        Number(stock?.on_hand_qty || 0) - Number(stock?.reserved_qty || 0),
-      );
+      // Match the training workbook: net against opening on-hand, scheduled
+      // receipts, and the material's safety stock. Reserved stock and reorder
+      // levels are operational extensions and are not inputs to this formula.
+      let projected = Number(stock?.on_hand_qty || 0);
       const safetyMin = Number(
-        Math.max(
-          Number(stock?.safety_stock_min ?? material.safety_stock_min ?? 0),
-          Number(constraint?.min_stock_qty || 0),
-          Number(constraint?.reorder_level || 0),
-          Number(stock?.reorder_level || 0),
-        ),
+        stock?.safety_stock_min ?? material.safety_stock_min ?? 0,
       );
       const maxCapacityValue =
         constraint?.max_storage_capacity ?? constraint?.max_stock_qty ??
