@@ -1,5 +1,9 @@
 # MRP Portal
 
+## Free demo deployment
+
+For a product-owner walkthrough, use the [Render + Supabase deployment guide](docs/free_demo_deployment.md). The deployment manifest is [`render.yaml`](render.yaml). Render serves both the built frontend and API; Supabase hosts PostgreSQL.
+
 ## PostgreSQL setup
 
 The existing database shown in DBeaver is `postgres` on `localhost:5432`; this app uses schema `mrp`. The original MRP schema can remain in place. Apply the additive forward-planning migration once:

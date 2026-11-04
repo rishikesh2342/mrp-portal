@@ -2,6 +2,8 @@ import "dotenv/config";
 import express from "express";
 import pg from "pg";
 import { readFile } from "node:fs/promises";
+import { existsSync } from "node:fs";
+import { resolve } from "node:path";
 import { calculateForwardMrp } from "./mrp-engine.js";
 import { importCsv } from "./csv-import.js";
 
@@ -352,6 +354,17 @@ app.get("/api/mrp/runs/:runId", async (req, res, next) => {
   }
 });
 
+// In production, serve the Vite build and API from the same origin. This keeps
+// browser API requests on /api and avoids a separate frontend CORS setup.
+const webDist = resolve("dist");
+if (existsSync(resolve(webDist, "index.html"))) {
+  app.use(express.static(webDist));
+  app.get("*", (req, res, next) => {
+    if (req.path.startsWith("/api/")) return next();
+    res.sendFile(resolve(webDist, "index.html"));
+  });
+}
+
 app.use((error, _req, res, _next) => {
   console.error(error);
   const message =
@@ -361,7 +374,7 @@ app.use((error, _req, res, _next) => {
   res.status(error.status || 500).json({ error: message });
 });
 
-const port = Number(process.env.API_PORT || 3001);
+const port = Number(process.env.PORT || process.env.API_PORT || 3001);
 async function start() {
   try {
     const baseSchema = await pool.query("SELECT to_regclass('mrp.inventory_on_hand') AS table_name");
