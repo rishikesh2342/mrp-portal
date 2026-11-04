@@ -14,7 +14,6 @@ import {
   X,
 } from "lucide-react";
 import type { PageProps } from "../types";
-// @ts-expect-error CSS is loaded by the bundler; TypeScript has no CSS module declaration.
 import "./forward-mrp.css";
 
 type Country = {
