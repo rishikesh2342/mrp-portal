@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1697" viewBox="0 0 1200 1697" role="img" aria-labelledby="title desc">
+  <title id="title">MRP Portal quick guide</title>
+  <desc id="desc">A visual guide for uploading master data, stock and demand, running MRP, and checking material requirements.</desc>
+  <defs>
+    <linearGradient id="hero" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#10284b"/><stop offset="1" stop-color="#1c4b7a"/></linearGradient>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#8aa2c1"/></marker>
+    <style>
+      .font{font-family:Arial,'Segoe UI',sans-serif}.title{font-size:43px;font-weight:700;fill:#fff}.sub{font-size:18px;fill:#d7e5f6}.h{font-size:22px;font-weight:700;fill:#173154}.body{font-size:16px;fill:#34465f}.small{font-size:14px;fill:#5e6e83}.tiny{font-size:12px;fill:#66768b}.label{font-size:13px;font-weight:700;letter-spacing:1px;fill:#687a91}.card{fill:#fff;stroke:#dce5ef;stroke-width:2}.num{font-size:17px;font-weight:700;fill:#fff}.white{fill:#fff}.bold{font-weight:700}
+    </style>
+  </defs>
+  <rect width="1200" height="1697" fill="#f3f7fb"/>
+  <rect x="0" y="0" width="1200" height="230" fill="url(#hero)"/>
+  <circle cx="1090" cy="62" r="130" fill="#ffffff" opacity=".045"/><circle cx="1110" cy="220" r="90" fill="#ffffff" opacity=".035"/>
+  <g class="font">
+    <text x="64" y="58" font-size="14" font-weight="700" letter-spacing="2" fill="#8ec5ff">MRP PORTAL · PRODUCT OWNER QUICK GUIDE</text>
+    <text x="64" y="122" class="title">From forecast to material plan</text>
+    <text x="64" y="163" class="sub">Upload the approved files in order, run MRP, then review the suggested material needs.</text>
+    <rect x="64" y="187" width="465" height="28" rx="14" fill="#ffffff" opacity=".13"/>
+    <text x="80" y="206" font-size="13" font-weight="700" fill="#fff">CSV uploads only · Excel workbooks are not accepted</text>
+
+    <!-- section 1 -->
+    <rect x="48" y="264" width="1104" height="490" rx="22" class="card"/>
+    <circle cx="84" cy="306" r="20" fill="#2563eb"/><text x="84" y="312" text-anchor="middle" class="num">1</text>
+    <text x="118" y="313" class="h">Upload the planning files</text>
+    <text x="78" y="350" class="small">Choose the matching Upload type. Upload one file, wait for the success message, then continue.</text>
+    <text x="80" y="390" class="label">MASTER DATA · MASTER DATA SCREEN</text>
+    <g>
+      <rect x="76" y="410" width="492" height="64" rx="12" fill="#eff6ff"/><circle cx="106" cy="442" r="17" fill="#2563eb"/><text x="106" y="448" text-anchor="middle" class="num">1</text><text x="136" y="438" class="body bold">plant_master.csv</text><text x="136" y="459" class="tiny">Sites and country · load first</text>
+      <rect x="632" y="410" width="492" height="64" rx="12" fill="#eff6ff"/><circle cx="662" cy="442" r="17" fill="#2563eb"/><text x="662" y="448" text-anchor="middle" class="num">2</text><text x="692" y="438" class="body bold">material_master.csv</text><text x="692" y="459" class="tiny">Names, units, scrap, lead time, MOQ, safety stock</text>
+      <rect x="76" y="486" width="492" height="64" rx="12" fill="#eff6ff"/><circle cx="106" cy="518" r="17" fill="#2563eb"/><text x="106" y="524" text-anchor="middle" class="num">3</text><text x="136" y="514" class="body bold">fg_master.csv</text><text x="136" y="535" class="tiny">Products assigned to plants</text>
+      <rect x="632" y="486" width="492" height="64" rx="12" fill="#eff6ff"/><circle cx="662" cy="518" r="17" fill="#2563eb"/><text x="662" y="524" text-anchor="middle" class="num">4</text><text x="692" y="514" class="body bold">plant_constraints.csv</text><text x="692" y="535" class="tiny">Approved plant-level stock and order rules</text>
+      <rect x="76" y="562" width="492" height="64" rx="12" fill="#eff6ff"/><circle cx="106" cy="594" r="17" fill="#2563eb"/><text x="106" y="600" text-anchor="middle" class="num">5</text><text x="136" y="590" class="body bold">bom_input.csv</text><text x="136" y="611" class="tiny">Materials and quantity used per product</text>
+      <rect x="632" y="562" width="492" height="64" rx="12" fill="#ecfeff"/><circle cx="662" cy="594" r="17" fill="#0891b2"/><text x="662" y="600" text-anchor="middle" class="num">6</text><text x="692" y="590" class="body bold">inventory_input.csv</text><text x="692" y="611" class="tiny">Inventory screen · on hand and incoming stock</text>
+      <rect x="76" y="638" width="492" height="64" rx="12" fill="#f5f3ff"/><circle cx="106" cy="670" r="17" fill="#7c3aed"/><text x="106" y="676" text-anchor="middle" class="num">7</text><text x="136" y="666" class="body bold">demand_input.csv</text><text x="136" y="687" class="tiny">Demand Planning screen · weekly product forecast</text>
+      <rect x="632" y="638" width="492" height="64" rx="12" fill="#f8fafc" stroke="#dce5ef"/><text x="654" y="665" class="small bold">Reconciliation only</text><text x="654" y="686" class="tiny">Monthly source and allocation detail files are not uploaded.</text>
+    </g>
+
+    <!-- connector -->
+    <path d="M600 757v36" stroke="#8aa2c1" stroke-width="3" marker-end="url(#arrow)"/>
+
+    <!-- section 2 -->
+    <rect x="48" y="806" width="1104" height="242" rx="22" class="card"/>
+    <circle cx="84" cy="850" r="20" fill="#059669"/><text x="84" y="856" text-anchor="middle" class="num">2</text>
+    <text x="118" y="857" class="h">Run the material plan</text>
+    <g>
+      <rect x="78" y="883" width="245" height="112" rx="14" fill="#f8fafc"/><text x="98" y="912" class="label">OPEN</text><text x="98" y="946" class="body bold">Dashboard</text><text x="98" y="972" class="tiny">Choose country and plants</text>
+      <path d="M326 939h33" stroke="#8aa2c1" stroke-width="3" marker-end="url(#arrow)"/>
+      <rect x="366" y="883" width="245" height="112" rx="14" fill="#f8fafc"/><text x="386" y="912" class="label">SET</text><text x="386" y="946" class="body bold">Dates &amp; buckets</text><text x="386" y="972" class="tiny">Match the uploaded forecast</text>
+      <path d="M614 939h33" stroke="#8aa2c1" stroke-width="3" marker-end="url(#arrow)"/>
+      <rect x="654" y="883" width="205" height="112" rx="14" fill="#eff6ff"/><text x="674" y="912" class="label">CALCULATE</text><rect x="674" y="927" width="150" height="42" rx="9" fill="#2563eb"/><text x="749" y="954" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">Run MRP</text>
+      <path d="M862 939h33" stroke="#8aa2c1" stroke-width="3" marker-end="url(#arrow)"/>
+      <rect x="902" y="883" width="222" height="112" rx="14" fill="#ecfdf5"/><text x="922" y="912" class="label">REVIEW</text><text x="922" y="946" class="body bold">Material Requirement</text><text x="922" y="972" class="tiny">Open saved result rows</text>
+    </g>
+    <text x="80" y="1022" class="tiny">Training example settings: Morocco · 1 Nov 2026 · Weekly · 3-month horizon. For other plans, use approved dates and scope.</text>
+
+    <!-- section 3 -->
+    <rect x="48" y="1080" width="1104" height="286" rx="22" class="card"/>
+    <circle cx="84" cy="1124" r="20" fill="#d97706"/><text x="84" y="1130" text-anchor="middle" class="num">3</text>
+    <text x="118" y="1131" class="h">Check that the result makes sense</text>
+    <g>
+      <rect x="78" y="1160" width="325" height="112" rx="14" fill="#f8fafc"/><text x="98" y="1190" class="label">UPLOADS</text><text x="98" y="1222" class="body bold">Success message per file</text><text x="98" y="1248" class="tiny">Check row counts; fix any error before running.</text>
+      <rect x="423" y="1160" width="325" height="112" rx="14" fill="#f8fafc"/><text x="443" y="1190" class="label">MRP RUN</text><text x="443" y="1222" class="body bold">Completion message + results</text><text x="443" y="1248" class="tiny">Confirm selected plants and periods appear.</text>
+      <rect x="768" y="1160" width="354" height="112" rx="14" fill="#f8fafc"/><text x="788" y="1190" class="label">RESULTS</text><text x="788" y="1222" class="body bold">Review material, units, quantities</text><text x="788" y="1248" class="tiny">Check shortages, MOQ orders, release dates, alerts.</text>
+      <rect x="78" y="1290" width="1044" height="54" rx="12" fill="#fff7ed"/>
+      <text x="98" y="1313" font-size="14" font-weight="700" fill="#9a4d0c">No material results?</text><text x="98" y="1333" font-size="13" fill="#8a4d18">Check the date range, plant/product codes, and that every forecasted product has a BOM.</text>
+    </g>
+
+    <!-- formula strip -->
+    <rect x="48" y="1398" width="1104" height="174" rx="22" fill="#10284b"/>
+    <text x="78" y="1440" font-size="13" font-weight="700" letter-spacing="1" fill="#8ec5ff">WHAT THE CALCULATION DOES</text>
+    <text x="78" y="1480" font-size="18" font-weight="700" fill="#fff">Gross need = forecast × BOM usage × (1 + scrap)</text>
+    <text x="78" y="1515" font-size="16" fill="#e0eafa">Net need = max(0, gross need + safety stock − opening stock − scheduled receipts)</text>
+    <text x="78" y="1548" font-size="14" fill="#bcd0e8">Suggested order is at least MOQ; lead time moves its release earlier. Review before purchase.</text>
+
+    <text x="64" y="1622" font-size="13" font-weight="700" fill="#173154">DATA NOTE</text>
+    <text x="64" y="1646" class="tiny">The attached Excel workbook cannot be uploaded directly. Example CSVs are training data; some site mappings and planning values are synthetic.</text>
+    <text x="64" y="1670" class="tiny">Use the latest approved CSVs and confirm units, codes, forecast period, and business rules before sharing a plan.</text>
+    <text x="1138" y="1670" text-anchor="end" font-size="12" fill="#94a3b8">MRP PORTAL · QUICK REFERENCE</text>
+  </g>
+</svg>
