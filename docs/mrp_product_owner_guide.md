@@ -29,7 +29,7 @@ Use the Upload type menu to tell the portal what each file contains. Upload one 
 | 3 | [`fg_master.csv`](../database/sample-data/fg_master.csv) | Finished goods | **Master Data** | Products made at each plant, including bulk or bagged type |
 | 4 | [`plant_constraints.csv`](../database/sample-data/plant_constraints.csv) | Plant constraints | **Master Data** | Plant-specific stock limits and purchasing rules; use when approved values exist |
 | 5 | [`bom_input.csv`](../database/sample-data/bom_input.csv) | Bill of materials | **Master Data** | Materials and quantities used to make each finished product |
-| 6 | [`inventory_input_latest.csv`](../database/sample-data/inventory_input_latest.csv) | Inventory & stock | **Inventory** | Current upload-ready copy; opening on-hand, reserved, in-transit, and scheduled receipt quantities |
+| 6 | [`inventory_input_with_dummy_dates.csv`](../database/sample-data/inventory_input_with_dummy_dates.csv) | Inventory & stock | **Inventory** | Upload-ready demo copy; includes placeholder due dates for all rows |
 | 7 | [`demand_input.csv`](../database/sample-data/demand_input.csv) | Weekly demand forecast | **Demand Planning** | Forecast quantity by plant, product, and week |
 
 The other two example files, [`demand_source_monthly.csv`](../database/sample-data/demand_source_monthly.csv) and [`demand_allocation_detail.csv`](../database/sample-data/demand_allocation_detail.csv), are for tracing and reconciling how weekly demand was derived. They are **not** upload files in the portal.
@@ -41,6 +41,7 @@ The other two example files, [`demand_source_monthly.csv`](../database/sample-da
 - A BOM upload replaces the component list for each plant/product pair present in that file. Make sure the file contains the complete BOM for every included pair before uploading it.
 - The current demand uploader accepts weekly buckets only. Each `bucket_date` must be a Sunday. The example forecast starts on 1 November 2026; use your approved forecast dates when planning another period.
 - For inventory, provide an in-transit due date when known. If `in_transit_qty` is positive but the date is blank, the MRP calculation assumes it arrives in the first planning bucket.
+- The demo file uses `2026-11-08` as a placeholder date on rows with zero in-transit quantity so it also passes older deployed upload validation. These placeholder dates do not affect MRP calculations when the in-transit quantity is zero.
 - A plant file currently needs a country code already supported by the portal importer. The supplied example uses Morocco (`MAR`, currency `MAD`). Ask the portal administrator to configure a new country before uploading another country.
 
 ## Run the forecast and material plan

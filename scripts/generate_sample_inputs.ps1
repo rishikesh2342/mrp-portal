@@ -140,7 +140,10 @@ foreach ($plant in $plants) {
     if ($plant.plant_code -eq 'P_SET' -and $material.material_code -eq 'RM-CLINKER') { $onHand=2500; $reserved=100; $case='VALIDATION_LOW_STOCK' }
     if ($plant.plant_code -eq 'P_BSK' -and $material.material_code -eq 'PK-BAG-50') { $onHand=0; $reserved=0; $inTransit=20000; $case='VALIDATION_IN_TRANSIT_RECEIPT' }
     if ($plant.plant_code -eq 'P_FES' -and $material.material_code -eq 'RM-GYPSUM') { $onHand=[math]::Round($safety * 3.5,2); $reserved=0; $case='VALIDATION_EXCESS_STOCK' }
-    $inventory += [pscustomobject]@{plant_code=$plant.plant_code;material_code=$material.material_code;as_of_date=$asOfDate;on_hand_qty=$onHand;reserved_qty=$reserved;in_transit_qty=$inTransit;in_transit_due_date=if($inTransit -gt 0){'2026-11-08'}else{''};scheduled_receipts_qty=0;uom=$material.uom;validation_case=$case}
+    # Keep a placeholder due date on every row for compatibility with deployed
+    # uploaders that validate the date field even when transit quantity is zero.
+    # The MRP engine ignores this date whenever in_transit_qty is 0.
+    $inventory += [pscustomobject]@{plant_code=$plant.plant_code;material_code=$material.material_code;as_of_date=$asOfDate;on_hand_qty=$onHand;reserved_qty=$reserved;in_transit_qty=$inTransit;in_transit_due_date='2026-11-08';scheduled_receipts_qty=0;uom=$material.uom;validation_case=$case}
   }
 }
 

@@ -144,8 +144,11 @@ async function importInventory(db, rows) {
     // consistent with calculation behavior.
     const due=date(row.in_transit_due_date,'in_transit_due_date',n,true); const scheduled=number(row.scheduled_receipts_qty,'scheduled_receipts_qty',n);
     const result = await db.query(`INSERT INTO mrp.inventory_on_hand(plant_code,material_code,on_hand_qty,scheduled_receipts,reserved_qty,in_transit_qty,in_transit_due_date,safety_stock_min,max_capacity,updated_at)
-      SELECT $1,$2,$3,$4,$5,$6,$7,COALESCE(c.min_stock_qty,m.safety_stock_min),COALESCE(c.max_storage_capacity,m.max_capacity),now()
-      FROM mrp.material_master m LEFT JOIN mrp.plant_material_constraints c ON c.plant_code=$1 AND c.material_code=m.material_code WHERE m.material_code=$2
+      SELECT $1::varchar,$2::varchar,$3::numeric,$4::numeric,$5::numeric,$6::numeric,$7::date,
+        COALESCE(c.min_stock_qty,m.safety_stock_min),COALESCE(c.max_storage_capacity,m.max_capacity),now()
+      FROM mrp.material_master m LEFT JOIN mrp.plant_material_constraints c
+        ON c.plant_code=$1::varchar AND c.material_code=m.material_code
+      WHERE m.material_code=$2::varchar
       ON CONFLICT(plant_code,material_code) DO UPDATE SET on_hand_qty=EXCLUDED.on_hand_qty,scheduled_receipts=EXCLUDED.scheduled_receipts,reserved_qty=EXCLUDED.reserved_qty,in_transit_qty=EXCLUDED.in_transit_qty,in_transit_due_date=EXCLUDED.in_transit_due_date,safety_stock_min=EXCLUDED.safety_stock_min,max_capacity=EXCLUDED.max_capacity,updated_at=now()`,
     [row.plant_code,row.material_code,onHand,scheduled,reserved,transit,due]);
     if (!result.rowCount) throw new Error(`Row ${n}: material ${row.material_code} does not exist.`);
