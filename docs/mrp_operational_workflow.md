@@ -64,7 +64,7 @@ Reject an upload before committing if any of these checks fail:
 - Quantities, costs, safety/reorder/min/max values, lead times, MOQ, and order multiples are nonnegative; demand and receipts cannot be negative. Scrap must satisfy `0 <= scrap_factor < 1`.
 - UOMs agree along each BOM line. For bagged cement, bags per tonne are `1000 / bag_weight_kg`; do not load bag counts as tonnes.
 - BOM has exactly one parent type, all effective date intervals are valid, and no component loop exists.
-- Opening stock is as-of the planning start. Reserved stock cannot exceed physical on-hand unless the business permits negative available stock. In-transit quantity requires a due date; due date must be inside or before the horizon if it should affect this run.
+- Opening stock is as-of the planning start. Reserved stock cannot exceed physical on-hand unless the business permits negative available stock. An in-transit due date is recommended; when it is blank, the MRP engine treats the quantity as arriving in the first planning bucket. Use a dated receipt when its expected arrival period is known.
 - Forecast bucket dates use the configured weekly/monthly cadence and have no duplicate plant/SKU/bucket. Workbook monthly totals must reconcile to the allocated weekly sum, including rounding.
 - Reject missing required values, unexpected extra columns unless explicitly ignored as provenance, malformed SKU values, and values outside configured capacity. Warn rather than reject for orders below MOQ and forecasts with no BOM until corrected.
 

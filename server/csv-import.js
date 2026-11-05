@@ -139,7 +139,9 @@ async function importInventory(db, rows) {
   for(const [i,row] of rows.entries()) {
     const n=i+2; const onHand=number(row.on_hand_qty,'on_hand_qty',n), reserved=number(row.reserved_qty,'reserved_qty',n), transit=number(row.in_transit_qty,'in_transit_qty',n);
     if(reserved>onHand) throw new Error(`Row ${n}: reserved_qty cannot exceed on_hand_qty.`);
-    if(transit>0&&!row.in_transit_due_date) throw new Error(`Row ${n}: in_transit_due_date is required when in_transit_qty is positive.`);
+    // The MRP engine treats undated in-transit stock as arriving in the first
+    // planning bucket, so allow a blank due date here and keep import behavior
+    // consistent with calculation behavior.
     const due=date(row.in_transit_due_date,'in_transit_due_date',n,true); const scheduled=number(row.scheduled_receipts_qty,'scheduled_receipts_qty',n);
     const result = await db.query(`INSERT INTO mrp.inventory_on_hand(plant_code,material_code,on_hand_qty,scheduled_receipts,reserved_qty,in_transit_qty,in_transit_due_date,safety_stock_min,max_capacity,updated_at)
       SELECT $1,$2,$3,$4,$5,$6,$7,COALESCE(c.min_stock_qty,m.safety_stock_min),COALESCE(c.max_storage_capacity,m.max_capacity),now()
