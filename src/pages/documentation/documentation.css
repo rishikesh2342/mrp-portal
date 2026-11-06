@@ -1,0 +1,25 @@
+.project-guides-page{max-width:1440px;margin:0 auto;padding:34px 38px 56px;color:#24364b}
+.guides-hero{display:flex;align-items:center;gap:20px;padding:28px 30px;background:linear-gradient(115deg,#edf5ff,#f8fbff 65%,#eef8f5);border:1px solid #dce7f2;border-radius:18px}
+.guides-hero-icon{width:56px;height:56px;display:grid;place-items:center;flex:none;border-radius:15px;background:#dcecff;color:#1475e8}
+.guides-hero-copy{flex:1;min-width:0}
+.guides-eyebrow{font-size:10px;font-weight:800;letter-spacing:.12em;color:#6180a2}
+.guides-hero h1{margin:5px 0 4px;font-size:27px;color:#17365d}
+.guides-hero p{margin:0;color:#647a94;font-size:14px}
+.guides-download-all{display:inline-flex;align-items:center;gap:9px;white-space:nowrap;text-decoration:none}
+.guides-bundle-note{display:flex;align-items:center;gap:10px;margin:18px 0 34px;padding:13px 16px;border:1px solid #dce7f2;border-radius:11px;background:#fff;color:#59718d;font-size:13px}
+.guides-bundle-note svg{color:#17856e;flex:none}
+.guides-section{margin-top:28px}
+.guides-section h2{margin:0 0 14px;font-size:17px;color:#193b62}
+.guides-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}
+.guide-card{display:flex;flex-direction:column;min-height:196px;padding:18px 19px 16px;background:#fff;border:1px solid #e0e8f0;border-radius:13px;box-shadow:0 3px 12px rgba(35,60,88,.035)}
+.guide-card-top{display:flex;align-items:center;justify-content:space-between}
+.guide-file-icon{display:grid;place-items:center;width:36px;height:36px;border-radius:10px;background:#edf4ff;color:#2676d6}
+.guide-format{padding:4px 8px;border-radius:20px;background:#f0f4f8;color:#60758d;font-size:10px;font-weight:700}
+.guide-card h3{margin:14px 0 6px;font-size:14px;color:#243c58}
+.guide-card p{margin:0 0 17px;color:#6d7f92;font-size:12px;line-height:1.55;flex:1}
+.guide-download-link{display:inline-flex;align-items:center;gap:7px;width:max-content;color:#176ed0;font-size:12px;font-weight:700;text-decoration:none}
+.guide-download-link:hover{text-decoration:underline}
+.guide-download-link svg:last-child{margin-left:1px;color:#8da0b4}
+.guides-footer-note{margin:30px 0 0;color:#708198;font-size:12px;line-height:1.6}
+@media(max-width:1000px){.guides-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.guides-hero{flex-wrap:wrap}.guides-download-all{margin-left:76px}}
+@media(max-width:640px){.project-guides-page{padding:22px 16px 40px}.guides-hero{padding:21px;gap:14px}.guides-hero-copy{width:calc(100% - 70px);flex:auto}.guides-hero h1{font-size:23px}.guides-hero p{font-size:12px}.guides-download-all{margin:0;width:100%;justify-content:center}.guides-grid{grid-template-columns:1fr}.guide-card{min-height:170px}}

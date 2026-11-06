@@ -5,6 +5,7 @@ import {
   ArrowLeft,
   Bell,
   Bookmark,
+  BookOpen,
   Box,
   Building2,
   CalendarDays,
@@ -65,6 +66,7 @@ const groups: {
     items: [
       { label: "Reports", icon: FileBarChart },
       { label: "Master Data", icon: Database },
+      { label: "Project Guides", icon: BookOpen },
       { label: "Settings", icon: Settings },
     ],
   },
@@ -202,9 +204,9 @@ export default function App() {
             ))}
           </div>
           <div className="sidebar-bottom">
-            <button className="nav-item">
+            <button className="nav-item" onClick={() => changePage("Project Guides")}>
               <CircleHelp size={17} />
-              <span>Help & support</span>
+              <span>Help & project guides</span>
             </button>
             <div className="profile-mini">
               <div className="avatar">RM</div>

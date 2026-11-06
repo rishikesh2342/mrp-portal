@@ -7,6 +7,7 @@ import MasterData from './master-data'
 import ProductionPlan from './production-plan'
 import PurchaseOrders from './purchase-orders'
 import Reports from './reports'
+import ProjectGuides from './documentation'
 import Settings from './settings'
 import Suppliers from './suppliers'
 import type { PageName, PageProps } from './types'
@@ -14,5 +15,5 @@ import type { PageName, PageProps } from './types'
 export const pageComponents: Record<PageName, ComponentType<PageProps>> = {
   Dashboard, 'Material Requirement': MaterialRequirement, 'Demand Planning': DemandPlanning,
   Inventory, 'Purchase Orders': PurchaseOrders, Suppliers, 'Production Plan': ProductionPlan,
-  Reports, 'Master Data': MasterData, Settings,
+  Reports, 'Master Data': MasterData, 'Project Guides': ProjectGuides, Settings,
 }
