@@ -44,7 +44,7 @@ const guides: { section: string; items: Guide[] }[] = [
       },
       {
         title: 'Operational MRP workflow',
-        description: 'Technical and operational notes about the project's MRP flow.',
+        description: "Technical and operational notes about the project's MRP flow.",
         href: '/project-docs/docs/mrp_operational_workflow.md',
         format: 'Markdown',
       },
