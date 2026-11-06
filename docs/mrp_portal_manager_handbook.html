@@ -1,0 +1,413 @@
+<!doctype html><html><head><meta charset="utf-8"><title>MRP Portal Manager Handbook</title><style>
+@page{size:A4;margin:16mm 15mm 17mm}*{box-sizing:border-box}body{font-family:Arial,Helvetica,sans-serif;color:#24364b;font-size:10pt;line-height:1.48}h1{font-size:25pt;color:#17365d;margin:0 0 14pt;border-bottom:3px solid #1675e8;padding-bottom:8pt}h2{font-size:16pt;color:#17365d;margin:24pt 0 8pt;page-break-after:avoid}h3{font-size:12pt;color:#1f548a;margin:17pt 0 6pt;page-break-after:avoid}h4{font-size:11pt;margin:12pt 0 5pt;page-break-after:avoid}p{margin:5pt 0 9pt}ul,ol{padding-left:22pt;margin:5pt 0 10pt}li{margin:3pt 0}table{width:100%;border-collapse:collapse;margin:8pt 0 14pt;font-size:8.2pt;page-break-inside:auto}thead{display:table-header-group}tr{page-break-inside:avoid}th{background:#eaf1f8;color:#17365d;text-align:left;font-weight:bold}th,td{border:1px solid #d4deea;padding:5pt 6pt;vertical-align:top}blockquote{margin:10pt 0;padding:9pt 12pt;background:#eef5ff;border-left:4px solid #1675e8;color:#314e70}code{font-family:Consolas,monospace;background:#f1f4f7;padding:1px 3px;font-size:9pt}pre{white-space:pre-wrap;background:#f3f6fa;border:1px solid #dce5ef;padding:10pt;font-size:8.5pt}a{color:#1268c4;text-decoration:none}strong{color:#1d3046}</style></head><body>
+<h1>MRP Portal: Manager&#39;s Complete Project Handbook</h1>
+<p><strong>Audience:</strong> managers, product owners, planners, procurement leaders, and business reviewers who are new to MRP and this portal.  </p>
+<p><strong>Purpose:</strong> explain why the portal exists, how a planning run works, what every important screen and label means, what information is required, and what the current implementation does and does not do.</p>
+<blockquote><strong>Scope and accuracy note</strong></blockquote>
+<blockquote>This handbook describes the project as it is currently implemented in this repository. The portal has a real database-backed CSV import, forward MRP calculation, dashboard, and saved material requirement results. Several surrounding screens are still UI demonstrations with sample/local data and do not yet represent a connected production workflow. Those differences are identified explicitly. This guide is intended to give a complete understanding of the current project, not to imply that every feature shown on screen is production-ready.</blockquote>
+<h2>1. Executive overview</h2>
+<p>The MRP Portal helps a planner turn a <strong>finished-product forecast</strong> into a <strong>time-phased plan for the materials</strong> needed to make those products. It answers three practical questions:</p>
+<ol>
+<li>What materials will the forecast consume, and when?</li>
+<li>After existing stock and expected inbound receipts are considered, where will stock fall below its minimum?</li>
+<li>What quantity should be planned, and when does its order need to be released based on lead time?</li>
+</ol>
+<p>The main planning result is a recommendation. It supports decisions by planning and procurement teams; it does not automatically place an order with a supplier.</p>
+<h3>In one sentence</h3>
+<p><strong>Forecast + product recipe (BOM) → material demand → net against stock and receipts → recommend replenishment → review dates, quantities, and risks.</strong></p>
+<h2>2. MRP in plain language</h2>
+<p><strong>MRP</strong> means <strong>Material Requirements Planning</strong>. A factory sells or plans finished products, but it must obtain or make the ingredients, packaging, and intermediate items needed to produce them. MRP translates product demand into a dated supply plan for those materials.</p>
+<h3>A simple example</h3>
+<p>Suppose a plant plans to make 100 tonnes of a product. Each tonne uses 0.75 tonnes of clinker, and the configured clinker loss/scrap is 1%.</p>
+<pre><code>
+Clinker demand = 100 &#215; 0.75 &#215; (1 + 0.01) = 75.75 tonnes
+</code></pre>
+<p>If the plant starts with 60 tonnes, expects 10 tonnes to arrive, and must retain a 5-tonne minimum, the pre-order stock would be <code>60 + 10 − 75.75 = −5.75</code>. To finish at the 5-tonne minimum, the net need is 10.75 tonnes. If the minimum order quantity (MOQ) is 12 tonnes, the plan recommends 12 tonnes. The planner then checks whether the release date is early enough for the supplier lead time.</p>
+<p>That is the core planning idea. The portal repeats it across plants, materials, and periods, carrying each period&#39;s projected stock into the next period.</p>
+<h2>3. Why this portal was created</h2>
+<p>The project provides a browser-based way to:</p>
+<ul>
+<li>bring planning inputs into a shared data model using CSV files;</li>
+<li>keep plant, product, material, and BOM codes connected;</li>
+<li>calculate future material needs from forecast and BOM usage;</li>
+<li>account for opening inventory, scheduled/in-transit supply, safety stock, MOQ, and lead time;</li>
+<li>show the resulting stock and suggested orders by period;</li>
+<li>identify orders whose release date is immediately due and stock projections that exceed configured capacity;</li>
+<li>retain completed calculation runs and inspect material requirements generated by the latest run.</li>
+</ul>
+<p>The portal is intended to make planning inputs and recommendations easier to review. The quality of its output depends on the quality of the approved forecast, BOM, units, inventory, receipts, and planning parameters supplied to it.</p>
+<h2>4. End-to-end business flow</h2>
+<pre><code>
+Approved business files
+        │
+        ├── Plant, material, product, constraints, and BOM masters
+        ├── Opening inventory and inbound receipts
+        └── Forecast by plant, finished good, and bucket date
+                    │
+                    ▼
+          Upload each CSV with its matching upload type
+                    │
+                    ▼
+     Dashboard loads valid countries/plants/material options
+                    │
+                    ▼
+       Planner chooses scope, horizon, buckets, start date
+                    │
+                    ▼
+ MRP explodes the BOM, calculates gross needs, nets stock/receipts,
+              recommends planned orders, and dates releases
+                    │
+                    ▼
+       Review dashboard and detailed Material Requirement rows
+                    │
+                    ▼
+      Planner/procurement owner validates and takes action outside
+       the MRP calculation (for example, prepares an approved PO)
+</code></pre>
+<p>The page named <strong>Demand Planning</strong> has a polished demand-planning interface, but its plan cards and create-plan form are currently sample/local UI state. For the working MRP calculation, demand is loaded using the <strong>Weekly demand forecast</strong> CSV upload and stored in <code>mrp.demand_forecast</code>. Do not assume that creating a plan card on that page publishes demand into the MRP engine.</p>
+<h2>5. What the current project is made of</h2>
+<table><thead><tr>
+<th>Part</th>
+<th>Role</th>
+</tr></thead><tbody>
+<tr><td><strong>React + TypeScript frontend</strong> (<code>src/</code>)</td><td>Browser pages, filters, tables, charts, CSV upload control, scenario form, and results display.</td></tr>
+<tr><td><strong>Node.js + Express API</strong> (<code>server/</code>)</td><td>Validates/imports CSV data, serves option and inventory data, runs the forward MRP calculation, and returns saved run results.</td></tr>
+<tr><td><strong>PostgreSQL database</strong> (<code>mrp</code> schema)</td><td>Holds planning masters, forecasts, stock, receipts, constraints, run history, and result rows. Supabase can host this database for a demo.</td></tr>
+<tr><td><strong>Render deployment</strong></td><td>Serves the built site and API from one web service. The service connects to the PostgreSQL database through <code>DATABASE_URL</code>.</td></tr>
+<tr><td><strong>Sample and training files</strong> (<code>database/sample-data/</code>)</td><td>Illustrative CSVs for practice and demo setup; values must not be mistaken for approved business data.</td></tr>
+</tbody></table>
+<h3>Main technical entry points</h3>
+<ul>
+<li><code>src/App.tsx</code>: navigation shell and route handling.</li>
+<li><code>src/pages/dashboard/index.tsx</code>: working forward MRP controls, charts, scenario form, and time-phased result matrix.</li>
+<li><code>src/pages/shared/CsvUpload.tsx</code>: common CSV selection/upload control; accepts <code>.csv</code> files up to 10 MB.</li>
+<li><code>server/index.js</code>: HTTP endpoints and startup migration behavior.</li>
+<li><code>server/csv-import.js</code>: CSV parsing, required headers, data validation, and database upserts.</li>
+<li><code>server/mrp-engine.js</code>: forward MRP calculation.</li>
+<li><code>database/schema.sql</code> and <code>database/002_forward_mrp.sql</code>: original/forward MRP data structures.</li>
+<li><code>database/006_operational_mrp_job.sql</code>: additive stock extensions and SQL procedure support. At API startup it is applied automatically if the base <code>mrp.inventory_on_hand</code> table exists.</li>
+<li><code>render.yaml</code>: Render service configuration.</li>
+</ul>
+<h2>6. Navigation and what each page currently does</h2>
+<p>The left navigation groups the product into Workspace, Supply Chain, and Administration. The visual presence of a page does not always mean that the page is connected to the MRP database. Current implementation status is included below.</p>
+<h3>6.1 Dashboard — connected MRP planning workspace</h3>
+<p>This is the main working screen for a forward planning calculation.</p>
+<p><strong>Planning selectors and filters</strong></p>
+<table><thead><tr>
+<th>Control</th>
+<th>Meaning</th>
+</tr></thead><tbody>
+<tr><td><strong>Country</strong></td><td>Selects the country/currency scope. Active plants for that country are loaded from the database.</td></tr>
+<tr><td><strong>Plant</strong></td><td>Limits results to one or more selected plants. If no plant is selected, all active plants in the selected country are included.</td></tr>
+<tr><td><strong>Product type</strong></td><td>Filters demand to finished goods marked <code>Bulk</code> or <code>Bagged</code>.</td></tr>
+<tr><td><strong>Finished good</strong></td><td>Restricts the forecasted products included in the calculation.</td></tr>
+<tr><td><strong>Material category</strong></td><td>Filters displayed results to <code>Raw</code>, <code>Packing</code>, or <code>Intermediate</code> materials.</td></tr>
+<tr><td><strong>Material</strong></td><td>Limits displayed rows/charts to selected material codes.</td></tr>
+<tr><td><strong>Planning Horizon</strong></td><td>Supported calculation lengths are 3, 6, or 12 months.</td></tr>
+<tr><td><strong>Time buckets</strong></td><td>Supported bucket types are <code>Weekly</code> and <code>Monthly</code>. The horizon is divided into dated periods.</td></tr>
+<tr><td><strong>Planning start date</strong></td><td>First date of the planning window. Forecast rows must fall into this selected window to contribute demand.</td></tr>
+<tr><td><strong>Run MRP</strong></td><td>Sends the chosen settings to the API, calculates the plan, stores a run and result rows, then refreshes dashboard output.</td></tr>
+<tr><td><strong>Scenario inputs</strong></td><td>Temporarily overrides one forecast quantity and/or one material&#39;s on-hand balance for a recalculation. Overrides are saved as run inputs but do not update master or inventory data.</td></tr>
+</tbody></table>
+<p><strong>Dashboard summary cards</strong></p>
+<ul>
+<li><strong>Forecast Demand:</strong> sum of selected finished-good forecast quantities in the selected window. The current card labels the total “tons”; confirm the selected product units because the database supports finished-good UOMs and a single total can combine them.</li>
+<li><strong>Planned Order Value:</strong> recommended planned-order quantities multiplied by material unit costs, grouped/displayed by configured country currency.</li>
+<li><strong>Raw / Packing Spend:</strong> the planned order value split by raw and packing categories. Intermediate category spend is not included in these two subtotals.</li>
+<li><strong>Expedite / Stockout Alerts:</strong> count of planned-order bucket rows whose release date falls on or before the first bucket date. This label is an urgency indicator, not a live supplier order status.</li>
+<li><strong>Capacity Exceeded Buckets:</strong> count of material/bucket results whose projected stock is over the chosen capacity value.</li>
+</ul>
+<p><strong>Charts</strong></p>
+<ul>
+<li><strong>Forward Procurement Projection:</strong> planned order value by period for the chosen currency.</li>
+<li><strong>Material Consumption &amp; Planned Qty:</strong> gross material demand and planned order quantity per bucket for a selected material; its Y-axis uses the material UOM.</li>
+<li><strong>Plant Capacity Utilization:</strong> peak projected stock divided by configured capacity, shown per material. It uses a peak value over the calculation window; it is not a warehouse-wide physical space calculation.</li>
+</ul>
+<p><strong>Time-Phased Material Plan</strong></p>
+<p>One primary row represents a plant/material pair. It shows starting on-hand stock, minimum/maximum reference, and end-of-bucket projected stock. A smaller blue <code>+N order</code> is the recommended order in that bucket; the bold projected amount already includes that order. Expand the row to view <strong>Gross Requirements</strong>, <strong>Scheduled Receipts</strong>, <strong>Net Requirements</strong>, <strong>Projected Inventory</strong>, and <strong>Planned Order Release</strong>. Read <a href="time_phased_material_plan_guide.md">the separate table guide</a> for a worked screenshot example.</p>
+<h3>6.2 Material Requirement — connected read view of MRP output</h3>
+<p>This page requests material requirement data from the API and maps saved forward-MRP results into a review table. Filters include planning period, product, material, status, priority, and text search.</p>
+<table><thead><tr>
+<th>Field</th>
+<th>Meaning</th>
+</tr></thead><tbody>
+<tr><td><strong>MRP ID</strong></td><td>Run identifier shown for the saved calculation.</td></tr>
+<tr><td><strong>Planning Period</strong></td><td>Bucket date represented as a month/year in the current table.</td></tr>
+<tr><td><strong>Material Code / Name</strong></td><td>Item with a requirement.</td></tr>
+<tr><td><strong>Product / BOM</strong></td><td>Product linked through the BOM where available.</td></tr>
+<tr><td><strong>Required Qty</strong></td><td>Requirement amount represented by the API result mapping.</td></tr>
+<tr><td><strong>Available Qty</strong></td><td>Availability figure supplied by the requirement API.</td></tr>
+<tr><td><strong>Net Requirement</strong></td><td>Requirement shortfall/need. For the forward results, this is the pre-order shortfall required to restore the safety minimum.</td></tr>
+<tr><td><strong>Suggested PO Qty</strong></td><td>Planned order recommendation; it can exceed net need because MOQ can raise order size.</td></tr>
+<tr><td><strong>Priority / Status</strong></td><td>Display values used for review/filtering. In the current forward-result mapping, the API supplies these as defaults/derived presentation labels rather than a full task workflow.</td></tr>
+</tbody></table>
+<p>This page is suitable for reviewing latest saved MRP results. Row-action menu, Import, Export, and Create MRP buttons are not all wired to full persistence actions; the calculation should be initiated from Dashboard.</p>
+<h3>6.3 Demand Planning — upload works; plan management is demonstration UI</h3>
+<p>The shared CSV uploader on this page uploads the <strong>Weekly demand forecast</strong> dataset to the database. The plan list, versions, model names, create-plan form, save-draft button, and forecast-entry grid are currently front-end sample/local state. Creating a card there does <strong>not</strong> write the entered period-by-period forecast to <code>mrp.demand_forecast</code>.</p>
+<p>For database-backed demand, use the approved <code>demand_input.csv</code> format through the CSV upload control. The current importer accepts weekly periods only and requires Sunday <code>bucket_date</code> values.</p>
+<h3>6.4 Inventory — live inventory read, upload, plus local demo actions</h3>
+<p>The page&#39;s stock table loads from <code>/api/inventory</code>. The Inventory CSV uploader writes the supplied stock figures to the MRP inventory table. Search and category/status tabs help find items.</p>
+<table><thead><tr>
+<th>Field</th>
+<th>Meaning</th>
+</tr></thead><tbody>
+<tr><td><strong>Material Code</strong></td><td>Material identity, shown alongside plant code in the current view.</td></tr>
+<tr><td><strong>Material Name / Category / Unit</strong></td><td>Description, material grouping, and unit of measure.</td></tr>
+<tr><td><strong>Current Stock</strong></td><td>Database on-hand balance.</td></tr>
+<tr><td><strong>Reserved</strong></td><td>Quantity reserved for other uses. The inventory page subtracts it for its displayed available stock/status, but the current forward MRP formula intentionally does not subtract reserved quantity (see Section 8).</td></tr>
+<tr><td><strong>Available Stock</strong></td><td>Inventory page display calculation: <code>max(current stock − reserved, 0)</code>. Do not confuse it with the forward MRP engine&#39;s planning balance.</td></tr>
+<tr><td><strong>Min. Stock / Max. Stock</strong></td><td>Applicable plant-material threshold/capacity, with material defaults where applicable.</td></tr>
+<tr><td><strong>Last Receipt Date</strong></td><td>Current API maps the in-transit due date into this display column; it is not a full receipt transaction history.</td></tr>
+<tr><td><strong>Inventory Value</strong></td><td>Current stock multiplied by material unit cost, formatted in rupees by the page. The displayed currency formatting is not currently driven by each country&#39;s currency.</td></tr>
+<tr><td><strong>Status</strong></td><td><code>Out of Stock</code> when on-hand is zero; <code>Low Stock</code> when on-hand minus reserved is below the minimum; otherwise <code>In Stock</code>.</td></tr>
+</tbody></table>
+<p>The <strong>Add Inventory</strong> form and some inventory action/filter/detail controls use local UI state/toasts and do not persist through the inventory API. Use CSV upload to update the database-backed opening balances.</p>
+<h3>6.5 Master Data — CSV imports are live; catalog tables/forms are demo UI</h3>
+<p>The page exposes five visual catalogs: Materials, Products &amp; BOMs, Suppliers, Locations, and Planning Parameters. Its CSV upload controls connect to real import handlers for plants, materials, finished goods, plant constraints, and BOMs. The displayed example records, counts, data-quality percentage, add/edit forms, and exported catalog are currently local/sample UI state, not a database-backed master-data editor.</p>
+<p>Use CSV upload for planning master changes. Reference records must be uploaded before dependent rows. BOM upload replaces the component list for every plant/product pair included in that file, so provide the complete intended BOM for each included pair.</p>
+<h3>6.6 Purchase Orders — visual workflow only</h3>
+<p>This page displays seeded sample purchase orders and a create-order form with supplier, currency, item, quantity, price, delivery date, payment terms, and status fields. Current orders and form submissions are in browser state. They are <strong>not</strong> written to a purchase-order API, not sent to a supplier, and not generated automatically from MRP planned orders. The “Import from MRP” action is a UI notice, not a connected import.</p>
+<h3>6.7 Suppliers — supplier list is connected; editing workflow is not fully persisted</h3>
+<p>The page reads supplier records from <code>/api/suppliers</code> backed by the legacy <code>mrp.dim_supplier</code> table. Supplier create/edit, file attachments, and some actions are front-end-only. The current CSV uploader does not include a supplier dataset. Supplier lead-time values in this table should not be assumed to drive the forward MRP calculation, which currently uses material- or plant/material-level lead-time buckets.</p>
+<h3>6.8 Production Plan — visual workflow only</h3>
+<p>This screen shows seeded plans and a multi-step create-plan form with period, product, quantity, dates, priority, and status. The list/form is currently local browser data and is not connected to the forward-MRP endpoint or a production-plan database API. The MRP engine uses the finished-good forecast and BOM, not a saved production plan from this screen.</p>
+<h3>6.9 Reports — demonstration library</h3>
+<p>Report cards, recent reports, schedule options, and generated report/download actions are currently demo/local UI. They do not yet create a persisted report schedule or deliver an automated email digest from the current API.</p>
+<h3>6.10 Settings — demonstration controls</h3>
+<p>Settings presents workspace, planning, inventory, procurement, integration, and user/access options. These controls are currently front-end UI state. Changes are not connected to database policy, access control, or deployment secrets. Do not rely on this screen to enforce permissions or change live MRP calculation rules.</p>
+<h2>7. Data needed by the working MRP calculation</h2>
+<p>The core calculation requires a consistent set of database records:</p>
+<ol>
+<li><strong>Country and plant:</strong> establishes planning scope and currency.</li>
+<li><strong>Material master:</strong> defines material description, category, UOM, cost, scrap, lead time, MOQ, order multiple, default safety minimum, and capacity.</li>
+<li><strong>Finished-good master:</strong> identifies active products at each plant, their type (Bulk or Bagged), and UOM.</li>
+<li><strong>BOM:</strong> defines component material quantities per finished good. A make material can itself have a component BOM for multilevel explosion.</li>
+<li><strong>Demand forecast:</strong> expected quantity for each plant/product/bucket date.</li>
+<li><strong>Opening inventory:</strong> on-hand balance, near-term scheduled receipts, reserved quantity, dated in-transit quantity, and optional stock/capacity overrides.</li>
+<li><strong>Plant-material constraints:</strong> optional site-specific minimum, reorder reference, max stock/capacity, lead time, MOQ, and order multiple. Where the engine reads a site-specific field, it overrides the material-level default.</li>
+<li><strong>Dated scheduled receipts:</strong> future supply records stored in <code>mrp.scheduled_receipts</code> (the provided simple CSV inventory upload does not itself load a separate receipt schedule).</li>
+</ol>
+<h3>7.1 CSV upload types and expected columns</h3>
+<p>Upload one <code>.csv</code> at a time and select the matching <strong>Upload type</strong>. Keep headers unchanged, keep codes identical between files, and use the approved source values/units. The upload limit is 10 MB and 50,000 data rows per file.</p>
+<table><thead><tr>
+<th>Upload type</th>
+<th>Required headers</th>
+<th>Header meaning</th>
+</tr></thead><tbody>
+<tr><td><strong>Plant master</strong></td><td><code>plant_code</code>, <code>plant_name</code>, <code>country_code</code>, <code>location</code>, <code>active_flag</code></td><td>Unique site code/name; configured country; location description; <code>true</code>/<code>false</code> active flag. Extra source/mapping columns in the sample are ignored by the importer. Current country importer mapping supports Morocco (<code>MAR</code>, <code>MAD</code>) only unless code is updated.</td></tr>
+<tr><td><strong>Material master</strong></td><td><code>material_code</code>, <code>description</code>, <code>category</code>, <code>supply_type</code>, <code>uom</code>, <code>unit_cost</code>, <code>scrap_pct</code>, <code>lead_time_buckets</code>, <code>moq</code>, <code>order_multiple</code>, <code>safety_stock_min</code>, <code>max_capacity</code></td><td>Unique item; <code>Raw</code>/<code>Packing</code>/<code>Intermediate</code>; <code>BUY</code>/<code>MAKE</code>; unit; unit cost; scrap as decimal fraction (<code>0.01</code> = 1%); lead time in periods/buckets; minimum order; order multiple; default minimum stock; optional maximum capacity.</td></tr>
+<tr><td><strong>Finished goods</strong></td><td><code>plant_code</code>, <code>fg_code</code>, <code>description</code>, <code>product_type</code>, <code>uom</code>, <code>active_flag</code></td><td>Site/product key; product name; <code>Bulk</code> or <code>Bagged</code>; product unit; active flag.</td></tr>
+<tr><td><strong>Plant constraints</strong></td><td><code>plant_code</code>, <code>material_code</code>, <code>min_stock_qty</code>, <code>reorder_level</code>, <code>max_stock_qty</code>, <code>max_storage_capacity</code>, <code>lead_time_buckets</code>, <code>moq</code>, <code>order_multiple</code></td><td>Site-specific policy override per material. The importer requires all named headers; empty optional numeric values are treated as null. The current calculation uses min stock, max storage/max stock, lead time, and MOQ as applicable; order multiple is stored but not currently applied by the Node forward calculation.</td></tr>
+<tr><td><strong>Bill of materials</strong></td><td><code>plant_code</code>, <code>fg_code</code>, <code>component_material_code</code>, <code>quantity_per_fg</code></td><td>Site/product/component and quantity of component needed for one product unit. Extra UOM/source columns in the sample are ignored. Quantities and UOMs must be consistent; the importer does not convert units.</td></tr>
+<tr><td><strong>Inventory &amp; stock</strong></td><td><code>plant_code</code>, <code>material_code</code>, <code>on_hand_qty</code>, <code>reserved_qty</code>, <code>in_transit_qty</code>, <code>in_transit_due_date</code>, <code>scheduled_receipts_qty</code></td><td>Site/item balance; reserved quantity; inbound transit amount/date; near-term scheduled receipt quantity. Date may be blank in current code; undated positive transit is allocated to the first planning bucket. A placeholder date on a zero transit amount does not create a receipt.</td></tr>
+<tr><td><strong>Weekly demand forecast</strong></td><td><code>plant_code</code>, <code>fg_code</code>, <code>bucket_date</code>, <code>bucket_type</code>, <code>forecast_qty</code></td><td>Site/product, period start, bucket type (<code>Weekly</code> only), and forecast quantity. Current importer requires the date to be a Sunday and the product to already exist.</td></tr>
+</tbody></table>
+<p>Sample CSVs also include explanatory columns such as <code>validation_case</code>, <code>source_months</code>, <code>source_file</code>, and mapping notes. These are for traceability; unless listed as required above, the importer ignores them.</p>
+<h3>7.2 Recommended upload order</h3>
+<ol>
+<li>Plant master.</li>
+<li>Material master.</li>
+<li>Finished goods.</li>
+<li>Plant constraints (where approved values exist).</li>
+<li>Bill of materials.</li>
+<li>Inventory &amp; stock.</li>
+<li>Weekly demand forecast.</li>
+</ol>
+<p>Upload success means the file passed the import validation and the database transaction completed. It does not confirm that business values, units, or planning assumptions are correct.</p>
+<h2>8. Exact calculation behavior in the current Node MRP engine</h2>
+<p>For each selected plant and material, the engine starts from on-hand stock and walks buckets in date order.</p>
+<h3>8.1 Gross material requirement</h3>
+<p>For each forecasted finished good and component in its BOM:</p>
+<pre><code>
+component gross demand = finished-good forecast &#215; BOM ratio &#215; (1 + component scrap fraction)
+</code></pre>
+<p>Requirements for the same component/bucket are added together. The engine can recursively create component requirements from a make material&#39;s BOM when that make material itself has a planned order.</p>
+<h3>8.2 Available balance, net need, order, projected stock</h3>
+<p>Current Node engine logic is:</p>
+<pre><code>
+starting projected stock = on_hand_qty
+scheduled supply in bucket = scheduled receipts + dated/undated in-transit allocation
+stock before planned order = prior projected stock + scheduled supply − gross requirement
+net requirement = max(0, safety minimum − stock before planned order)
+planned order = 0 if net requirement is 0; otherwise max(net requirement, MOQ)
+projected inventory = stock before planned order + planned order
+</code></pre>
+<p>Important details when interpreting this formula:</p>
+<ul>
+<li>The calculation follows the training-template rule and does <strong>not</strong> subtract <code>reserved_qty</code>, despite the Inventory page displaying an available-stock number that does subtract reservations.</li>
+<li>A zero-dated <code>in_transit_qty</code> amount has no effect. A positive amount with no due date is counted in the first planning bucket. A positive dated amount is assigned to the matching planning bucket if that bucket falls within the horizon.</li>
+<li>The inventory upload field <code>scheduled_receipts_qty</code> is loaded as near-term scheduled receipts and included in W0 / the first period.</li>
+<li>The current Node calculation applies MOQ but does <strong>not</strong> round up to <code>order_multiple</code> and does <strong>not</strong> cap the order at maximum stock/capacity. The database stores order multiples and several maximum fields, but stored data does not mean a rule is active in this calculation.</li>
+<li>Reserved quantities and reorder levels are similarly not inputs to this forward calculation. This is a known distinction between operational display/schema fields and the active training-template calculation.</li>
+<li>Material UOMs are not automatically converted. A BOM ratio in tonnes against a product forecast in kilograms will produce a wrong requirement unless the source data expresses compatible units.</li>
+</ul>
+<h3>8.3 Lead time and Expedite</h3>
+<p>Lead time is configured in <strong>buckets</strong>, not supplier calendar days, in this forward engine. To calculate a release date, the engine shifts from the order&#39;s need bucket earlier by its lead-time bucket count. If the resulting release date is on or before the first planning bucket date, the row receives <code>Expedite</code> / an expedite alert. This does not check today&#39;s live date, supplier confirmation, or purchase-order status.</p>
+<h3>8.4 Capacity check</h3>
+<p>The projected quantity is compared against the selected capacity setting (plant-material max storage capacity, max stock, inventory override, or material default according to available values). If projected quantity is greater, the bucket is marked capacity exceeded. No automatic order reduction or rescheduling is performed to fix it.</p>
+<h3>8.5 Screenshot example</h3>
+<p>In the prior screenshot, <code>P_AGR &#183; PK-BAG-45</code> shows 60,000 on hand, minimum 50,000, W0 projected stock 79,993, and a 30,000 order. If W0 receipts are zero, this implies about 10,007 gross demand:</p>
+<pre><code>
+60,000 − 10,007 + 30,000 = 79,993
+</code></pre>
+<p>Before ordering, stock would be 49,993, which is 7 below the 50,000 minimum. An MOQ of 30,000 makes the planned order 30,000, not 7. Expand the row to see the exact gross requirement, receipts, net requirement, and release date rather than relying on the inferred reconstruction.</p>
+<h2>9. How to conduct and verify a planning run</h2>
+<h3>Before running</h3>
+<ul>
+<li>Confirm that the approved forecast version, period, and plant scope are known.</li>
+<li>Verify that all referenced plant, product, and material codes exist and are active.</li>
+<li>Check BOM coverage and units for all forecasted products.</li>
+<li>Check opening stock, reserved values, transit amounts/dates, and near-term scheduled receipts.</li>
+<li>Confirm safety minimum, MOQ, lead-time buckets, and capacity with the business owner.</li>
+</ul>
+<h3>Run</h3>
+<ol>
+<li>Open <strong>Dashboard</strong>.</li>
+<li>Select country and plant(s).</li>
+<li>Select product type/product and material filters if the run should be restricted.</li>
+<li>Select a supported 3-, 6-, or 12-month horizon, Weekly or Monthly bucket, and start date.</li>
+<li>Select <strong>Run MRP</strong> and wait for the response.</li>
+<li>Review totals and material matrix. For orders, expedite markers, large quantities, or capacity flags, expand the material row.</li>
+<li>Open <strong>Material Requirement</strong> to review saved result rows and filters.</li>
+<li>Record the run scope/date and the forecast/source file version used when sharing results.</li>
+</ol>
+<h3>What demonstrates that it worked</h3>
+<ul>
+<li>CSV upload produces a success notification with imported row count.</li>
+<li>Dashboard selectors populate with database countries, active plants, products, and materials.</li>
+<li>MRP returns buckets and material rows for selected forecast/BOMs.</li>
+<li>The run is saved in <code>mrp.mrp_runs</code>; result bucket rows are saved in <code>mrp.mrp_results</code>.</li>
+<li>Material Requirement can read saved rows from the latest run.</li>
+<li>One hand-check reconciles: gross demand, scheduled receipts, stock before order, minimum, MOQ, projected stock, and release date.</li>
+</ul>
+<p>An empty result can be caused by no forecast within the selected date window, no active BOM, product/plant mismatch, or filters excluding the expected records. An upload notification alone does not prove a later run used the intended dates or selected plants.</p>
+<h2>10. Scenario analysis</h2>
+<p>The Dashboard&#39;s <strong>Scenario inputs</strong> lets a planner override one selected product&#39;s forecast for one bucket and/or one material&#39;s starting on-hand quantity. When recalculated:</p>
+<ul>
+<li>the changed values affect that calculation only;</li>
+<li>the master forecast and inventory rows are not overwritten;</li>
+<li>scenario input details are recorded with the MRP run;</li>
+<li>the resulting run/result rows are still saved for history.</li>
+</ul>
+<p>Use a scenario to answer a narrow “what if” question, such as “What if the first-week product forecast is 10% higher?” or “What if actual stock is 5,000 lower?” Return to approved input data for the official baseline run.</p>
+<h2>11. Data storage and API overview</h2>
+<h3>Main database objects</h3>
+<table><thead><tr>
+<th>Table</th>
+<th>Business content</th>
+</tr></thead><tbody>
+<tr><td><code>mrp.countries</code></td><td>Country code/name and reporting currency.</td></tr>
+<tr><td><code>mrp.plants</code></td><td>Plant/site identity and country.</td></tr>
+<tr><td><code>mrp.material_master</code></td><td>Material descriptions, category, UOM, cost, scrap, lead-time/MOQ/order multiple, safety minimum, and capacity defaults.</td></tr>
+<tr><td><code>mrp.fg_master</code></td><td>Finished goods by plant, type, UOM, active state.</td></tr>
+<tr><td><code>mrp.bom_matrix</code></td><td>Plant-specific finished-good or make-material component relationships and ratios.</td></tr>
+<tr><td><code>mrp.demand_forecast</code></td><td>Forecast rows keyed by plant, product, and bucket date.</td></tr>
+<tr><td><code>mrp.inventory_on_hand</code></td><td>Opening balance, near-term scheduled receipts, reserved/transit stock, due date, and stock overrides.</td></tr>
+<tr><td><code>mrp.scheduled_receipts</code></td><td>Separately dated inbound receipt quantities.</td></tr>
+<tr><td><code>mrp.plant_material_constraints</code></td><td>Site-specific planning overrides.</td></tr>
+<tr><td><code>mrp.mrp_runs</code></td><td>Calculation metadata, scope, scenario values, and timestamp.</td></tr>
+<tr><td><code>mrp.mrp_results</code></td><td>Per-run plant/material/bucket requirement, receipts, planned orders, projected stock, release and flags.</td></tr>
+</tbody></table>
+<p>The repository also contains an earlier/legacy set of <code>dim_*</code> and <code>fact_*</code> tables and routines in <code>database/schema.sql</code>. The newer forward calculation uses the additive forward model under <code>mrp</code> described above. There are legacy API fallback paths; the forward Dashboard is the primary planning workflow described here.</p>
+<h3>Main API endpoints</h3>
+<table><thead><tr>
+<th>Endpoint</th>
+<th>Purpose</th>
+</tr></thead><tbody>
+<tr><td><code>GET /api/health</code></td><td>Basic service/database health response.</td></tr>
+<tr><td><code>POST /api/import/csv</code></td><td>Parse, validate, and transactionally import one supported CSV dataset.</td></tr>
+<tr><td><code>GET /api/mrp/options</code></td><td>Returns countries, active plants, finished goods, and materials for dashboard selectors.</td></tr>
+<tr><td><code>POST /api/mrp/run</code></td><td>Calculates, stores, and returns a forward MRP run.</td></tr>
+<tr><td><code>GET /api/mrp/runs/:runId</code></td><td>Returns stored run metadata and its calculated results.</td></tr>
+<tr><td><code>GET /api/material-requirements</code></td><td>Returns latest saved forward MRP requirements (legacy function fallback if there is no forward run).</td></tr>
+<tr><td><code>GET /api/inventory</code></td><td>Returns material/site stock view data.</td></tr>
+<tr><td><code>GET /api/suppliers</code></td><td>Reads supplier records from the legacy supplier table.</td></tr>
+</tbody></table>
+<h2>12. Hosting and deployment model</h2>
+<p>For the current demo setup:</p>
+<pre><code>
+Manager/planner browser
+       │ HTTPS
+       ▼
+Render web service (built React app + Express API, same origin)
+       │ PostgreSQL connection via DATABASE_URL
+       ▼
+Supabase PostgreSQL project
+</code></pre>
+<p>The frontend and API share one Render service. The browser sends <code>/api/...</code> requests to that same origin. Supabase hosts the PostgreSQL database. Render&#39;s service needs the <code>DATABASE_URL</code> secret set in its environment. Do not commit database passwords to source control or place them in CSV files.</p>
+<p>For step-by-step setup, credentials, migration order, and troubleshooting, see <a href="free_demo_deployment.md">Free demo deployment guide</a>. For the manager or product owner daily use process, see <a href="mrp_product_owner_guide.md">Product owner guide</a>.</p>
+<h2>13. Security, access, and data handling notes</h2>
+<ul>
+<li>Database access is made server-side through the Render API and <code>DATABASE_URL</code>.</li>
+<li>Current frontend profile/login visuals are not evidence of an integrated authentication or authorization system. Treat the demo URL as accessible to anyone who can reach it unless hosting access restrictions are separately configured.</li>
+<li>The Settings page&#39;s role/access controls are not connected to API authorization.</li>
+<li>Use synthetic or approved demo data for external demonstrations. Do not upload confidential company, customer, supplier, or employee data to an unapproved environment.</li>
+<li>A free demo host/database plan is not a production service-level, backup, disaster-recovery, or uptime commitment. Keep approved source files and database backups according to company policy.</li>
+</ul>
+<h2>14. Current limitations and business decisions still needed</h2>
+<p>This section is deliberate: a manager should know the boundary of the current tool before interpreting a number as a commitment.</p>
+<ol>
+<li><strong>Surrounding pages are not all live.</strong> Demand plan editing, purchase orders, production plans, report scheduling, settings, and most master-data catalog editing are UI demos. They do not form a complete connected ERP workflow.</li>
+<li><strong>No automatic procurement.</strong> Planned orders are recommendations; there is no supplier PO creation, approval, dispatch, acknowledgement, or receipt posting from the MRP result.</li>
+<li><strong>Order multiples are stored but not applied in Node MRP.</strong> Confirm whether the management template expects rounding to order multiples, then implement/validate that rule if required.</li>
+<li><strong>Maximum is an alert, not a hard order cap.</strong> Capacity exceedance is flagged; the engine does not automatically reduce or move orders.</li>
+<li><strong>Reserved stock differs by screen.</strong> Inventory display subtracts reserved stock for “Available Stock”; the forward formula uses on-hand and follows the workbook note to not subtract reserved quantities. Management should confirm which rule is authoritative for live planning.</li>
+<li><strong>Forecast UOM aggregation needs care.</strong> The dashboard summary labels forecast total as tons while database products carry units. Avoid summing unlike units until the display is made UOM-aware.</li>
+<li><strong>No automatic UOM conversion.</strong> BOM ratio, forecast, and inventory quantities must already be expressed in compatible units.</li>
+<li><strong>Inventory CSV is one balance row per plant/material.</strong> The upload handles on-hand and one in-transit due date per material row plus near-term receipt quantity. It does not upload an arbitrary list of multiple dated receipts; those use the separate scheduled-receipts table/API/database process.</li>
+<li><strong>Current country CSV import mapping is narrow.</strong> Importer currently maps <code>MAR</code> to Morocco/MAD; additional countries need a controlled code change or admin/data setup.</li>
+<li><strong>Weekly demand CSV only.</strong> The demand importer rejects monthly upload rows. The calculation engine itself supports weekly and monthly buckets when matching data exists.</li>
+<li><strong>Lead time uses bucket units.</strong> Confirm how days/weeks/months from source planning files map to <code>lead_time_buckets</code> for the chosen bucket mode.</li>
+<li><strong>Supplier master is not the forward lead-time source.</strong> Material or plant-material lead-time policy drives the forward calculation.</li>
+<li><strong>Demo/sample data is not business-approved by default.</strong> Some mappings and values in sample files are explicitly synthetic/inferred. They demonstrate workflow and should not be treated as purchase instructions.</li>
+<li><strong>No forecast-accuracy result without actuals.</strong> The schema can hold actual demand in an extension, but the portal currently does not provide an end-to-end actuals upload and forecast accuracy analysis workflow.</li>
+</ol>
+<h2>15. Management review checklist</h2>
+<p>Before approving a result for business use, the reviewer should be able to answer:</p>
+<ul>
+<li>Which forecast version and source was used?</li>
+<li>What country, plants, planning start, horizon, and bucket size were selected?</li>
+<li>Are product and component units compatible? Are BOM ratios correct and complete?</li>
+<li>Do opening stock and inbound receipts match the latest trusted snapshot?</li>
+<li>Should reserved quantities reduce MRP availability under the agreed business policy?</li>
+<li>Are minimum stock, MOQ, order multiple, lead time, and capacity approved for each site/material?</li>
+<li>Are large orders explained by gross demand, MOQ, or BOM/UOM setup?</li>
+<li>Are expedite release dates feasible with suppliers and calendar assumptions?</li>
+<li>Are there capacity warnings or missing forecast/BOM data?</li>
+<li>Has procurement separately approved and created any actual order?</li>
+<li>Is the environment and data appropriate for the intended decision (demo versus operations)?</li>
+</ul>
+<h2>16. Glossary</h2>
+<table><thead><tr>
+<th>Term</th>
+<th>Plain-language meaning</th>
+</tr></thead><tbody>
+<tr><td><strong>Available stock</strong></td><td>Physical on-hand stock less reserved quantity in the Inventory page display. The forward formula currently uses a different rule.</td></tr>
+<tr><td><strong>BOM (Bill of Materials)</strong></td><td>Recipe/list of component materials and quantities needed for one finished product or make material.</td></tr>
+<tr><td><strong>Bucket</strong></td><td>One time period in the plan, such as one week or one month.</td></tr>
+<tr><td><strong>Capacity</strong></td><td>Configured maximum material quantity for the capacity warning.</td></tr>
+<tr><td><strong>Expedite</strong></td><td>The order release date calculated from lead time is due on or before the first plan bucket.</td></tr>
+<tr><td><strong>Finished good (FG)</strong></td><td>Product that is forecasted and produced/sold.</td></tr>
+<tr><td><strong>Forecast</strong></td><td>Expected finished-good demand for a plant and time bucket.</td></tr>
+<tr><td><strong>Gross requirement</strong></td><td>Total component demand from forecast and BOM before stock is considered.</td></tr>
+<tr><td><strong>Intermediate / make material</strong></td><td>A component produced internally that can have its own BOM.</td></tr>
+<tr><td><strong>Lead time</strong></td><td>Number of planning buckets between releasing supply and needing it.</td></tr>
+<tr><td><strong>MOQ</strong></td><td>Minimum order quantity; the smallest suggested order quantity when replenishment is needed.</td></tr>
+<tr><td><strong>Net requirement</strong></td><td>Shortfall needed to restore stock to its minimum after demand and receipts.</td></tr>
+<tr><td><strong>On hand</strong></td><td>Starting physical inventory quantity recorded for the planning run.</td></tr>
+<tr><td><strong>Order multiple</strong></td><td>Desired lot-size increment (for example, order in multiples of 100); stored today but not used by the current Node forward calculation.</td></tr>
+<tr><td><strong>Planned order</strong></td><td>Suggested replenishment quantity generated by MRP. Not yet an approved/sent purchase order.</td></tr>
+<tr><td><strong>Projected inventory</strong></td><td>Calculated expected end-of-bucket stock after demand, receipts, and planned order.</td></tr>
+<tr><td><strong>Receipt / scheduled receipt</strong></td><td>Supply expected to arrive and increase available material in a future bucket.</td></tr>
+<tr><td><strong>Safety stock / minimum stock</strong></td><td>Minimum balance the plan aims to retain after meeting demand.</td></tr>
+<tr><td><strong>Scrap</strong></td><td>Allowance for material loss during production, entered as a decimal fraction in material master.</td></tr>
+<tr><td><strong>UOM</strong></td><td>Unit of measure, such as each, kg, or tonne.</td></tr>
+</tbody></table>
+<h2>17. Supporting documents</h2>
+<ul>
+<li><a href="mrp_product_owner_guide.md">Product owner operating guide</a> — file upload sequence and how to run/check a forecast.</li>
+<li><a href="time_phased_material_plan_guide.md">Time-phased material plan guide</a> — illustrated explanation of the dashboard matrix and the prior screenshot example.</li>
+<li><a href="free_demo_deployment.md">Free demo deployment guide</a> — Supabase and Render setup.</li>
+<li><a href="../README.md">README</a> — developer setup and database notes.</li>
+</ul>
+</body></html>

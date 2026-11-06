@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="1754" viewBox="0 0 1240 1754">
+  <defs>
+    <style>
+      .bg{fill:#f3f6fa}.card{fill:#fff;stroke:#dce5ef;stroke-width:2}.navy{fill:#17365d}.ink{fill:#24364b}.muted{fill:#60758f}.blue{fill:#1675e8}.red{fill:#e84f45}.green{fill:#149b76}.line{stroke:#9ab0c8;stroke-width:2;fill:none}.title{font:700 40px Arial,sans-serif}.head{font:700 23px Arial,sans-serif}.body{font:18px Arial,sans-serif}.small{font:15px Arial,sans-serif}.tiny{font:13px Arial,sans-serif}.bold{font-weight:700}
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#9ab0c8"/></marker>
+  </defs>
+  <rect class="bg" width="1240" height="1754"/>
+  <rect class="navy" x="0" y="0" width="1240" height="220"/>
+  <text x="74" y="80" fill="#b8d6ff" class="small bold">PRODUCT OWNER QUICK GUIDE</text>
+  <text x="74" y="137" fill="#fff" class="title">Time-Phased Material Plan</text>
+  <text x="74" y="180" fill="#e3edf8" class="body">How to read projected stock, recommended orders, and expedite flags</text>
+
+  <rect class="card" x="60" y="255" width="1120" height="390" rx="18"/>
+  <text x="92" y="300" class="head ink">A weekly row, explained</text>
+  <text x="92" y="333" class="small muted">One row represents one material at one plant. Values use that material's unit of measure.</text>
+  <rect x="92" y="370" width="1056" height="190" rx="10" fill="#f7f9fc" stroke="#dce5ef"/>
+  <text x="114" y="405" class="small muted bold">Plant</text><text x="245" y="405" class="small muted bold">Material</text><text x="428" y="405" class="small muted bold">On Hand</text><text x="565" y="405" class="small muted bold">Min / Max</text><text x="750" y="405" class="small muted bold">W0 · 1 Nov</text><text x="920" y="405" class="small muted bold">W+1 · 8 Nov</text>
+  <line x1="108" y1="422" x2="1130" y2="422" stroke="#dce5ef"/>
+  <text x="114" y="466" class="body ink">P_AGR</text><text x="245" y="466" class="body blue bold">PK-BAG-45</text><text x="428" y="466" class="body ink">60,000</text><text x="565" y="466" class="body ink">50,000 / 600,000</text>
+  <rect x="730" y="433" width="160" height="105" rx="8" fill="#fff" stroke="#ef625a" stroke-width="3"/>
+  <text x="750" y="466" class="body navy bold">79,993</text><text x="750" y="493" class="small blue">+30,000 order</text><text x="750" y="519" class="small red">Expedite</text>
+  <text x="920" y="466" class="body navy bold">69,985</text><text x="920" y="493" class="small blue">+ order if shown</text>
+  <path d="M810 540 C810 590,250 578,250 620" class="line" marker-end="url(#arrow)"/>
+  <path d="M830 491 C830 585,590 575,590 620" class="line" marker-end="url(#arrow)"/>
+  <path d="M840 518 C840 585,945 580,945 620" class="line" marker-end="url(#arrow)"/>
+  <text x="92" y="614" class="small ink"><tspan class="bold">Bold:</tspan> projected stock at bucket end</text>
+  <text x="442" y="614" class="small ink"><tspan class="bold blue">Blue:</tspan> recommended order quantity</text>
+  <text x="824" y="614" class="small ink"><tspan class="bold red">Red:</tspan> release due by horizon start</text>
+
+  <rect class="card" x="60" y="680" width="540" height="370" rx="18"/>
+  <text x="92" y="727" class="head ink">What the labels mean</text>
+  <circle cx="108" cy="782" r="8" fill="#17365d"/><text x="132" y="789" class="body ink bold">Projected stock</text>
+  <text x="132" y="819" class="small muted">Expected remaining stock after demand, receipts,</text><text x="132" y="843" class="small muted">and the recommended order are included.</text>
+  <circle cx="108" cy="883" r="8" fill="#1675e8"/><text x="132" y="890" class="body ink bold">+N order</text>
+  <text x="132" y="920" class="small muted">Planned supply in this bucket. It is already included</text><text x="132" y="944" class="small muted">in projected stock; do not add it a second time.</text>
+  <circle cx="108" cy="984" r="8" fill="#e84f45"/><text x="132" y="991" class="body ink bold">Expedite / Capacity</text>
+  <text x="132" y="1021" class="small muted">Expedite: release date is on/before W0. Capacity:</text><text x="132" y="1043" class="small muted">projected stock is above the configured maximum.</text>
+
+  <rect class="card" x="630" y="680" width="550" height="370" rx="18"/>
+  <text x="662" y="727" class="head ink">PK-BAG-45 · W0 example</text>
+  <text x="662" y="773" class="body ink">Opening stock</text><text x="1098" y="773" text-anchor="end" class="body ink bold">60,000</text>
+  <text x="662" y="812" class="body ink">Gross demand (inferred)</text><text x="1098" y="812" text-anchor="end" class="body ink bold">−10,007</text>
+  <text x="662" y="851" class="body ink">Recommended order</text><text x="1098" y="851" text-anchor="end" class="body blue bold">+30,000</text>
+  <line x1="662" y1="873" x2="1140" y2="873" stroke="#dce5ef"/>
+  <text x="662" y="911" class="body ink bold">Projected stock</text><text x="1098" y="911" text-anchor="end" class="body navy bold">79,993</text>
+  <rect x="662" y="940" width="478" height="77" rx="10" fill="#fff3e9"/>
+  <text x="680" y="970" class="small ink">Before the order, stock is 49,993: 7 below the</text><text x="680" y="995" class="small ink">50,000 minimum. MOQ is 30,000, so order quantity</text><text x="680" y="1020" class="small ink">is 30,000. Screenshot values imply no W0 receipts.</text>
+
+  <rect class="card" x="60" y="1085" width="1120" height="390" rx="18"/>
+  <text x="92" y="1132" class="head ink">Calculation flow</text>
+  <rect x="92" y="1170" width="240" height="105" rx="12" fill="#edf4ff" stroke="#bed4f5"/><text x="212" y="1210" text-anchor="middle" class="small blue bold">1 · DEMAND</text><text x="212" y="1240" text-anchor="middle" class="small ink">Forecast × BOM usage</text><text x="212" y="1262" text-anchor="middle" class="small ink">with configured scrap</text>
+  <path d="M338 1222 H380" class="line" marker-end="url(#arrow)"/>
+  <rect x="390" y="1170" width="240" height="105" rx="12" fill="#edf8f5" stroke="#b7e2d5"/><text x="510" y="1210" text-anchor="middle" class="small green bold">2 · AVAILABLE STOCK</text><text x="510" y="1240" text-anchor="middle" class="small ink">Opening/projected stock</text><text x="510" y="1262" text-anchor="middle" class="small ink">+ scheduled receipts − demand</text>
+  <path d="M636 1222 H678" class="line" marker-end="url(#arrow)"/>
+  <rect x="688" y="1170" width="220" height="105" rx="12" fill="#fff7e8" stroke="#f1d49a"/><text x="798" y="1210" text-anchor="middle" class="small ink bold">3 · NET NEED</text><text x="798" y="1240" text-anchor="middle" class="small ink">max(0, minimum</text><text x="798" y="1262" text-anchor="middle" class="small ink">stock − available stock)</text>
+  <path d="M914 1222 H956" class="line" marker-end="url(#arrow)"/>
+  <rect x="966" y="1170" width="180" height="105" rx="12" fill="#fff0ef" stroke="#f1b8b4"/><text x="1056" y="1210" text-anchor="middle" class="small red bold">4 · ORDER</text><text x="1056" y="1240" text-anchor="middle" class="small ink">max(net need,</text><text x="1056" y="1262" text-anchor="middle" class="small ink">MOQ)</text>
+  <text x="92" y="1330" class="body ink bold">Then:</text><text x="160" y="1330" class="body ink">Projected stock = available stock + planned order. Lead time shifts the order release earlier.</text>
+  <text x="92" y="1383" class="small muted">Current implementation applies MOQ but does not round to order multiples or cap the order at Max.</text>
+  <text x="92" y="1410" class="small muted">Expand a material to inspect Gross Requirements, Scheduled Receipts, Net Requirements,</text><text x="92" y="1434" class="small muted">Projected Inventory, and Planned Order Release. This is a recommendation, not a created PO.</text>
+
+  <rect x="60" y="1510" width="1120" height="170" rx="18" fill="#17365d"/>
+  <text x="92" y="1558" fill="#fff" class="head">When a number looks surprising</text>
+  <text x="92" y="1595" fill="#e3edf8" class="small">Check gross demand and BOM units, uploaded on-hand and dated receipts, then minimum stock, MOQ,</text>
+  <text x="92" y="1622" fill="#e3edf8" class="small">lead time, scrap, and capacity settings. Demo data is illustrative; validate with approved inputs before</text>
+  <text x="92" y="1649" fill="#e3edf8" class="small">making procurement decisions. See time_phased_material_plan_guide.md for the full explanation.</text>
+  <text x="60" y="1720" class="tiny muted">MRP Product Owner Guide · Planning values use the configured material unit of measure.</text>
+</svg>
