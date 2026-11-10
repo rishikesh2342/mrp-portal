@@ -37,6 +37,12 @@ const guides: { section: string; items: Guide[] }[] = [
         href: '/project-docs/docs/demand_workbook_integration.md',
         format: 'Markdown',
       },
+      {
+        title: 'New tenant validation guide',
+        description: 'Create an isolated tenant, upload the matching sample masters and stock, import three 12-month scenarios, and validate Dashboard output.',
+        href: '/project-docs/docs/tenant_validation_guide.md',
+        format: 'Markdown',
+      },
     ],
   },
   {

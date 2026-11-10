@@ -1,0 +1,4 @@
+"plant_code","fg_code","description","product_type","uom","active_flag"
+"P_VAL","FG-CEM-BULK","Cement bulk","Bulk","ton","true"
+"P_VAL","FG-CEM-50","Cement bag 50 kg","Bagged","ton","true"
+"P_VAL","FG-CEM-45","Cement bag 45 kg","Bagged","ton","true"

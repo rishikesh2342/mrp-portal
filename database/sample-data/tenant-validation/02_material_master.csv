@@ -1,0 +1,6 @@
+"material_code","description","category","supply_type","uom","unit_cost","scrap_pct","lead_time_buckets","moq","order_multiple","safety_stock_min","max_capacity"
+"RM-CLINKER","Cement clinker","Raw","BUY","ton","720","0.01","2","200","50","900","10000"
+"RM-GYPSUM","Gypsum","Raw","BUY","ton","290","0.01","1","100","25","250","5000"
+"RM-LIMESTONE","Limestone filler","Raw","BUY","ton","125","0.01","1","100","25","300","5000"
+"PK-BAG-50","Cement bag 50 kg","Packing","BUY","each","1.85","0.02","2","5000","1000","12000","150000"
+"PK-BAG-45","Cement bag 45 kg","Packing","BUY","each","1.65","0.02","2","5000","1000","10000","120000"

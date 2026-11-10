@@ -121,7 +121,7 @@ export default function DashboardPage({ onNotify }: PageProps) {
   const [fgCodes, setFgCodes] = useState<string[]>([]);
   const [materialCategories, setMaterialCategories] = useState<string[]>([]);
   const [materialCodes, setMaterialCodes] = useState<string[]>([]);
-  const [horizonMonths, setHorizonMonths] = useState(3);
+  const [horizonMonths, setHorizonMonths] = useState(12);
   const [bucketType, setBucketType] = useState<"Monthly" | "Weekly">("Monthly");
   const [planningStart, setPlanningStart] = useState(defaultDate);
   const [output, setOutput] = useState<MRPOutput | null>(null);
@@ -169,8 +169,17 @@ export default function DashboardPage({ onNotify }: PageProps) {
       .catch((reason: Error) => setError(reason.message));
   }, []);
 
-  const refreshDemandScenarios = () => fetch("/api/demand/scenarios").then((r) => r.ok ? r.json() : []).then((rows: DemandScenario[]) => { setDemandScenarios(rows); return rows; });
-  useEffect(() => { void refreshDemandScenarios(); }, []);
+  const refreshDemandScenarios = async () => {
+    const response = await fetch("/api/demand/scenarios");
+    const body = await response.json();
+    if (!response.ok) throw new Error(body.error || "Could not load saved scenarios for this tenant.");
+    const rows = body as DemandScenario[];
+    setDemandScenarios(rows);
+    return rows;
+  };
+  useEffect(() => {
+    void refreshDemandScenarios().catch((reason: Error) => setError(reason.message));
+  }, []);
   useEffect(() => {
     if (!demandScenarioId) { setScenarioDimensions([]); setDimensionFilters({}); return; }
     fetch(`/api/demand/scenarios/${demandScenarioId}/dimensions`).then((r) => r.json()).then((rows: ScenarioDimension[]) => { setScenarioDimensions(rows); setDimensionFilters({}); });
@@ -492,7 +501,8 @@ export default function DashboardPage({ onNotify }: PageProps) {
             })}
           </select>
           <small className="filter-help">
-            Each upload is saved as a separate version. Choose the version to use for this MRP run; earlier imports remain available.
+            {demandScenarios.length} saved workbook scenario{demandScenarios.length === 1 ? "" : "s"}. Each upload is retained as a version. {demandScenarios.length === 0 ? "Import a workbook from Demand Planning, then refresh this list." : "Choose the version for this MRP run."} {" "}
+            <button type="button" className="button-link" onClick={() => void refreshDemandScenarios().catch((reason: Error) => setError(reason.message))}>Refresh list</button>
           </small>
         </label>
         {demandScenarioId && <label>Demand aggregation<select value={demandAggregation} onChange={(e)=>setDemandAggregation(e.target.value)}><option value="ship_to">Ship To detail</option><option value="sold_to">Sold To</option><option value="product">Product total</option></select><small className="filter-help">Select one hierarchy level to prevent summing parent and child totals together.</small></label>}

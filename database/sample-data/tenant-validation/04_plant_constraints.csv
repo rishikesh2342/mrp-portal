@@ -1,0 +1,6 @@
+"plant_code","material_code","min_stock_qty","reorder_level","max_stock_qty","max_storage_capacity","lead_time_buckets","moq","order_multiple","uom"
+"P_VAL","RM-CLINKER","900","1125","10000","10000","2","200","50","ton"
+"P_VAL","RM-GYPSUM","250","312.5","5000","5000","1","100","25","ton"
+"P_VAL","RM-LIMESTONE","300","375","5000","5000","1","100","25","ton"
+"P_VAL","PK-BAG-50","12000","15000","150000","150000","2","5000","1000","each"
+"P_VAL","PK-BAG-45","10000","12500","120000","120000","2","5000","1000","each"

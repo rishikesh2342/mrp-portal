@@ -1,0 +1,6 @@
+"plant_code","material_code","as_of_date","on_hand_qty","reserved_qty","in_transit_qty","in_transit_due_date","scheduled_receipts_qty","uom"
+"P_VAL","RM-CLINKER","2026-11-01","500","25","300","2026-12-15","0","ton"
+"P_VAL","RM-GYPSUM","2026-11-01","100","5","100","2027-01-10","0","ton"
+"P_VAL","RM-LIMESTONE","2026-11-01","150","10","0","","0","ton"
+"P_VAL","PK-BAG-50","2026-11-01","6000","200","4000","2026-12-01","0","each"
+"P_VAL","PK-BAG-45","2026-11-01","5000","100","3000","2027-01-01","0","each"
