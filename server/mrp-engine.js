@@ -164,12 +164,12 @@ export async function calculateForwardMrp(client, input) {
   if (demandScenarioId) {
     const scenarioResult = await client.query(
       `SELECT import_id, scenario_name, scenario_type, bucket_type
-       FROM ${schema}.demand_scenario_imports WHERE tenant_id=$1 AND import_id=$2 AND is_active`,
+       FROM ${schema}.demand_scenario_imports WHERE tenant_id=$1 AND import_id=$2`,
       [tenantId, demandScenarioId],
     );
     demandScenario = scenarioResult.rows[0] || null;
     if (!demandScenario)
-      throw new Error("The selected forecast scenario is not active. Reload the scenario list and select the latest version.");
+      throw new Error("The selected forecast scenario could not be found for this tenant. Reload the scenario list and select an available version.");
     if (["actual", "previous_year"].includes(demandScenario.scenario_type))
       throw new Error("Select a forecast scenario. Actuals and prior-year sheets are reference data.");
     if (demandScenario.bucket_type !== bucketType)

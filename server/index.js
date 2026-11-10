@@ -36,7 +36,7 @@ app.get("/api/demand/scenarios", async (_req, res, next) => {
         MIN(f.bucket_date) AS first_bucket, MAX(f.bucket_date) AS last_bucket
       FROM ${schema}.demand_scenario_imports i
       LEFT JOIN ${schema}.demand_scenario_forecasts f USING (import_id)
-      WHERE i.tenant_id=$1 AND i.is_active
+      WHERE i.tenant_id=$1
       GROUP BY i.import_id
       ORDER BY i.imported_at DESC, i.scenario_name
     `, [(_req).tenant.tenant_id]);

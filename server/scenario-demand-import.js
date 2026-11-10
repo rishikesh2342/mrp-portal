@@ -90,11 +90,8 @@ export async function importDemandScenario(pool, input, tenantId, schemaName) {
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
-    await client.query(
-      `UPDATE ${schema}.demand_scenario_imports SET is_active=false
-       WHERE tenant_id=$1 AND is_active=true AND scenario_name=$2 AND source_sheet=$3 AND scenario_type=$4`,
-      [tenantId, scenarioName, sourceSheet, scenarioType],
-    );
+    // Each workbook upload is an immutable scenario version. Keep earlier
+    // imports so planners can compare and rerun any uploaded version.
     const importResult = await client.query(
       `INSERT INTO ${schema}.demand_scenario_imports
        (tenant_id, file_name, source_sheet, scenario_name, scenario_type, bucket_type, date_format, imported_rows, import_metadata)

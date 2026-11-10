@@ -80,7 +80,7 @@ type MRPOutput = {
   >;
   results: MRPRow[];
 };
-type DemandScenario = { import_id: string; scenario_name: string; scenario_type: string; bucket_type: "Monthly" | "Weekly"; imported_at: string; imported_rows: number };
+type DemandScenario = { import_id: string; file_name: string; source_sheet: string; scenario_name: string; scenario_type: string; bucket_type: "Monthly" | "Weekly"; imported_at: string; imported_rows: number; first_bucket?: string | null; last_bucket?: string | null };
 type ScenarioDimension = { dimension_key: string; values: { value: string; rows: number }[] };
 type Options = {
   countries: Country[];
@@ -169,7 +169,7 @@ export default function DashboardPage({ onNotify }: PageProps) {
       .catch((reason: Error) => setError(reason.message));
   }, []);
 
-  const refreshDemandScenarios = () => fetch("/api/demand/scenarios").then((r) => r.ok ? r.json() : []).then((rows: DemandScenario[]) => setDemandScenarios(rows));
+  const refreshDemandScenarios = () => fetch("/api/demand/scenarios").then((r) => r.ok ? r.json() : []).then((rows: DemandScenario[]) => { setDemandScenarios(rows); return rows; });
   useEffect(() => { void refreshDemandScenarios(); }, []);
   useEffect(() => {
     if (!demandScenarioId) { setScenarioDimensions([]); setDimensionFilters({}); return; }
@@ -468,7 +468,33 @@ export default function DashboardPage({ onNotify }: PageProps) {
       </header>
 
       <section className="forward-filters" aria-label="MRP planning filters">
-        <label>Demand scenario<select value={demandScenarioId} onChange={(e) => { const id=e.target.value; setDemandScenarioId(id); const selected=demandScenarios.find((s)=>s.import_id===id); if (selected) setBucketType(selected.bucket_type); }}><option value="">Existing demand forecast</option>{demandScenarios.map((s)=><option key={s.import_id} value={s.import_id} disabled={["actual","previous_year"].includes(s.scenario_type)}>{s.scenario_name} · {s.scenario_type.replace(/_/g," ")}{["actual","previous_year"].includes(s.scenario_type) ? " (reference only)" : ""}</option>)}</select><small className="filter-help">One forecast scenario is used per MRP run.</small></label>
+        <label>
+          Demand scenario
+          <select
+            value={demandScenarioId}
+            onChange={(event) => {
+              const id = event.target.value;
+              setDemandScenarioId(id);
+              const selected = demandScenarios.find((row) => row.import_id === id);
+              if (selected) setBucketType(selected.bucket_type);
+            }}
+          >
+            <option value="">Existing demand forecast</option>
+            {demandScenarios.map((row) => {
+              const referenceOnly = ["actual", "previous_year"].includes(row.scenario_type);
+              const importedAt = new Date(row.imported_at).toLocaleString();
+              return (
+                <option key={row.import_id} value={row.import_id} disabled={referenceOnly}>
+                  {row.scenario_name} · {row.scenario_type.replace(/_/g, " ")} · {row.bucket_type} · {row.source_sheet} · {importedAt}
+                  {referenceOnly ? " (reference only)" : ""}
+                </option>
+              );
+            })}
+          </select>
+          <small className="filter-help">
+            Each upload is saved as a separate version. Choose the version to use for this MRP run; earlier imports remain available.
+          </small>
+        </label>
         {demandScenarioId && <label>Demand aggregation<select value={demandAggregation} onChange={(e)=>setDemandAggregation(e.target.value)}><option value="ship_to">Ship To detail</option><option value="sold_to">Sold To</option><option value="product">Product total</option></select><small className="filter-help">Select one hierarchy level to prevent summing parent and child totals together.</small></label>}
         {demandScenarioId && scenarioDimensions.map((dimension)=><label key={dimension.dimension_key}>{dimension.dimension_key.replace(/_/g," ")}<select value={dimensionFilters[dimension.dimension_key] || ""} onChange={(e)=>setDimensionFilters({...dimensionFilters,[dimension.dimension_key]:e.target.value})}><option value="">All</option>{dimension.values.map((v)=><option key={v.value} value={v.value}>{v.value}</option>)}</select></label>)}
         <label>
