@@ -7,15 +7,18 @@ import { resolve } from "node:path";
 import { calculateForwardMrp } from "./mrp-engine.js";
 import { importCsv } from "./csv-import.js";
 import { importDemandScenario } from "./scenario-demand-import.js";
+import { bootstrapDefaultTenant, registerTenantAuth } from "./tenant-auth.js";
 
 const { Pool } = pg;
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const app = express();
 app.use(express.json({ limit: "32mb" }));
 
+registerTenantAuth(app, pool);
+
 app.post("/api/demand/scenario-import", async (req, res, next) => {
   try {
-    const result = await importDemandScenario(pool, req.body || {});
+    const result = await importDemandScenario(pool, req.body || {}, req.tenant.tenant_id);
     res.json(result);
   } catch (error) {
     if (error.code && !String(error.code).startsWith("23")) return next(error);
@@ -31,10 +34,10 @@ app.get("/api/demand/scenarios", async (_req, res, next) => {
         MIN(f.bucket_date) AS first_bucket, MAX(f.bucket_date) AS last_bucket
       FROM mrp.demand_scenario_imports i
       LEFT JOIN mrp.demand_scenario_forecasts f USING (import_id)
-      WHERE i.is_active
+      WHERE i.tenant_id=$1 AND i.is_active
       GROUP BY i.import_id
       ORDER BY i.imported_at DESC, i.scenario_name
-    `);
+    `, [(_req).tenant.tenant_id]);
     res.json(rows);
   } catch (error) {
     next(error);
@@ -48,7 +51,7 @@ app.get("/api/demand/scenarios/:importId/dimensions", async (req, res, next) => 
         SELECT d.key AS dimension_key, d.value AS dimension_value, COUNT(*)::int AS row_count
         FROM mrp.demand_scenario_forecasts f
         CROSS JOIN LATERAL jsonb_each_text(f.dimensions) d
-        WHERE f.import_id=$1
+        WHERE f.tenant_id=$1 AND f.import_id=$2
         GROUP BY d.key, d.value
       ), ranked AS (
         SELECT *, ROW_NUMBER() OVER (PARTITION BY dimension_key ORDER BY row_count DESC, dimension_value) AS rank
@@ -58,7 +61,7 @@ app.get("/api/demand/scenarios/:importId/dimensions", async (req, res, next) => 
                ORDER BY row_count DESC,dimension_value) AS values
       FROM ranked WHERE rank <= 1000
       GROUP BY dimension_key ORDER BY dimension_key
-    `, [req.params.importId]);
+    `, [req.tenant.tenant_id, req.params.importId]);
     res.json(rows);
   } catch (error) {
     next(error);
@@ -67,7 +70,7 @@ app.get("/api/demand/scenarios/:importId/dimensions", async (req, res, next) => 
 
 app.post("/api/import/csv", async (req, res, next) => {
   try {
-    const result = await importCsv(pool, req.body || {});
+    const result = await importCsv(pool, { ...(req.body || {}), tenantId: req.tenant.tenant_id });
     res.json(result);
   } catch (error) {
     if (error.code && !String(error.code).startsWith("23")) return next(error);
@@ -87,8 +90,13 @@ app.get("/api/health", async (_req, res) => {
 app.get("/api/dashboard", async (req, res, next) => {
   try {
     const { rows } = await pool.query(
-      "SELECT * FROM mrp.fn_get_dashboard_summary($1, $2)",
-      [req.query.plantId || null, req.query.period || null],
+      `SELECT COUNT(DISTINCT p.plant_code)::int AS active_plants,
+        COUNT(DISTINCT i.material_code)::int AS inventory_materials,
+        COALESCE(SUM(i.on_hand_qty),0) AS total_on_hand
+       FROM mrp.plants p LEFT JOIN mrp.inventory_on_hand i
+         ON i.tenant_id=p.tenant_id AND i.plant_code=p.plant_code
+       WHERE p.tenant_id=$1 AND p.active_flag AND ($2::varchar IS NULL OR p.plant_code=$2)`,
+      [req.tenant.tenant_id, req.query.plantId || null],
     );
     res.json(rows[0] ?? {});
   } catch (error) {
@@ -116,12 +124,12 @@ app.get("/api/material-requirements", async (req, res, next) => {
     const [forwardRun, forward] = await Promise.all([
       pool.query(`SELECT EXISTS (
         SELECT 1 FROM mrp.mrp_runs r
-        WHERE EXISTS (SELECT 1 FROM mrp.mrp_results x WHERE x.run_id=r.run_id)
-      ) AS has_run`),
+        WHERE r.tenant_id=$1 AND EXISTS (SELECT 1 FROM mrp.mrp_results x WHERE x.tenant_id=$1 AND x.run_id=r.run_id)
+      ) AS has_run`, [req.tenant.tenant_id]),
       pool.query(
       `WITH latest_run AS (
          SELECT run_id FROM mrp.mrp_runs
-         WHERE EXISTS (SELECT 1 FROM mrp.mrp_results r WHERE r.run_id=mrp_runs.run_id)
+         WHERE tenant_id=$8 AND EXISTS (SELECT 1 FROM mrp.mrp_results r WHERE r.tenant_id=$8 AND r.run_id=mrp_runs.run_id)
          ORDER BY created_at DESC LIMIT 1
        ), requirement_rows AS (
          SELECT r.result_id AS requirement_id, r.run_id::text AS mrp_run_code,
@@ -130,7 +138,7 @@ app.get("/api/material-requirements", async (req, res, next) => {
            COALESCE((
              SELECT string_agg(DISTINCT b.parent_fg_code, ', ' ORDER BY b.parent_fg_code)
              FROM mrp.bom_matrix b
-             WHERE b.plant_code=r.plant_code AND b.material_code=r.material_code
+             WHERE b.tenant_id=$8 AND b.plant_code=r.plant_code AND b.material_code=r.material_code
                AND b.parent_fg_code IS NOT NULL AND b.active_flag
            ), 'N/A') AS product_code,
            r.gross_req AS required_qty,
@@ -143,9 +151,9 @@ app.get("/api/material-requirements", async (req, res, next) => {
            CASE WHEN r.planned_orders > 0 THEN 'Planned' ELSE 'Open' END AS status
          FROM mrp.mrp_results r
          JOIN latest_run lr ON lr.run_id=r.run_id
-         JOIN mrp.material_master m USING (material_code)
-         LEFT JOIN mrp.inventory_on_hand i ON i.plant_code=r.plant_code AND i.material_code=r.material_code
-         WHERE r.gross_req > 0 OR r.net_req > 0 OR r.planned_orders > 0
+         JOIN mrp.material_master m ON m.tenant_id=$8 AND m.material_code=r.material_code
+         LEFT JOIN mrp.inventory_on_hand i ON i.tenant_id=$8 AND i.plant_code=r.plant_code AND i.material_code=r.material_code
+         WHERE r.tenant_id=$8 AND (r.gross_req > 0 OR r.net_req > 0 OR r.planned_orders > 0)
        )
        SELECT * FROM requirement_rows
        WHERE ($1::varchar IS NULL OR status=$1)
@@ -155,26 +163,13 @@ app.get("/api/material-requirements", async (req, res, next) => {
          AND ($5::varchar IS NULL OR material_code=$5)
        ORDER BY period_date DESC, material_code
        LIMIT $6 OFFSET $7`,
-      filters,
+      [...filters, req.tenant.tenant_id],
       ),
     ]);
 
     if (forwardRun.rows[0].has_run) return res.json(forward.rows);
 
-    // Preserve support for data generated by the original MRP procedure.
-    const legacy = await pool.query(
-      "SELECT * FROM mrp.fn_get_material_requirements_grid($1,$2,$3,$4,$5,$6,$7)",
-      [
-        req.query.period ? `${req.query.period}-01` : null,
-        null,
-        null,
-        req.query.status || null,
-        req.query.priority || null,
-        limit,
-        offset,
-      ],
-    );
-    res.json(legacy.rows);
+    res.json([]);
   } catch (error) {
     next(error);
   }
@@ -193,11 +188,11 @@ app.get("/api/inventory", async (req, res, next) => {
         CASE WHEN COALESCE(i.on_hand_qty,0)=0 THEN 'Out of Stock'
              WHEN COALESCE(i.on_hand_qty,0)-COALESCE(i.reserved_qty,0)<COALESCE(c.min_stock_qty,i.safety_stock_min,m.safety_stock_min,0) THEN 'Low Stock' ELSE 'In Stock' END AS stock_status
       FROM mrp.material_master m CROSS JOIN mrp.plants p
-      LEFT JOIN mrp.inventory_on_hand i ON i.material_code=m.material_code AND i.plant_code=p.plant_code
-      LEFT JOIN mrp.plant_material_constraints c ON c.material_code=m.material_code AND c.plant_code=p.plant_code
-      WHERE m.active_flag=true AND p.active_flag=true AND ($1::varchar IS NULL OR p.plant_code=$1)
+      LEFT JOIN mrp.inventory_on_hand i ON i.tenant_id=$1 AND i.material_code=m.material_code AND i.plant_code=p.plant_code
+      LEFT JOIN mrp.plant_material_constraints c ON c.tenant_id=$1 AND c.material_code=m.material_code AND c.plant_code=p.plant_code
+      WHERE m.tenant_id=$1 AND p.tenant_id=$1 AND m.active_flag=true AND p.active_flag=true AND ($2::varchar IS NULL OR p.plant_code=$2)
       ORDER BY p.plant_code,m.material_code`,
-      [req.query.plantCode || null],
+      [req.tenant.tenant_id, req.query.plantCode || null],
     );
     res.json(rows);
   } catch (error) {
@@ -221,16 +216,18 @@ app.get("/api/suppliers", async (_req, res, next) => {
 app.get("/api/mrp/options", async (_req, res, next) => {
   try {
     const [countries, plants, finishedGoods, materials] = await Promise.all([
+      pool.query(`SELECT c.country_code, c.country_name, c.currency_code
+        FROM mrp.countries c
+        WHERE EXISTS (SELECT 1 FROM mrp.plants p
+          WHERE p.tenant_id=$1 AND p.country_code=c.country_code AND p.active_flag)
+        ORDER BY c.country_name`, [_req.tenant.tenant_id]),
       pool.query(
-        "SELECT country_code, country_name, currency_code FROM mrp.countries ORDER BY country_name",
-      ),
-      pool.query(
-        "SELECT plant_code, plant_name, country_code FROM mrp.plants WHERE active_flag ORDER BY plant_name",
+        "SELECT plant_code, plant_name, country_code FROM mrp.plants WHERE tenant_id=$1 AND active_flag ORDER BY plant_name", [_req.tenant.tenant_id],
       ),
       pool.query(`SELECT plant_code, fg_code, description, product_type, uom FROM mrp.fg_master
-        WHERE active_flag ORDER BY plant_code, fg_code`),
+        WHERE tenant_id=$1 AND active_flag ORDER BY plant_code, fg_code`, [_req.tenant.tenant_id]),
       pool.query(`SELECT material_code, description, category, uom, unit_cost, safety_stock_min, max_capacity
-        FROM mrp.material_master WHERE active_flag ORDER BY material_code`),
+        FROM mrp.material_master WHERE tenant_id=$1 AND active_flag ORDER BY material_code`, [_req.tenant.tenant_id]),
     ]);
     res.json({
       countries: countries.rows,
@@ -260,8 +257,8 @@ app.post("/api/mrp/run", async (req, res, next) => {
     const runIds = [];
     for (const countryCode of [...new Set(countries.filter(Boolean))]) {
       const eligiblePlants = await client.query(
-        "SELECT plant_code FROM mrp.plants WHERE country_code=$1 AND active_flag",
-        [countryCode],
+        "SELECT plant_code FROM mrp.plants WHERE tenant_id=$1 AND country_code=$2 AND active_flag",
+        [req.tenant.tenant_id, countryCode],
       );
       const countryPlantCodes = eligiblePlants.rows.map(
         (row) => row.plant_code,
@@ -274,12 +271,14 @@ app.post("/api/mrp/run", async (req, res, next) => {
         ...req.body,
         countryCode,
         plantCodes,
+        tenantId: req.tenant.tenant_id,
       });
       const run = await client.query(
         `INSERT INTO mrp.mrp_runs
-        (country_code, planning_start, horizon_months, bucket_type, created_by, scenario_inputs)
-        VALUES ($1,$2,$3,$4,$5,$6) RETURNING run_id`,
+        (tenant_id, country_code, planning_start, horizon_months, bucket_type, created_by, scenario_inputs)
+        VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING run_id`,
         [
+          req.tenant.tenant_id,
           output.countryCode,
           output.planningStart,
           output.horizonMonths,
@@ -311,8 +310,9 @@ app.post("/api/mrp/run", async (req, res, next) => {
         const chunk = output.results.slice(offset, offset + chunkSize);
         const params = [];
         const tuples = chunk.map((row, index) => {
-          const base = index * 12;
+          const base = index * 13;
           params.push(
+            req.tenant.tenant_id,
             runId,
             row.plantCode,
             row.materialCode,
@@ -326,11 +326,11 @@ app.post("/api/mrp/run", async (req, res, next) => {
             row.expediteNow,
             row.capacityExceeded,
           );
-          return `($${base + 1},$${base + 2},$${base + 3},$${base + 4},$${base + 5},$${base + 6},$${base + 7},$${base + 8},$${base + 9},$${base + 10},$${base + 11},$${base + 12})`;
+          return `($${base + 1},$${base + 2},$${base + 3},$${base + 4},$${base + 5},$${base + 6},$${base + 7},$${base + 8},$${base + 9},$${base + 10},$${base + 11},$${base + 12},$${base + 13})`;
         });
         await client.query(
           `INSERT INTO mrp.mrp_results
-          (run_id, plant_code, material_code, bucket_date, gross_req, scheduled_receipts,
+          (tenant_id, run_id, plant_code, material_code, bucket_date, gross_req, scheduled_receipts,
            net_req, planned_orders, projected_inventory, order_release_date, expedite_now, capacity_exceeded_flag)
           VALUES ${tuples.join(",")}`,
           params,
@@ -391,8 +391,8 @@ app.get("/api/mrp/runs/:runId", async (req, res, next) => {
   try {
     const run = await pool.query(
       `SELECT run_id, country_code, planning_start, horizon_months, bucket_type, scenario_inputs, created_at
-      FROM mrp.mrp_runs WHERE run_id=$1`,
-      [req.params.runId],
+      FROM mrp.mrp_runs WHERE tenant_id=$1 AND run_id=$2`,
+      [req.tenant.tenant_id, req.params.runId],
     );
     if (!run.rowCount)
       return res.status(404).json({ error: "MRP run not found" });
@@ -400,9 +400,9 @@ app.get("/api/mrp/runs/:runId", async (req, res, next) => {
       `SELECT r.plant_code, r.material_code, m.description, m.category, m.uom,
       m.unit_cost, r.bucket_date, r.gross_req, r.scheduled_receipts, r.net_req, r.planned_orders,
       r.projected_inventory, r.order_release_date, r.expedite_now, r.capacity_exceeded_flag AS capacity_exceeded
-      FROM mrp.mrp_results r JOIN mrp.material_master m USING (material_code)
-      WHERE r.run_id=$1 ORDER BY r.plant_code, r.material_code, r.bucket_date`,
-      [req.params.runId],
+      FROM mrp.mrp_results r JOIN mrp.material_master m ON m.tenant_id=r.tenant_id AND m.material_code=r.material_code
+      WHERE r.tenant_id=$1 AND m.tenant_id=$1 AND r.run_id=$2 ORDER BY r.plant_code, r.material_code, r.bucket_date`,
+      [req.tenant.tenant_id, req.params.runId],
     );
     res.json({ run: run.rows[0], results: results.rows });
   } catch (error) {
@@ -439,12 +439,29 @@ async function start() {
       await pool.query(operationalMigration);
       const scenarioDemandMigration = await readFile(new URL("../database/007_scenario_demand.sql", import.meta.url), "utf8");
       await pool.query(scenarioDemandMigration);
+      const migrationTable = await pool.query("SELECT to_regclass('public.schema_migrations') AS table_name");
+      let tenantMigrationApplied = false;
+      if (migrationTable.rows[0].table_name) {
+        const migrationStatus = await pool.query(
+          "SELECT EXISTS (SELECT 1 FROM public.schema_migrations WHERE version='008_multi_tenant') AS applied",
+        );
+        tenantMigrationApplied = migrationStatus.rows[0].applied;
+      }
+      if (!tenantMigrationApplied) {
+        const multiTenantMigration = await readFile(new URL("../database/008_multi_tenant.sql", import.meta.url), "utf8");
+        await pool.query(multiTenantMigration);
+      }
+      await bootstrapDefaultTenant(pool);
       console.log("Operational MRP schema is ready.");
     } else {
       console.warn("Base MRP schema is missing. Apply schema.sql and 002_forward_mrp.sql before uploading data.");
+      process.exitCode = 1;
+      return;
     }
   } catch (error) {
     console.error("Could not prepare operational MRP schema:", error.message);
+    process.exitCode = 1;
+    return;
   }
   app.listen(port, () => console.log(`MRP API listening on http://localhost:${port}`));
 }

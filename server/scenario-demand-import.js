@@ -31,7 +31,8 @@ function canonicalDimensions(value) {
   return { dimensions: sorted, key: JSON.stringify(sorted) };
 }
 
-export async function importDemandScenario(pool, input) {
+export async function importDemandScenario(pool, input, tenantId) {
+  if (!tenantId) throw new Error("A signed-in tenant workspace is required for demand imports.");
   const fileName = String(input.fileName || "").trim().slice(0, 255);
   const sourceSheet = String(input.sourceSheet || "").trim().slice(0, 255);
   const scenarioName = String(input.scenarioName || sourceSheet).trim().slice(0, 255);
@@ -88,14 +89,15 @@ export async function importDemandScenario(pool, input) {
     await client.query("BEGIN");
     await client.query(
       `UPDATE mrp.demand_scenario_imports SET is_active=false
-       WHERE is_active=true AND scenario_name=$1 AND source_sheet=$2 AND scenario_type=$3`,
-      [scenarioName, sourceSheet, scenarioType],
+       WHERE tenant_id=$1 AND is_active=true AND scenario_name=$2 AND source_sheet=$3 AND scenario_type=$4`,
+      [tenantId, scenarioName, sourceSheet, scenarioType],
     );
     const importResult = await client.query(
       `INSERT INTO mrp.demand_scenario_imports
-       (file_name, source_sheet, scenario_name, scenario_type, bucket_type, date_format, imported_rows, import_metadata)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8::jsonb) RETURNING import_id`,
+       (tenant_id, file_name, source_sheet, scenario_name, scenario_type, bucket_type, date_format, imported_rows, import_metadata)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9::jsonb) RETURNING import_id`,
       [
+        tenantId,
         fileName,
         sourceSheet,
         scenarioName,
@@ -118,8 +120,9 @@ export async function importDemandScenario(pool, input) {
       const chunk = records.slice(offset, offset + INSERT_CHUNK_SIZE);
       const params = [];
       const tuples = chunk.map((row, index) => {
-        const base = index * 9;
+        const base = index * 10;
         params.push(
+          tenantId,
           importId,
           row.plantCode,
           row.fgCode,
@@ -130,11 +133,11 @@ export async function importDemandScenario(pool, input) {
           row.dimensionKey,
           row.sourceRowNumber,
         );
-        return `($${base + 1},$${base + 2},$${base + 3},$${base + 4},$${base + 5},$${base + 6},$${base + 7}::jsonb,$${base + 8},$${base + 9})`;
+        return `($${base + 1},$${base + 2},$${base + 3},$${base + 4},$${base + 5},$${base + 6},$${base + 7},$${base + 8}::jsonb,$${base + 9},$${base + 10})`;
       });
       await client.query(
         `INSERT INTO mrp.demand_scenario_forecasts
-         (import_id,plant_code,fg_code,bucket_date,forecast_qty,uom,dimensions,dimension_key,source_row_number)
+         (tenant_id,import_id,plant_code,fg_code,bucket_date,forecast_qty,uom,dimensions,dimension_key,source_row_number)
          VALUES ${tuples.join(",")}`,
         params,
       );

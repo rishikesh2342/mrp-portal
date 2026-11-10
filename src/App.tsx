@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import type { FormEvent } from "react";
 import {
   ArrowDown,
   ArrowLeft,
@@ -67,6 +68,7 @@ const pageFor = (path: string): Page =>
     .flatMap((group) => group.items)
     .find((item) => routeFor(item.label) === path)?.label ?? "Dashboard";
 export default function App() {
+  type SignedInUser = { email: string; display_name: string; tenant_name: string; role: string };
   const [page, setPage] = useState<Page>(() =>
     pageFor(window.location.pathname),
   );
@@ -75,6 +77,8 @@ export default function App() {
   );
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [toast, setToast] = useState("");
+  const [authUser, setAuthUser] = useState<SignedInUser | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
   useEffect(() => {
     const syncRoute = () => {
       setIsLoginRoute(window.location.pathname === "/login");
@@ -91,15 +95,36 @@ export default function App() {
     window.addEventListener("popstate", syncRoute);
     return () => window.removeEventListener("popstate", syncRoute);
   }, []);
+  useEffect(() => {
+    fetch("/api/auth/me").then(async (response) => {
+      if (!response.ok) return null;
+      const body = await response.json();
+      return body.user as SignedInUser;
+    }).then((user) => {
+      setAuthUser(user);
+      if (!user) {
+        history.replaceState({}, "", "/login");
+        setIsLoginRoute(true);
+      } else if (window.location.pathname === "/login") {
+        history.replaceState({}, "", routeFor("Dashboard"));
+        setIsLoginRoute(false);
+      }
+    }).catch(() => {
+      history.replaceState({}, "", "/login");
+      setIsLoginRoute(true);
+    }).finally(() => setAuthChecked(true));
+  }, []);
   const changePage = (target: Page) => {
     history.pushState({}, "", routeFor(target));
     setPage(target);
     setSidebarOpen(true);
   };
-  if (isLoginRoute)
+  if (!authChecked) return <div className="auth-loading">Loading workspace…</div>;
+  if (isLoginRoute || !authUser)
     return (
       <Login
-        onLogin={() => {
+        onLogin={(user) => {
+          setAuthUser(user);
           history.pushState({}, "", routeFor("Dashboard"));
           setIsLoginRoute(false);
           setPage("Dashboard");
@@ -142,7 +167,7 @@ export default function App() {
               <Building2 size={16} />
             </span>
             <span className="workspace-text">
-              Holcim Group<small>Demand planning</small>
+              {authUser.tenant_name}<small>Company workspace</small>
             </span>
             <ChevronDown size={15} />
           </button>
@@ -173,9 +198,9 @@ export default function App() {
               <span>Help & project guides</span>
             </button>
             <div className="profile-mini">
-              <div className="avatar">RM</div>
+              <div className="avatar">{authUser.display_name.split(/\s+/).map((part) => part[0]).join("").slice(0,2).toUpperCase()}</div>
               <div className="profile-name">
-                Rishi Mishra<small>Planner</small>
+                {authUser.display_name}<small>{authUser.role}</small>
               </div>
               <MoreHorizontal size={17} />
             </div>
@@ -225,18 +250,22 @@ export default function App() {
             </button>
             <span className="top-divider" />
             <button className="org-switch">
-              <span className="org-logo">H</span>
-              <span>Holcim Group</span>
+                <span className="org-logo">{authUser.tenant_name.slice(0,1).toUpperCase()}</span>
+                <span>{authUser.tenant_name}</span>
               <ChevronDown size={15} />
             </button>
             <button
               className="avatar top-avatar"
-              onClick={() => {
+              title="Sign out"
+              aria-label="Sign out"
+              onClick={async () => {
+                await fetch("/api/auth/logout", { method: "POST" });
+                setAuthUser(null);
                 history.pushState({}, "", "/login");
                 setIsLoginRoute(true);
               }}
             >
-              RM
+              {authUser.display_name.split(/\s+/).map((part) => part[0]).join("").slice(0,2).toUpperCase()}
             </button>
           </div>
         </header>
@@ -267,8 +296,30 @@ function ModulePage({
   return <Component onNotify={onNotify} onNavigate={onNavigate} />;
 }
 
-function Login({ onLogin }: { onLogin: () => void }) {
+function Login({ onLogin }: { onLogin: (user: { email:string; display_name:string; tenant_name:string; role:string }) => void }) {
   const [showPassword, setShowPassword] = useState(false);
+  const [creatingTenant, setCreatingTenant] = useState(false);
+  const [tenantName, setTenantName] = useState("");
+  const [displayName, setDisplayName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [authError, setAuthError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const submit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSubmitting(true); setAuthError("");
+    try {
+      const response = await fetch(creatingTenant ? "/api/auth/signup" : "/api/auth/login", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tenantName, displayName, email, password }),
+      });
+      const body = await response.json();
+      if (!response.ok) throw new Error(body.error || "Could not sign in.");
+      onLogin(body.user);
+    } catch (error) {
+      setAuthError(error instanceof Error ? error.message : "Could not sign in.");
+    } finally { setSubmitting(false); }
+  };
   return (
     <main className="login-page">
       <section className="login-story">
@@ -337,22 +388,25 @@ function Login({ onLogin }: { onLogin: () => void }) {
               <LockKeyhole size={19} />
             </span>
             <span className="eyebrow">YOUR WORKSPACE</span>
-            <h2>Welcome back</h2>
-            <p>Sign in to continue to your planning workspace.</p>
+            <h2>{creatingTenant ? "Create a company workspace" : "Welcome back"}</h2>
+            <p>{creatingTenant ? "Set up a separate, private planning space for your company." : "Sign in to continue to your planning workspace."}</p>
           </div>
           <form
             className="login-form"
-            onSubmit={(e) => {
-              e.preventDefault();
-              onLogin();
-            }}
+            onSubmit={(e) => void submit(e)}
           >
+            {creatingTenant && <>
+              <label>Company name<input required value={tenantName} onChange={(e)=>setTenantName(e.target.value)} placeholder="Your company"/></label>
+              <label>Your name<input required value={displayName} onChange={(e)=>setDisplayName(e.target.value)} placeholder="Workspace administrator"/></label>
+            </>}
             <label>
               Work email
               <input
                 type="email"
                 required
-                defaultValue="rishi.mishra@holcim.com"
+                autoComplete="email"
+                value={email}
+                onChange={(e)=>setEmail(e.target.value)}
                 placeholder="you@company.com"
               />
             </label>
@@ -362,7 +416,10 @@ function Login({ onLogin }: { onLogin: () => void }) {
                 <input
                   type={showPassword ? "text" : "password"}
                   required
-                  defaultValue="meridian2026"
+                  minLength={creatingTenant ? 10 : 1}
+                  autoComplete={creatingTenant ? "new-password" : "current-password"}
+                  value={password}
+                  onChange={(e)=>setPassword(e.target.value)}
                   placeholder="Enter your password"
                 />
                 <button
@@ -373,7 +430,7 @@ function Login({ onLogin }: { onLogin: () => void }) {
                 </button>
               </span>
             </label>
-            <div className="form-options">
+            {!creatingTenant && <div className="form-options">
               <label className="remember">
                 <input type="checkbox" defaultChecked />
                 <span />
@@ -382,23 +439,13 @@ function Login({ onLogin }: { onLogin: () => void }) {
               <button type="button" className="forgot-link">
                 Forgot password?
               </button>
-            </div>
-            <button className="button primary login-submit" type="submit">
-              Sign in <ChevronRight size={16} />
+            </div>}
+            {authError && <div className="auth-error" role="alert">{authError}</div>}
+            <button className="button primary login-submit" type="submit" disabled={submitting}>
+              {submitting ? "Please wait…" : creatingTenant ? "Create workspace" : "Sign in"} <ChevronRight size={16} />
             </button>
-            <div className="sso-divider">
-              <span />
-              or continue with
-              <span />
-            </div>
-            <button type="button" className="sso-button" onClick={onLogin}>
-              <span className="microsoft-mark">
-                <i />
-                <i />
-                <i />
-                <i />
-              </span>
-              Continue with Microsoft
+            <button type="button" className="forgot-link auth-mode-toggle" onClick={()=>{setCreatingTenant(!creatingTenant);setAuthError("")}}>
+              {creatingTenant ? "Already have a workspace? Sign in" : "New company? Create a workspace"}
             </button>
             <p className="login-help">
               Having trouble signing in?{" "}

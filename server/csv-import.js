@@ -58,12 +58,13 @@ function uniqueKeys(rows, keyFields) {
   });
 }
 
-export async function importCsv(pool, { dataset, fileName, csvText }) {
+export async function importCsv(pool, { dataset, fileName, csvText, tenantId }) {
+  if (!tenantId) throw new Error('A signed-in tenant workspace is required for uploads.');
   const handlers = {
     plants: importPlants, materials: importMaterials, finished_goods: importFinishedGoods,
     plant_constraints: importConstraints, bom: importBom, inventory: importInventory,
-    demand: (db, data) => importDemand(db, data, 'Weekly'),
-    demand_monthly: (db, data) => importDemand(db, data, 'Monthly'),
+    demand: (db, data, id) => importDemand(db, data, 'Weekly', id),
+    demand_monthly: (db, data, id) => importDemand(db, data, 'Monthly', id),
   };
   if (!handlers[dataset]) throw new Error('Select a supported CSV upload type.');
   if (typeof csvText !== 'string' || csvText.length > 10 * 1024 * 1024) throw new Error('CSV file is missing or larger than 10 MB.');
@@ -71,7 +72,7 @@ export async function importCsv(pool, { dataset, fileName, csvText }) {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
-    await handlers[dataset](client, rows);
+    await handlers[dataset](client, rows, tenantId);
     await client.query('COMMIT');
     return { imported: rows.length, fileName };
   } catch (error) {
@@ -83,60 +84,63 @@ export async function importCsv(pool, { dataset, fileName, csvText }) {
   } finally { client.release(); }
 }
 
-async function importPlants(db, rows) {
+async function importPlants(db, rows, tenantId) {
   requireColumns(rows, ['plant_code','plant_name','country_code','location','active_flag']); uniqueKeys(rows,['plant_code']);
   const countries = new Map([['MAR',['Morocco','MAD']]]);
   for (const row of rows) {
     if (!/^(true|false)$/i.test(row.active_flag)) throw new Error(`Plant ${row.plant_code}: active_flag must be true or false.`);
     const country = countries.get(row.country_code);
     if (!country) throw new Error(`Country ${row.country_code} is unknown to this importer. Add its country and currency mapping first.`);
+    // Country codes are shared reference data. A workspace upload may ensure
+    // that a supported code exists, but must never overwrite labels used by
+    // another tenant.
     await db.query(`INSERT INTO mrp.countries(country_code,country_name,currency_code) VALUES($1,$2,$3)
-      ON CONFLICT(country_code) DO UPDATE SET country_name=EXCLUDED.country_name,currency_code=EXCLUDED.currency_code`, [row.country_code,...country]);
+      ON CONFLICT(country_code) DO NOTHING`, [row.country_code,...country]);
   }
-  for (const row of rows) await db.query(`INSERT INTO mrp.plants(plant_code,plant_name,country_code,location,active_flag)
-    VALUES($1,$2,$3,$4,$5) ON CONFLICT(plant_code) DO UPDATE SET plant_name=EXCLUDED.plant_name,country_code=EXCLUDED.country_code,location=EXCLUDED.location,active_flag=EXCLUDED.active_flag`,
-  [row.plant_code,row.plant_name,row.country_code,row.location,/^true$/i.test(row.active_flag)]);
+  for (const row of rows) await db.query(`INSERT INTO mrp.plants(tenant_id,plant_code,plant_name,country_code,location,active_flag)
+    VALUES($1,$2,$3,$4,$5,$6) ON CONFLICT(tenant_id,plant_code) DO UPDATE SET plant_name=EXCLUDED.plant_name,country_code=EXCLUDED.country_code,location=EXCLUDED.location,active_flag=EXCLUDED.active_flag`,
+  [tenantId,row.plant_code,row.plant_name,row.country_code,row.location,/^true$/i.test(row.active_flag)]);
 }
-async function importMaterials(db, rows) {
+async function importMaterials(db, rows, tenantId) {
   requireColumns(rows,['material_code','description','category','supply_type','uom','unit_cost','scrap_pct','lead_time_buckets','moq','order_multiple','safety_stock_min','max_capacity']); uniqueKeys(rows,['material_code']);
   for (const [i,row] of rows.entries()) {
     const n=i+2;
     if (!['Raw','Packing','Intermediate'].includes(row.category)) throw new Error(`Row ${n}: unsupported category ${row.category}.`);
     if (!['BUY','MAKE'].includes(row.supply_type)) throw new Error(`Row ${n}: supply_type must be BUY or MAKE.`);
     number(row.unit_cost,'unit_cost',n); number(row.scrap_pct,'scrap_pct',n,{max:0.999999}); number(row.lead_time_buckets,'lead_time_buckets',n); number(row.moq,'moq',n); number(row.order_multiple,'order_multiple',n); number(row.safety_stock_min,'safety_stock_min',n); if(row.max_capacity) number(row.max_capacity,'max_capacity',n);
-    await db.query(`INSERT INTO mrp.material_master(material_code,description,category,supply_type,uom,unit_cost,scrap_pct,lead_time_buckets,moq,order_multiple,safety_stock_min,max_capacity,active_flag)
-      VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,true) ON CONFLICT(material_code) DO UPDATE SET description=EXCLUDED.description,category=EXCLUDED.category,supply_type=EXCLUDED.supply_type,uom=EXCLUDED.uom,unit_cost=EXCLUDED.unit_cost,scrap_pct=EXCLUDED.scrap_pct,lead_time_buckets=EXCLUDED.lead_time_buckets,moq=EXCLUDED.moq,order_multiple=EXCLUDED.order_multiple,safety_stock_min=EXCLUDED.safety_stock_min,max_capacity=EXCLUDED.max_capacity,active_flag=true`,
-    [row.material_code,row.description,row.category,row.supply_type,row.uom,Number(row.unit_cost),Number(row.scrap_pct),Number(row.lead_time_buckets),Number(row.moq),Number(row.order_multiple),Number(row.safety_stock_min),row.max_capacity?Number(row.max_capacity):null]);
+    await db.query(`INSERT INTO mrp.material_master(tenant_id,material_code,description,category,supply_type,uom,unit_cost,scrap_pct,lead_time_buckets,moq,order_multiple,safety_stock_min,max_capacity,active_flag)
+      VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,true) ON CONFLICT(tenant_id,material_code) DO UPDATE SET description=EXCLUDED.description,category=EXCLUDED.category,supply_type=EXCLUDED.supply_type,uom=EXCLUDED.uom,unit_cost=EXCLUDED.unit_cost,scrap_pct=EXCLUDED.scrap_pct,lead_time_buckets=EXCLUDED.lead_time_buckets,moq=EXCLUDED.moq,order_multiple=EXCLUDED.order_multiple,safety_stock_min=EXCLUDED.safety_stock_min,max_capacity=EXCLUDED.max_capacity,active_flag=true`,
+    [tenantId,row.material_code,row.description,row.category,row.supply_type,row.uom,Number(row.unit_cost),Number(row.scrap_pct),Number(row.lead_time_buckets),Number(row.moq),Number(row.order_multiple),Number(row.safety_stock_min),row.max_capacity?Number(row.max_capacity):null]);
   }
 }
-async function importFinishedGoods(db, rows) {
+async function importFinishedGoods(db, rows, tenantId) {
   requireColumns(rows,['plant_code','fg_code','description','product_type','uom','active_flag']); uniqueKeys(rows,['plant_code','fg_code']);
   for (const row of rows) {
     if (!['Bulk','Bagged'].includes(row.product_type) || !/^(true|false)$/i.test(row.active_flag)) throw new Error(`Finished good ${row.fg_code}: invalid product_type or active_flag.`);
-    await db.query(`INSERT INTO mrp.fg_master(plant_code,fg_code,description,product_type,uom,active_flag) VALUES($1,$2,$3,$4,$5,$6)
-      ON CONFLICT(plant_code,fg_code) DO UPDATE SET description=EXCLUDED.description,product_type=EXCLUDED.product_type,uom=EXCLUDED.uom,active_flag=EXCLUDED.active_flag`,
-    [row.plant_code,row.fg_code,row.description,row.product_type,row.uom,/^true$/i.test(row.active_flag)]);
+    await db.query(`INSERT INTO mrp.fg_master(tenant_id,plant_code,fg_code,description,product_type,uom,active_flag) VALUES($1,$2,$3,$4,$5,$6,$7)
+      ON CONFLICT(tenant_id,plant_code,fg_code) DO UPDATE SET description=EXCLUDED.description,product_type=EXCLUDED.product_type,uom=EXCLUDED.uom,active_flag=EXCLUDED.active_flag`,
+    [tenantId,row.plant_code,row.fg_code,row.description,row.product_type,row.uom,/^true$/i.test(row.active_flag)]);
   }
 }
-async function importConstraints(db, rows) {
+async function importConstraints(db, rows, tenantId) {
   requireColumns(rows,['plant_code','material_code','min_stock_qty','reorder_level','max_stock_qty','max_storage_capacity','lead_time_buckets','moq','order_multiple']); uniqueKeys(rows,['plant_code','material_code']);
   for (const [i,row] of rows.entries()) {
     const n=i+2; for(const field of ['min_stock_qty','reorder_level','max_stock_qty','max_storage_capacity','lead_time_buckets','moq','order_multiple']) if(row[field]) number(row[field],field,n);
     if (Number(row.max_stock_qty) > Number(row.max_storage_capacity)) throw new Error(`Row ${n}: max_stock_qty cannot exceed max_storage_capacity.`);
-    await db.query(`INSERT INTO mrp.plant_material_constraints(plant_code,material_code,min_stock_qty,reorder_level,max_stock_qty,max_storage_capacity,lead_time_buckets,moq,order_multiple)
-      VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9) ON CONFLICT(plant_code,material_code) DO UPDATE SET min_stock_qty=EXCLUDED.min_stock_qty,reorder_level=EXCLUDED.reorder_level,max_stock_qty=EXCLUDED.max_stock_qty,max_storage_capacity=EXCLUDED.max_storage_capacity,lead_time_buckets=EXCLUDED.lead_time_buckets,moq=EXCLUDED.moq,order_multiple=EXCLUDED.order_multiple,updated_at=now()`,
-    [row.plant_code,row.material_code,Number(row.min_stock_qty),row.reorder_level?Number(row.reorder_level):null,row.max_stock_qty?Number(row.max_stock_qty):null,row.max_storage_capacity?Number(row.max_storage_capacity):null,row.lead_time_buckets?Number(row.lead_time_buckets):null,row.moq?Number(row.moq):null,row.order_multiple?Number(row.order_multiple):null]);
+    await db.query(`INSERT INTO mrp.plant_material_constraints(tenant_id,plant_code,material_code,min_stock_qty,reorder_level,max_stock_qty,max_storage_capacity,lead_time_buckets,moq,order_multiple)
+      VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) ON CONFLICT(tenant_id,plant_code,material_code) DO UPDATE SET min_stock_qty=EXCLUDED.min_stock_qty,reorder_level=EXCLUDED.reorder_level,max_stock_qty=EXCLUDED.max_stock_qty,max_storage_capacity=EXCLUDED.max_storage_capacity,lead_time_buckets=EXCLUDED.lead_time_buckets,moq=EXCLUDED.moq,order_multiple=EXCLUDED.order_multiple,updated_at=now()`,
+    [tenantId,row.plant_code,row.material_code,Number(row.min_stock_qty),row.reorder_level?Number(row.reorder_level):null,row.max_stock_qty?Number(row.max_stock_qty):null,row.max_storage_capacity?Number(row.max_storage_capacity):null,row.lead_time_buckets?Number(row.lead_time_buckets):null,row.moq?Number(row.moq):null,row.order_multiple?Number(row.order_multiple):null]);
   }
 }
-async function importBom(db, rows) {
+async function importBom(db, rows, tenantId) {
   requireColumns(rows,['plant_code','fg_code','component_material_code','quantity_per_fg']); uniqueKeys(rows,['plant_code','fg_code','component_material_code']);
   for (const [i,row] of rows.entries()) number(row.quantity_per_fg,'quantity_per_fg',i+2,{min:Number.MIN_VALUE});
   const scope = [...new Map(rows.map(row=>[`${row.plant_code}|${row.fg_code}`,row])).values()];
-  for(const row of scope) await db.query('DELETE FROM mrp.bom_matrix WHERE plant_code=$1 AND parent_fg_code=$2',[row.plant_code,row.fg_code]);
-  for(const row of rows) await db.query(`INSERT INTO mrp.bom_matrix(plant_code,parent_fg_code,material_code,ratio,effective_from,effective_to,active_flag)
-    VALUES($1,$2,$3,$4,DATE '1900-01-01',NULL,true)`,[row.plant_code,row.fg_code,row.component_material_code,Number(row.quantity_per_fg)]);
+  for(const row of scope) await db.query('DELETE FROM mrp.bom_matrix WHERE tenant_id=$1 AND plant_code=$2 AND parent_fg_code=$3',[tenantId,row.plant_code,row.fg_code]);
+  for(const row of rows) await db.query(`INSERT INTO mrp.bom_matrix(tenant_id,plant_code,parent_fg_code,material_code,ratio,effective_from,effective_to,active_flag)
+    VALUES($1,$2,$3,$4,$5,DATE '1900-01-01',NULL,true)`,[tenantId,row.plant_code,row.fg_code,row.component_material_code,Number(row.quantity_per_fg)]);
 }
-async function importInventory(db, rows) {
+async function importInventory(db, rows, tenantId) {
   requireColumns(rows,['plant_code','material_code','on_hand_qty','reserved_qty','in_transit_qty','in_transit_due_date','scheduled_receipts_qty']); uniqueKeys(rows,['plant_code','material_code']);
   for(const [i,row] of rows.entries()) {
     const n=i+2; const onHand=number(row.on_hand_qty,'on_hand_qty',n), reserved=number(row.reserved_qty,'reserved_qty',n), transit=number(row.in_transit_qty,'in_transit_qty',n);
@@ -145,18 +149,18 @@ async function importInventory(db, rows) {
     // planning bucket, so allow a blank due date here and keep import behavior
     // consistent with calculation behavior.
     const due=date(row.in_transit_due_date,'in_transit_due_date',n,true); const scheduled=number(row.scheduled_receipts_qty,'scheduled_receipts_qty',n);
-    const result = await db.query(`INSERT INTO mrp.inventory_on_hand(plant_code,material_code,on_hand_qty,scheduled_receipts,reserved_qty,in_transit_qty,in_transit_due_date,safety_stock_min,max_capacity,updated_at)
-      SELECT $1::varchar,$2::varchar,$3::numeric,$4::numeric,$5::numeric,$6::numeric,$7::date,
+    const result = await db.query(`INSERT INTO mrp.inventory_on_hand(tenant_id,plant_code,material_code,on_hand_qty,scheduled_receipts,reserved_qty,in_transit_qty,in_transit_due_date,safety_stock_min,max_capacity,updated_at)
+      SELECT $1::uuid,$2::varchar,$3::varchar,$4::numeric,$5::numeric,$6::numeric,$7::numeric,$8::date,
         COALESCE(c.min_stock_qty,m.safety_stock_min),COALESCE(c.max_storage_capacity,m.max_capacity),now()
       FROM mrp.material_master m LEFT JOIN mrp.plant_material_constraints c
-        ON c.plant_code=$1::varchar AND c.material_code=m.material_code
-      WHERE m.material_code=$2::varchar
-      ON CONFLICT(plant_code,material_code) DO UPDATE SET on_hand_qty=EXCLUDED.on_hand_qty,scheduled_receipts=EXCLUDED.scheduled_receipts,reserved_qty=EXCLUDED.reserved_qty,in_transit_qty=EXCLUDED.in_transit_qty,in_transit_due_date=EXCLUDED.in_transit_due_date,safety_stock_min=EXCLUDED.safety_stock_min,max_capacity=EXCLUDED.max_capacity,updated_at=now()`,
-    [row.plant_code,row.material_code,onHand,scheduled,reserved,transit,due]);
+        ON c.tenant_id=$1::uuid AND c.plant_code=$2::varchar AND c.material_code=m.material_code
+      WHERE m.tenant_id=$1::uuid AND m.material_code=$3::varchar
+      ON CONFLICT(tenant_id,plant_code,material_code) DO UPDATE SET on_hand_qty=EXCLUDED.on_hand_qty,scheduled_receipts=EXCLUDED.scheduled_receipts,reserved_qty=EXCLUDED.reserved_qty,in_transit_qty=EXCLUDED.in_transit_qty,in_transit_due_date=EXCLUDED.in_transit_due_date,safety_stock_min=EXCLUDED.safety_stock_min,max_capacity=EXCLUDED.max_capacity,updated_at=now()`,
+    [tenantId,row.plant_code,row.material_code,onHand,scheduled,reserved,transit,due]);
     if (!result.rowCount) throw new Error(`Row ${n}: material ${row.material_code} does not exist.`);
   }
 }
-async function importDemand(db, rows, expectedBucket) {
+async function importDemand(db, rows, expectedBucket, tenantId) {
   requireColumns(rows,['plant_code','fg_code','bucket_date','bucket_type','forecast_qty']); uniqueKeys(rows,['plant_code','fg_code','bucket_date']);
   for(const [i,row] of rows.entries()) {
     const n=i+2; date(row.bucket_date,'bucket_date',n);
@@ -164,7 +168,7 @@ async function importDemand(db, rows, expectedBucket) {
     if(expectedBucket==='Weekly' && new Date(`${row.bucket_date}T00:00:00Z`).getUTCDay()!==0) throw new Error(`Row ${n}: weekly bucket_date must be a Sunday.`);
     if(expectedBucket==='Monthly' && !/^\d{4}-\d{2}-01$/.test(row.bucket_date)) throw new Error(`Row ${n}: monthly bucket_date must be the first day of the month (YYYY-MM-01).`);
     number(row.forecast_qty,'forecast_qty',n);
-    await db.query(`INSERT INTO mrp.demand_forecast(plant_code,fg_code,bucket_date,forecast_qty,updated_at) VALUES($1,$2,$3,$4,now())
-      ON CONFLICT(plant_code,fg_code,bucket_date) DO UPDATE SET forecast_qty=EXCLUDED.forecast_qty,updated_at=now()`,[row.plant_code,row.fg_code,row.bucket_date,Number(row.forecast_qty)]);
+    await db.query(`INSERT INTO mrp.demand_forecast(tenant_id,plant_code,fg_code,bucket_date,forecast_qty,updated_at) VALUES($1,$2,$3,$4,$5,now())
+      ON CONFLICT(tenant_id,plant_code,fg_code,bucket_date) DO UPDATE SET forecast_qty=EXCLUDED.forecast_qty,updated_at=now()`,[tenantId,row.plant_code,row.fg_code,row.bucket_date,Number(row.forecast_qty)]);
   }
 }
