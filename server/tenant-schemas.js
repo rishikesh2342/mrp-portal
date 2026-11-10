@@ -3,6 +3,7 @@ const TABLES = [
   "inventory_on_hand", "scheduled_receipts", "mrp_runs", "mrp_results",
   "plant_material_constraints", "demand_actuals",
   "demand_scenario_imports", "demand_scenario_forecasts", "dim_supplier",
+  "purchase_orders", "purchase_order_items", "production_plans",
 ];
 
 export function quoteTenantSchema(value) {
@@ -36,6 +37,10 @@ export async function ensureTenantSchema(client, tenant, { copyExisting = false 
     `ALTER TABLE ${schema}.mrp_results ADD CONSTRAINT tenant_results_tenant_fk FOREIGN KEY(tenant_id) REFERENCES public.tenants(tenant_id), ADD CONSTRAINT tenant_results_run_fk FOREIGN KEY(tenant_id,run_id) REFERENCES ${schema}.mrp_runs(tenant_id,run_id) ON DELETE CASCADE, ADD CONSTRAINT tenant_results_plant_fk FOREIGN KEY(tenant_id,plant_code) REFERENCES ${schema}.plants(tenant_id,plant_code), ADD CONSTRAINT tenant_results_material_fk FOREIGN KEY(tenant_id,material_code) REFERENCES ${schema}.material_master(tenant_id,material_code)`,
     `ALTER TABLE ${schema}.demand_scenario_imports ADD CONSTRAINT tenant_scenario_imports_tenant_fk FOREIGN KEY(tenant_id) REFERENCES public.tenants(tenant_id)`,
     `ALTER TABLE ${schema}.demand_scenario_forecasts ADD CONSTRAINT tenant_scenario_forecasts_tenant_fk FOREIGN KEY(tenant_id) REFERENCES public.tenants(tenant_id), ADD CONSTRAINT tenant_scenario_forecasts_plant_fk FOREIGN KEY(tenant_id,plant_code) REFERENCES ${schema}.plants(tenant_id,plant_code), ADD CONSTRAINT tenant_scenario_forecasts_fg_fk FOREIGN KEY(tenant_id,plant_code,fg_code) REFERENCES ${schema}.fg_master(tenant_id,plant_code,fg_code), ADD CONSTRAINT tenant_scenario_forecasts_import_fk FOREIGN KEY(tenant_id,import_id) REFERENCES ${schema}.demand_scenario_imports(tenant_id,import_id) ON DELETE CASCADE`,
+    `ALTER TABLE ${schema}.purchase_order_items ADD CONSTRAINT tenant_po_items_header_fk FOREIGN KEY(tenant_id,purchase_order_id) REFERENCES ${schema}.purchase_orders(tenant_id,id) ON DELETE CASCADE`,
+    `ALTER TABLE ${schema}.purchase_orders ADD CONSTRAINT tenant_purchase_orders_tenant_fk FOREIGN KEY(tenant_id) REFERENCES public.tenants(tenant_id)`,
+    `ALTER TABLE ${schema}.purchase_order_items ADD CONSTRAINT tenant_purchase_order_items_tenant_fk FOREIGN KEY(tenant_id) REFERENCES public.tenants(tenant_id)`,
+    `ALTER TABLE ${schema}.production_plans ADD CONSTRAINT tenant_production_plans_tenant_fk FOREIGN KEY(tenant_id) REFERENCES public.tenants(tenant_id)`,
   ];
   for (const sql of foreignKeys) await client.query(sql);
 

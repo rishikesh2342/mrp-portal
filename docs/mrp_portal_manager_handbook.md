@@ -196,7 +196,7 @@ Use CSV upload for planning master changes. Reference records must be uploaded b
 
 ### 6.6 Purchase Orders — visual workflow only
 
-This page displays seeded sample purchase orders and a create-order form with supplier, currency, item, quantity, price, delivery date, payment terms, and status fields. Current orders and form submissions are in browser state. They are **not** written to a purchase-order API, not sent to a supplier, and not generated automatically from MRP planned orders. The “Import from MRP” action is a UI notice, not a connected import.
+Purchase orders are stored in the selected tenant schema. The list, totals, and order details load from that tenant's database, and new orders and their item lines are saved through the tenant-scoped purchase-order API. A PO record is an internal planning record: creating it does not send it to a supplier or automatically convert MRP planned orders into PO lines. Supplier and material details are captured as entered; the workflow does not yet validate them against a supplier catalog or handle goods receipt updates.
 
 ### 6.7 Suppliers — supplier list is connected; editing workflow is not fully persisted
 
@@ -204,7 +204,7 @@ The page reads supplier records from `/api/suppliers` backed by the legacy `mrp.
 
 ### 6.8 Production Plan — visual workflow only
 
-This screen shows seeded plans and a multi-step create-plan form with period, product, quantity, dates, priority, and status. The list/form is currently local browser data and is not connected to the forward-MRP endpoint or a production-plan database API. The MRP engine uses the finished-good forecast and BOM, not a saved production plan from this screen.
+Production plans are stored in the selected tenant schema. The list and summary values load from that tenant's database, and the create-plan form saves the product, period, quantity, dates, priority, status, production type, schedule details, and demand lines. Saving a production plan does not start manufacturing or change inventory. The MRP engine continues to calculate from the finished-good forecast and BOM; a saved production plan is an operational record and is not currently an MRP input.
 
 ### 6.9 Reports — demonstration library
 
@@ -380,7 +380,7 @@ An administrator uses the tenant selector in the page header to choose the activ
 
 Demand and scenario imports use the existing scenario import and forecast tables inside each tenant schema. Every workbook upload gets a unique import ID and is appended as a separate, immutable version; uploading the same scenario name again does not replace the previous import. The Dashboard scenario dropdown lists saved versions by scenario name, type, time bucket, worksheet, and import time. Select a forecast version before running MRP; actuals and prior-year scenarios remain visible as reference-only entries. Variable source columns and customer levels are preserved in the forecast row's JSON dimensions, so adding a scenario or customer attribute does not create a new database table. This keeps future editing and Dashboard filtering on a consistent table structure.
 
-The repository also contains an earlier/legacy set of `dim_*` and `fact_*` tables and routines in `database/schema.sql`. The newer forward calculation uses the additive forward model described above. Existing supplier rows are copied into the current tenant schema; newly added tenant schemas start with an empty supplier catalog. Purchase-order and production-plan screens remain sample/local UI rather than tenant database workflows.
+The repository also contains an earlier/legacy set of `dim_*` and `fact_*` tables and routines in `database/schema.sql`. The newer forward calculation uses the additive forward model described above. Existing supplier rows are copied into the current tenant schema; newly added tenant schemas start with an empty supplier catalog. Purchase orders, their item lines, and production plans are stored in tenant-local tables created by `database/011_tenant_operations.sql`.
 
 ### Main API endpoints
 

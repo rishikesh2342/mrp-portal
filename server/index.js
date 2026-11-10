@@ -4,6 +4,7 @@ import pg from "pg";
 import { readFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
+import { randomUUID } from "node:crypto";
 import { calculateForwardMrp } from "./mrp-engine.js";
 import { importCsv } from "./csv-import.js";
 import { importDemandScenario } from "./scenario-demand-import.js";
@@ -87,6 +88,120 @@ app.get("/api/health", async (_req, res) => {
     res.json({ status: "ok", database: "connected" });
   } catch (error) {
     res.status(503).json({ status: "error", message: "Database unavailable" });
+  }
+});
+
+app.get("/api/purchase-orders", async (req, res, next) => {
+  try {
+    const schema = quoteTenantSchema(req.tenant.schema_name);
+    const { rows } = await pool.query(`
+      SELECT po.id, po.po_number AS number, to_char(po.po_date,'DD Mon YYYY') AS date,
+        po.supplier_name AS supplier, po.currency, po.reference_no AS reference,
+        po.payment_terms AS "paymentTerms", po.delivery_terms AS "deliveryTerms",
+        po.ship_to_location AS "shipToLocation",
+        to_char(po.expected_delivery_date,'DD Mon YYYY') AS delivery,
+        CASE WHEN po.status IN ('Open','Sent','Confirmed','Partially Received') AND po.expected_delivery_date < CURRENT_DATE
+          THEN 'Overdue' ELSE po.status END AS status,
+        po.remarks, po.created_by AS "createdBy",
+        COALESCE(SUM(i.quantity),0)::float8 AS qty,
+        COALESCE(SUM(i.received_quantity),0)::float8 AS received,
+        COALESCE(SUM(i.quantity*i.unit_price),0)::float8 AS value,
+        COUNT(i.id)::int AS "itemCount",
+        COALESCE(json_agg(json_build_object(
+          'code',i.material_code,'name',i.material_name,'unit',i.unit,
+          'qty',i.quantity,'received',i.received_quantity,'price',i.unit_price
+        ) ORDER BY i.line_number) FILTER (WHERE i.id IS NOT NULL), '[]'::json) AS items
+      FROM ${schema}.purchase_orders po
+      LEFT JOIN ${schema}.purchase_order_items i
+        ON i.tenant_id=po.tenant_id AND i.purchase_order_id=po.id
+      WHERE po.tenant_id=$1
+      GROUP BY po.id
+      ORDER BY po.po_date DESC, po.created_at DESC
+    `, [req.tenant.tenant_id]);
+    res.json(rows);
+  } catch (error) { next(error); }
+});
+
+app.post("/api/purchase-orders", async (req, res, next) => {
+  const body = req.body || {};
+  const items = Array.isArray(body.items) ? body.items : [];
+  if (!body.poDate || !body.expectedDeliveryDate || !String(body.supplier || '').trim() || !items.length)
+    return res.status(400).json({ error: "PO date, delivery date, supplier, and at least one item are required." });
+  if (!items.every((item) => String(item.name || '').trim() && Number(item.quantity) > 0 && Number(item.unitPrice) >= 0))
+    return res.status(400).json({ error: "Each PO item needs a name, positive quantity, and non-negative unit price." });
+  const schema = quoteTenantSchema(req.tenant.schema_name);
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    const number = `PO-${new Date(body.poDate).getFullYear()}-${randomUUID().slice(0, 8).toUpperCase()}`;
+    const header = await client.query(`
+      INSERT INTO ${schema}.purchase_orders
+        (tenant_id,po_number,po_date,supplier_name,currency,reference_no,payment_terms,
+         delivery_terms,ship_to_location,expected_delivery_date,status,remarks,created_by)
+      VALUES ($1,$2,$3::date,$4,$5,$6,$7,$8,$9,$10::date,$11,$12,$13)
+      RETURNING id
+    `, [req.tenant.tenant_id, number, body.poDate, String(body.supplier).trim(), body.currency || 'INR',
+      body.reference || '', body.paymentTerms || '', body.deliveryTerms || '', body.shipToLocation || '',
+      body.expectedDeliveryDate, body.status || 'Open', body.remarks || '', req.tenant.display_name || req.tenant.email || '']);
+    for (const [index, item] of items.entries()) {
+      await client.query(`
+        INSERT INTO ${schema}.purchase_order_items
+          (tenant_id,purchase_order_id,line_number,material_code,material_name,unit,quantity,unit_price,expected_delivery_date)
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9::date)
+      `, [req.tenant.tenant_id, header.rows[0].id, index + 1, item.code || '', item.name,
+        item.unit || '', Number(item.quantity), Number(item.unitPrice), item.expectedDeliveryDate || body.expectedDeliveryDate]);
+    }
+    await client.query("COMMIT");
+    res.status(201).json({ id: header.rows[0].id, number });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    if (error.code === '23505') return res.status(409).json({ error: "A purchase order with this number already exists. Please try again." });
+    if (error.code === '22007' || error.code === '23514') return res.status(400).json({ error: "Check the purchase order dates, status, and item values." });
+    next(error);
+  } finally { client.release(); }
+});
+
+app.get("/api/production-plans", async (req, res, next) => {
+  try {
+    const schema = quoteTenantSchema(req.tenant.schema_name);
+    const { rows } = await pool.query(`
+      SELECT plan_number AS id, period_label AS period, product_code AS "productCode",
+        product_name AS product, planned_quantity::float8 AS planned, produced_quantity::float8 AS produced,
+        to_char(start_date,'DD Mon YYYY') AS start, to_char(end_date,'DD Mon YYYY') AS end,
+        priority, status, production_type AS type, target_stock_quantity::float8 AS target,
+        description, production_line AS "productionLine", shift_name AS shift,
+        demands, created_by AS "createdBy"
+      FROM ${schema}.production_plans WHERE tenant_id=$1
+      ORDER BY created_at DESC
+    `, [req.tenant.tenant_id]);
+    res.json(rows);
+  } catch (error) { next(error); }
+});
+
+app.post("/api/production-plans", async (req, res, next) => {
+  const body = req.body || {};
+  if (!String(body.productCode || '').trim() || !String(body.productName || '').trim() || !body.startDate || !body.endDate || Number(body.plannedQuantity) <= 0)
+    return res.status(400).json({ error: "Product, start and end dates, and a positive planned quantity are required." });
+  const schema = quoteTenantSchema(req.tenant.schema_name);
+  try {
+    const number = `PP-${new Date(body.startDate).getFullYear()}-${randomUUID().slice(0, 8).toUpperCase()}`;
+    const { rows } = await pool.query(`
+      INSERT INTO ${schema}.production_plans
+        (tenant_id,plan_number,period_label,product_code,product_name,planned_quantity,produced_quantity,
+         start_date,end_date,priority,status,production_type,target_stock_quantity,description,
+         production_line,shift_name,demands,created_by)
+      VALUES ($1,$2,$3,$4,$5,$6,0,$7::date,$8::date,$9,$10,$11,$12,$13,$14,$15,$16::jsonb,$17)
+      RETURNING id
+    `, [req.tenant.tenant_id, number, body.period || '', body.productCode, body.productName,
+      Number(body.plannedQuantity), body.startDate, body.endDate, body.priority || 'Medium', body.status || 'Planned',
+      body.productionType || 'Make to Stock', Number(body.targetStockQuantity || 0), body.description || '',
+      body.productionLine || '', body.shift || '', JSON.stringify(Array.isArray(body.demands) ? body.demands : []),
+      req.tenant.display_name || req.tenant.email || '']);
+    res.status(201).json({ id: rows[0].id, number });
+  } catch (error) {
+    if (error.code === '23505') return res.status(409).json({ error: "A production plan with this number already exists. Please try again." });
+    if (error.code === '22007' || error.code === '23514' || error.code === '22P02') return res.status(400).json({ error: "Check the plan dates, priority, status, and quantity." });
+    next(error);
   }
 });
 
@@ -476,6 +591,8 @@ async function start() {
         const tenantSchemaMigration = await readFile(new URL("../database/010_tenant_schemas.sql", import.meta.url), "utf8");
         await pool.query(tenantSchemaMigration);
       }
+      const operationalTablesMigration = await readFile(new URL("../database/011_tenant_operations.sql", import.meta.url), "utf8");
+      await pool.query(operationalTablesMigration);
       const tenants = await pool.query(
         "SELECT tenant_id,tenant_code,tenant_name,schema_name FROM public.tenants ORDER BY tenant_code",
       );
