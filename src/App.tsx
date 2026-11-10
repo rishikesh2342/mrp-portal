@@ -68,7 +68,8 @@ const pageFor = (path: string): Page =>
     .flatMap((group) => group.items)
     .find((item) => routeFor(item.label) === path)?.label ?? "Dashboard";
 export default function App() {
-  type SignedInUser = { email: string; display_name: string; tenant_name: string; role: string };
+  type SignedInUser = { email: string; display_name: string; tenant_id: string; tenant_name: string; role: string };
+  type TenantOption = { tenant_id: string; tenant_name: string };
   const [page, setPage] = useState<Page>(() =>
     pageFor(window.location.pathname),
   );
@@ -79,6 +80,8 @@ export default function App() {
   const [toast, setToast] = useState("");
   const [authUser, setAuthUser] = useState<SignedInUser | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
+  const [tenantOptions, setTenantOptions] = useState<TenantOption[]>([]);
+  const [tenantMenuOpen, setTenantMenuOpen] = useState(false);
   useEffect(() => {
     const syncRoute = () => {
       setIsLoginRoute(window.location.pathname === "/login");
@@ -249,11 +252,47 @@ export default function App() {
               <i />
             </button>
             <span className="top-divider" />
-            <button className="org-switch">
+            {authUser.role === "platform_admin" ? (
+              <div className="tenant-switcher">
+                <button className="org-switch" onClick={async () => {
+                  if (!tenantMenuOpen && tenantOptions.length === 0) {
+                    try {
+                      const response = await fetch("/api/admin/tenants");
+                      const body = await response.json();
+                      if (!response.ok) throw new Error(body.error || "Could not load workspaces.");
+                      setTenantOptions(body.tenants);
+                    } catch (error) {
+                      notify(error instanceof Error ? error.message : "Could not load workspaces.");
+                    }
+                  }
+                  setTenantMenuOpen(!tenantMenuOpen);
+                }} aria-expanded={tenantMenuOpen}>
+                  <span className="org-logo">{authUser.tenant_name.slice(0,1).toUpperCase()}</span>
+                  <span>{authUser.tenant_name}<small className="platform-admin-label">Platform admin · choose workspace</small></span>
+                  <ChevronDown size={15} />
+                </button>
+                {tenantMenuOpen && <div className="tenant-menu" role="menu">
+                  {tenantOptions.map((tenant) => <button key={tenant.tenant_id} role="menuitem" disabled={tenant.tenant_id === authUser.tenant_id} onClick={async () => {
+                    try {
+                      const response = await fetch("/api/admin/active-tenant", {
+                        method: "POST", headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ tenantId: tenant.tenant_id }),
+                      });
+                      const body = await response.json();
+                      if (!response.ok) throw new Error(body.error || "Could not switch workspace.");
+                      window.location.reload();
+                    } catch (error) {
+                      notify(error instanceof Error ? error.message : "Could not switch workspace.");
+                    }
+                  }}>{tenant.tenant_name}</button>)}
+                </div>}
+              </div>
+            ) : (
+              <div className="org-switch" aria-label={`Workspace: ${authUser.tenant_name}`}>
                 <span className="org-logo">{authUser.tenant_name.slice(0,1).toUpperCase()}</span>
                 <span>{authUser.tenant_name}</span>
-              <ChevronDown size={15} />
-            </button>
+              </div>
+            )}
             <button
               className="avatar top-avatar"
               title="Sign out"
@@ -296,7 +335,7 @@ function ModulePage({
   return <Component onNotify={onNotify} onNavigate={onNavigate} />;
 }
 
-function Login({ onLogin }: { onLogin: (user: { email:string; display_name:string; tenant_name:string; role:string }) => void }) {
+function Login({ onLogin }: { onLogin: (user: { email:string; display_name:string; tenant_id:string; tenant_name:string; role:string }) => void }) {
   const [showPassword, setShowPassword] = useState(false);
   const [creatingTenant, setCreatingTenant] = useState(false);
   const [tenantName, setTenantName] = useState("");

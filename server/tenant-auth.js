@@ -57,6 +57,25 @@ export async function bootstrapDefaultTenant(pool) {
   );
 }
 
+export async function bootstrapPlatformAdmin(pool) {
+  const email = String(process.env.BOOTSTRAP_PLATFORM_ADMIN_EMAIL || "").trim().toLowerCase();
+  const password = String(process.env.BOOTSTRAP_PLATFORM_ADMIN_PASSWORD || "");
+  if (!email && !password) return;
+  if (!/^\S+@\S+\.\S+$/.test(email) || password.length < 10)
+    throw new Error("Set both BOOTSTRAP_PLATFORM_ADMIN_EMAIL and a BOOTSTRAP_PLATFORM_ADMIN_PASSWORD of at least 10 characters.");
+  const hash = await createPasswordHash(password);
+  await pool.query(
+    `INSERT INTO public.tenant_users(tenant_id,email,password_hash,display_name,role)
+     SELECT tenant_id,$1,$2,'Platform Administrator','platform_admin'
+     FROM public.tenants WHERE tenant_slug='holcim-group'
+     ON CONFLICT(email) DO NOTHING`,
+    [email, hash],
+  );
+  const account = await pool.query("SELECT role FROM public.tenant_users WHERE email=$1", [email]);
+  if (account.rows[0]?.role !== "platform_admin")
+    throw new Error("BOOTSTRAP_PLATFORM_ADMIN_EMAIL is already assigned to a non-platform-admin account; use a separate email address.");
+}
+
 async function createSession(pool, user) {
   const token = randomBytes(32).toString("hex");
   await pool.query(
@@ -135,10 +154,11 @@ export function registerTenantAuth(app, pool) {
     if (!token) return res.status(401).json({ error: "Sign in to a company workspace to continue." });
     try {
       const result = await pool.query(
-        `SELECT u.user_id,u.tenant_id,u.email,u.display_name,u.role,t.tenant_name
-         FROM public.tenant_sessions s JOIN public.tenant_users u USING(user_id,tenant_id)
-         JOIN public.tenants t USING(tenant_id)
-         WHERE s.session_hash=$1 AND s.expires_at>now() AND u.active_flag AND t.active_flag`,
+        `SELECT u.user_id,u.tenant_id AS home_tenant_id,s.tenant_id,u.email,u.display_name,u.role,t.tenant_name
+         FROM public.tenant_sessions s JOIN public.tenant_users u ON u.user_id=s.user_id
+         JOIN public.tenants t ON t.tenant_id=s.tenant_id
+         WHERE s.session_hash=$1 AND s.expires_at>now() AND u.active_flag AND t.active_flag
+           AND (u.role='platform_admin' OR u.tenant_id=s.tenant_id)`,
         [hashToken(token)],
       );
       if (!result.rowCount) {
@@ -147,6 +167,33 @@ export function registerTenantAuth(app, pool) {
       }
       req.tenant = result.rows[0];
       next();
+    } catch (error) { next(error); }
+  });
+  app.get("/api/admin/tenants", async (req, res, next) => {
+    if (req.tenant.role !== "platform_admin")
+      return res.status(403).json({ error: "Platform administrator access is required." });
+    try {
+      const { rows } = await pool.query(
+        "SELECT tenant_id,tenant_name FROM public.tenants WHERE active_flag ORDER BY tenant_name",
+      );
+      res.json({ tenants: rows, activeTenantId: req.tenant.tenant_id });
+    } catch (error) { next(error); }
+  });
+  app.post("/api/admin/active-tenant", async (req, res, next) => {
+    if (req.tenant.role !== "platform_admin")
+      return res.status(403).json({ error: "Platform administrator access is required." });
+    const tenantId = String(req.body.tenantId || "");
+    const token = sessionToken(req);
+    try {
+      const result = await pool.query(
+        `UPDATE public.tenant_sessions s SET tenant_id=t.tenant_id
+         FROM public.tenants t
+         WHERE s.session_hash=$1 AND s.expires_at>now() AND t.tenant_id=$2 AND t.active_flag
+         RETURNING t.tenant_id,t.tenant_name`,
+        [hashToken(token), tenantId],
+      );
+      if (!result.rowCount) return res.status(404).json({ error: "Workspace not found or inactive." });
+      res.json({ tenant: result.rows[0] });
     } catch (error) { next(error); }
   });
   app.get("/api/auth/me", (req, res) => res.json({ user: req.tenant }));

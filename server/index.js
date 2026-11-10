@@ -7,7 +7,7 @@ import { resolve } from "node:path";
 import { calculateForwardMrp } from "./mrp-engine.js";
 import { importCsv } from "./csv-import.js";
 import { importDemandScenario } from "./scenario-demand-import.js";
-import { bootstrapDefaultTenant, registerTenantAuth } from "./tenant-auth.js";
+import { bootstrapDefaultTenant, bootstrapPlatformAdmin, registerTenantAuth } from "./tenant-auth.js";
 
 const { Pool } = pg;
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
@@ -451,7 +451,15 @@ async function start() {
         const multiTenantMigration = await readFile(new URL("../database/008_multi_tenant.sql", import.meta.url), "utf8");
         await pool.query(multiTenantMigration);
       }
+      const platformMigration = await pool.query(
+        "SELECT EXISTS (SELECT 1 FROM public.schema_migrations WHERE version='009_platform_admin') AS applied",
+      );
+      if (!platformMigration.rows[0].applied) {
+        const platformAdminMigration = await readFile(new URL("../database/009_platform_admin.sql", import.meta.url), "utf8");
+        await pool.query(platformAdminMigration);
+      }
       await bootstrapDefaultTenant(pool);
+      await bootstrapPlatformAdmin(pool);
       console.log("Operational MRP schema is ready.");
     } else {
       console.warn("Base MRP schema is missing. Apply schema.sql and 002_forward_mrp.sql before uploading data.");
