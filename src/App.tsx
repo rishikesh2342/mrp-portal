@@ -1,40 +1,30 @@
 import { useEffect, useState } from "react";
 import {
-  Activity,
   ArrowDown,
   ArrowLeft,
   Bell,
-  Bookmark,
   BookOpen,
-  Box,
   Building2,
   CalendarDays,
   Check,
   ChevronDown,
-  ChevronLeft,
   ChevronRight,
   CircleHelp,
   ClipboardList,
   Database,
   FileBarChart,
-  Filter,
   Factory,
-  Layers,
   LayoutDashboard,
-  ListOrdered,
   LockKeyhole,
   Menu,
   MoreHorizontal,
   Package,
-  Plus,
   Search,
   Settings,
   ShoppingCart,
-  SlidersHorizontal,
   Sparkles,
   TrendingUp,
   Truck,
-  User,
   X,
 } from "lucide-react";
 import { pageComponents } from "./pages";
@@ -42,7 +32,7 @@ import type { PageName as Page } from "./pages/types";
 
 const groups: {
   title: string;
-  items: { label: Page; icon: typeof Activity; children?: Page[] }[];
+  items: { label: Page; icon: typeof LayoutDashboard; children?: Page[] }[];
 }[] = [
   {
     title: "Workspace",
@@ -76,26 +66,6 @@ const pageFor = (path: string): Page =>
   groups
     .flatMap((group) => group.items)
     .find((item) => routeFor(item.label) === path)?.label ?? "Dashboard";
-const attributes = [
-  "Sales Organisation",
-  "Distribution Channel",
-  "Product Family",
-  "Responsible Planner",
-  "Sold To Customer",
-  "Plant",
-  "Customer Segment",
-  "Material Group",
-  "Destination Market",
-  "Customer Status",
-  "Product Category",
-  "Province",
-  "Customer Type",
-  "Vendor",
-  "Region",
-  "Transport Zone",
-  "Product",
-];
-
 export default function App() {
   const [page, setPage] = useState<Page>(() =>
     pageFor(window.location.pathname),
@@ -104,12 +74,6 @@ export default function App() {
     () => window.location.pathname === "/login",
   );
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [expanded, setExpanded] = useState(true);
-  const [activeFilters, setActiveFilters] = useState<string[]>([]);
-  const [search, setSearch] = useState("");
-  const [range, setRange] = useState(
-    "Mar 2026 ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ Aug 2026",
-  );
   const [toast, setToast] = useState("");
   useEffect(() => {
     const syncRoute = () => {
@@ -252,7 +216,7 @@ export default function App() {
               aria-label="Notifications"
               onClick={() =>
                 notify(
-                  "YouÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¾ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢re all caught up",
+                  "You're all caught up.",
                 )
               }
             >
@@ -276,215 +240,8 @@ export default function App() {
             </button>
           </div>
         </header>
-        <div
-          className={`page-wrap ${page.toLowerCase().replace(/ /g, "-")}-wrap`}
-        >
-          <div className="page-heading">
-            <div>
-              <div className="eyebrow">
-                DEMAND PLANNING <span>/</span> ANALYTICS
-              </div>
-              <h1>{page}</h1>
-              <p>
-                Track forecast performance and understand accuracy trends across
-                your planning horizon.
-              </p>
-            </div>
-            <div className="heading-actions">
-              <button
-                className="button secondary"
-                onClick={() => notify("Report saved to your workspace")}
-              >
-                <Bookmark size={16} /> Save view
-              </button>
-              <button
-                className="button primary"
-                onClick={() => notify("Your report is being prepared")}
-              >
-                <FileBarChart size={16} /> Generate report
-              </button>
-            </div>
-          </div>
-          <div className="toolbar">
-            <div className="toolbar-left">
-              <button
-                className="control-button"
-                onClick={() => notify("Saved views are up to date")}
-              >
-                <Bookmark size={15} /> Bookmarks <ChevronDown size={14} />
-              </button>
-              <button
-                className="square-control"
-                aria-label="Add bookmark"
-                onClick={() => notify("Current view added to bookmarks")}
-              >
-                <Plus size={17} />
-              </button>
-              <span className="toolbar-separator" />
-              <button className="control-button">
-                <ListOrdered size={16} /> Quantity <ChevronDown size={14} />
-              </button>
-              <button
-                className="control-button date-control"
-                onClick={() =>
-                  setRange(
-                    range.startsWith("Mar")
-                      ? "Jan 2026 ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ Jun 2026"
-                      : "Mar 2026 ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ Aug 2026",
-                  )
-                }
-              >
-                <CalendarDays size={16} />
-                {range}
-                <span className="period">M0</span>
-                <ChevronDown size={14} />
-              </button>
-              <button
-                className="control-button"
-                onClick={() => notify("Showing all planning levels")}
-              >
-                <Layers size={16} /> Levels <ChevronDown size={14} />
-              </button>
-              <button className="control-button version-control">
-                <Activity size={16} /> Versions <span className="count">3</span>
-                <ChevronDown size={14} />
-              </button>
-              <button className="control-button optional-control">
-                <SlidersHorizontal size={16} /> Planning runs{" "}
-                <ChevronDown size={14} />
-              </button>
-            </div>
-            <button
-              className="icon-button filter-mobile"
-              onClick={() => setExpanded(!expanded)}
-            >
-              <Filter size={17} />
-            </button>
-            <span className="data-refresh">
-              <i /> Live data
-            </span>
-          </div>
-          <div className="dashboard-layout">
-            <aside
-              className={`filter-panel ${expanded ? "" : "filters-collapsed"}`}
-            >
-              <div className="filter-header">
-                <div>
-                  <span className="filter-kicker">REFINE RESULTS</span>
-                  <h3>
-                    Attributes{" "}
-                    <span className="filter-count">
-                      {activeFilters.length || "All"}
-                    </span>
-                  </h3>
-                </div>
-                <button
-                  className="icon-button filter-collapse"
-                  onClick={() => setExpanded(false)}
-                  aria-label="Collapse filters"
-                >
-                  <ChevronLeft size={18} />
-                </button>
-              </div>
-              <div className="filter-search">
-                <Search size={15} />
-                <input
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Find an attribute"
-                />
-                <kbd>
-                  ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¹ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ
-                  K
-                </kbd>
-              </div>
-              <div className="selected-filters">
-                {activeFilters.length > 0 && (
-                  <>
-                    {activeFilters.map((filter) => (
-                      <button
-                        className="filter-chip"
-                        key={filter}
-                        onClick={() =>
-                          setActiveFilters(
-                            activeFilters.filter((f) => f !== filter),
-                          )
-                        }
-                      >
-                        {filter}
-                        <X size={12} />
-                      </button>
-                    ))}
-                    <button
-                      className="clear-filters"
-                      onClick={() => setActiveFilters([])}
-                    >
-                      Clear all
-                    </button>
-                  </>
-                )}
-              </div>
-              <div className="attribute-list">
-                {attributes
-                  .filter((a) => a.toLowerCase().includes(search.toLowerCase()))
-                  .map((name, index) => (
-                    <button
-                      key={name}
-                      className={`attribute-row ${activeFilters.includes(name) ? "chosen" : ""}`}
-                      onClick={() =>
-                        setActiveFilters(
-                          activeFilters.includes(name)
-                            ? activeFilters.filter((f) => f !== name)
-                            : [...activeFilters, name],
-                        )
-                      }
-                    >
-                      <span className="attribute-icon">
-                        {index === 2 || index === 16 ? (
-                          <Box size={15} />
-                        ) : index === 0 || index === 1 ? (
-                          <Building2 size={15} />
-                        ) : (
-                          <User size={15} />
-                        )}
-                      </span>
-                      <span>{name}</span>
-                      <Plus className="attribute-plus" size={14} />
-                    </button>
-                  ))}
-              </div>
-              <div className="filter-footer">
-                <span>{attributes.length} attributes</span>
-                <button
-                  onClick={() => {
-                    setActiveFilters([]);
-                    setSearch("");
-                  }}
-                >
-                  Reset filters
-                </button>
-              </div>
-            </aside>
-            <ModulePage page={page} onNotify={notify} onNavigate={changePage} />
-          </div>
-          <footer className="page-footer">
-            <span>
-              Meridian Planning Cloud{" "}
-              <span className="footer-sep">
-                ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â·
-              </span>{" "}
-              Demand workspace
-            </span>
-            <div>
-              <span>Data updated 24 Sep 2026</span>
-              <span className="footer-sep">
-                ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â·
-              </span>
-              <button onClick={() => notify("Help centre opened")}>
-                Help centre
-              </button>
-            </div>
-          </footer>
+        <div className={`page-wrap ${page.toLowerCase().replace(/ /g, "-")}-wrap`}>
+          <ModulePage page={page} onNotify={notify} onNavigate={changePage} />
         </div>
       </main>
       {toast && (
@@ -560,7 +317,7 @@ function Login({ onLogin }: { onLogin: () => void }) {
         <div className="story-bottom">
           <span>
             Trusted planning for teams that build
-            whatÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¾ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢s
+            what's
             next.
           </span>
           <div className="story-avatars">
@@ -653,7 +410,7 @@ function Login({ onLogin }: { onLogin: () => void }) {
         </div>
         <footer className="login-footer">
           <span>
-            ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â©
+            (c)
             2026 Meridian Planning Cloud
           </span>
           <span>
