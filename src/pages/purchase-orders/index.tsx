@@ -1,45 +1,942 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react'
-import { ArrowUpRight, CalendarDays, ChevronLeft, ChevronRight, CircleAlert, ClipboardList, Ellipsis, FileText, Filter, Package, Plus, Printer, Search, Truck, Upload, X } from 'lucide-react'
-import type { PageProps } from '../types'
+import { useEffect, useMemo, useState, type FormEvent } from "react";
+import {
+  CalendarDays,
+  ChevronLeft,
+  ChevronRight,
+  CircleAlert,
+  ClipboardList,
+  Ellipsis,
+  FileText,
+  Filter,
+  Package,
+  Plus,
+  Printer,
+  Search,
+  Truck,
+  Upload,
+  X,
+} from "lucide-react";
+import type { PageProps } from "../types";
 
-type POStatus='Draft'|'Sent'|'Confirmed'|'Partially Received'|'Completed'|'Cancelled'|'Open'|'Overdue'
-type POItem={code:string;name:string;unit:string;qty:number;received:number;price:number}
-type PurchaseOrder={number:string;date:string;supplier:string;itemCount:number;qty:number;received:number;value:number;delivery:string;status:POStatus;currency:string;reference:string;paymentTerms:string;deliveryTerms?:string;shipToLocation?:string;remarks?:string;createdBy?:string;items:POItem[]}
-const orderTabs=['All','Draft','Sent','Confirmed','Partially Received','Completed','Cancelled']
-const money=(value:number)=>`₹ ${value.toLocaleString('en-IN')}`
+type POStatus =
+  | "Draft"
+  | "Sent"
+  | "Confirmed"
+  | "Partially Received"
+  | "Completed"
+  | "Cancelled"
+  | "Open"
+  | "Overdue";
+type POItem = {
+  code: string;
+  name: string;
+  unit: string;
+  qty: number;
+  received: number;
+  price: number;
+};
+type PurchaseOrder = {
+  number: string;
+  date: string;
+  supplier: string;
+  itemCount: number;
+  qty: number;
+  received: number;
+  value: number;
+  delivery: string;
+  status: POStatus;
+  currency: string;
+  reference: string;
+  paymentTerms: string;
+  deliveryTerms?: string;
+  shipToLocation?: string;
+  remarks?: string;
+  createdBy?: string;
+  items: POItem[];
+};
+const orderTabs = [
+  "All",
+  "Draft",
+  "Sent",
+  "Confirmed",
+  "Partially Received",
+  "Completed",
+  "Cancelled",
+];
+const money = (value: number) => `₹ ${value.toLocaleString("en-IN")}`;
 
-export default function PurchaseOrdersPage({onNotify}:PageProps){
-  const [orders,setOrders]=useState<PurchaseOrder[]>([])
-  const [loading,setLoading]=useState(true)
-  const [loadError,setLoadError]=useState('')
-  const [query,setQuery]=useState('')
-  const [activeTab,setActiveTab]=useState('All')
-  const [showForm,setShowForm]=useState(false)
-  const [selected,setSelected]=useState<PurchaseOrder|null>(null)
-  const [supplier,setSupplier]=useState('')
-  const [currency,setCurrency]=useState('INR')
-  const [reference,setReference]=useState('')
-  const [deliveryTerms,setDeliveryTerms]=useState('Delivered at Place (DAP)')
-  const [shipToLocation,setShipToLocation]=useState('')
-  const [remarks,setRemarks]=useState('')
-  const [poDate,setPoDate]=useState(new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}))
-  const [deliveryDate,setDeliveryDate]=useState('')
-  const [paymentTerms,setPaymentTerms]=useState('30 Days')
-  const [lines,setLines]=useState<POItem[]>([{code:'',name:'',unit:'',qty:1,received:0,price:0}])
-  const loadOrders=()=>fetch('/api/purchase-orders').then(async response=>{const data=await response.json();if(!response.ok)throw new Error(data.error||'Could not load purchase orders.');setOrders(data);setLoadError('')}).catch(error=>setLoadError(error instanceof Error?error.message:'Could not load purchase orders.')).finally(()=>setLoading(false))
-  useEffect(()=>{void loadOrders()},[])
-  const filtered=useMemo(()=>orders.filter(order=>(activeTab==='All'||order.status===activeTab)&&`${order.number} ${order.supplier} ${order.items.map(item=>item.name).join(' ')}`.toLowerCase().includes(query.toLowerCase())),[orders,activeTab,query])
-  const total=lines.reduce((sum,item)=>sum+item.qty*item.price,0)
-  const saveOrder=async(event?:FormEvent<HTMLFormElement>,status:POStatus='Open')=>{event?.preventDefault();try{const response=await fetch('/api/purchase-orders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({poDate,supplier,currency,reference,paymentTerms,deliveryTerms,shipToLocation,remarks,expectedDeliveryDate:deliveryDate,status,items:lines.map(item=>({code:item.code,name:item.name,unit:item.unit,quantity:item.qty,unitPrice:item.price}))})});const result=await response.json();if(!response.ok)throw new Error(result.error||'Purchase order could not be saved.');setShowForm(false);await loadOrders();onNotify(`${result.number} ${status==='Draft'?'saved as draft':'created'}`)}catch(error){onNotify(error instanceof Error?error.message:'Purchase order could not be saved.')}}
-  const addLine=()=>setLines([...lines,{code:'',name:'',unit:'Pcs',qty:1,received:0,price:0}])
-  const updateLine=(index:number,key:keyof POItem,value:string|number)=>setLines(lines.map((line,lineIndex)=>lineIndex===index?{...line,[key]:value}:line))
-  return <section className="purchase-page" aria-busy={loading}>
-    <div className="purchase-heading"><div><h1>Purchase Orders</h1><p>Create and manage purchase orders for raw materials, components and consumables</p></div><div className="purchase-heading-actions"><label className="purchase-search"><Search size={15}/><input value={query} onChange={event=>setQuery(event.target.value)} placeholder="Search PO number, supplier, material..."/></label><button className="button secondary" onClick={()=>onNotify('Purchase order filters opened')}><Filter size={15}/> Filters</button><button className="button primary" onClick={()=>setShowForm(true)}><Plus size={16}/> Create Purchase Order</button></div></div>
-    {loadError&&<p role="alert" className="form-error">{loadError}</p>}
-    <div className="purchase-list-card"><div className="purchase-tabs">{orderTabs.map(tab=><button key={tab} className={activeTab===tab?'active':''} onClick={()=>setActiveTab(tab)}>{tab}<em>({tab==='All'?orders.length:orders.filter(order=>order.status===tab).length})</em></button>)}</div><div className="purchase-table-wrap"><table className="purchase-table"><thead><tr><th><input type="checkbox" aria-label="Select all purchase orders"/></th><th>PO Number</th><th>PO Date</th><th>Supplier</th><th>Material Items</th><th>Total Qty</th><th>Received Qty</th><th>Pending Qty</th><th>Total Value</th><th>Expected Delivery</th><th>Status</th><th>Actions</th></tr></thead><tbody>{filtered.map(order=><tr key={order.number} onClick={()=>setSelected(order)}><td><input type="checkbox" aria-label={`Select ${order.number}`} onClick={event=>event.stopPropagation()}/></td><td>{order.number}</td><td>{order.date}</td><td>{order.supplier}</td><td>{order.itemCount} Items</td><td>{order.qty.toLocaleString()}</td><td>{order.received.toLocaleString()}</td><td>{Math.max(order.qty-order.received,0).toLocaleString()}</td><td><strong>{money(order.value)}</strong></td><td>{order.delivery}</td><td><span className={`po-status ${order.status.toLowerCase().replace(/ /g,'-')}`}>{order.status}</span></td><td><button className="row-menu" aria-label={`More actions for ${order.number}`} onClick={event=>{event.stopPropagation();onNotify(`Actions for ${order.number}`)}}><Ellipsis size={18}/></button></td></tr>)}{!loading&&filtered.length===0&&<tr><td colSpan={12}>No purchase orders saved for this tenant yet.</td></tr>}</tbody></table></div><div className="purchase-footer"><span>Showing 1 to {filtered.length} of {activeTab==='All'?orders.length:filtered.length} results</span><div className="pagination"><button aria-label="Previous page"><ChevronLeft size={16}/></button><button className="selected">1</button><button>2</button><button>3</button><button>4</button><button>5</button><button aria-label="Next page"><ChevronRight size={16}/></button></div></div></div>
-    {showForm&&<div className="po-modal-backdrop" onMouseDown={event=>{if(event.target===event.currentTarget)setShowForm(false)}}><form className="po-modal" onSubmit={event=>saveOrder(event,'Open')} role="dialog" aria-modal="true" aria-labelledby="create-po-title"><header className="po-modal-header"><div><span>PURCHASING</span><h2 id="create-po-title">Create Purchase Order</h2><p>Create a new purchase order for selected materials.</p></div><button type="button" aria-label="Close purchase order form" onClick={()=>setShowForm(false)}><X size={19}/></button></header><div className="po-modal-body"><div className="po-steps"><span className="active"><i>1</i><b>Basic Information</b><small>PO details and supplier</small></span><span><i>2</i><b>Items &amp; Pricing</b><small>Select materials and quantities</small></span><span><i>3</i><b>Delivery &amp; Terms</b><small>Schedule and payment terms</small></span><span><i>4</i><b>Review &amp; Submit</b><small>Verify and create PO</small></span></div><section className="po-form-section"><div className="po-section-heading"><i>1</i><div><h3>Basic Information</h3><p>Enter purchase order details and supplier information.</p></div></div><div className="po-form-grid"><label>PO Number <b>*</b><div className="po-autonumber"><input value="Generated when saved" readOnly/><button type="button" onClick={()=>onNotify('Purchase order number generated')}>Auto Generate</button></div></label><label>PO Date <b>*</b><span className="po-date-input"><CalendarDays size={14}/><input value={poDate} onChange={event=>setPoDate(event.target.value)}/></span></label><label>Supplier <b>*</b><input value={supplier} onChange={event=>setSupplier(event.target.value)} placeholder="Supplier name" required/></label><label>Currency <b>*</b><select value={currency} onChange={event=>setCurrency(event.target.value)}><option>INR</option><option>USD</option><option>EUR</option></select></label><label>Reference No.<input value={reference} onChange={event=>setReference(event.target.value)} placeholder="e.g. quotation number"/></label><label>Buyer / Created By<input value="Recorded from signed-in user" readOnly className="po-readonly"/></label></div></section><section className="po-form-section po-items-section"><div className="po-section-heading"><i className="second">2</i><div><h3>Items &amp; Pricing</h3><p>Add materials and quantities to this purchase order.</p></div><button type="button" className="po-import-button" onClick={()=>onNotify('Import items from MRP')}><Upload size={13}/> Import from MRP</button></div><div className="po-lines-wrap"><table className="po-lines"><thead><tr><th>#</th><th>Material Code</th><th>Material Name</th><th>Unit</th><th>Qty</th><th>Unit Price (₹)</th><th>Total (₹)</th><th>Expected Delivery</th><th>Actions</th></tr></thead><tbody>{lines.map((line,index)=><tr key={`${index}-${line.code}`}><td>{index+1}</td><td><input value={line.code} onChange={event=>updateLine(index,'code',event.target.value)} placeholder="Material code"/></td><td><input value={line.name} onChange={event=>updateLine(index,"name",event.target.value)} placeholder="Material name" required/></td><td><select value={line.unit} onChange={event=>updateLine(index,'unit',event.target.value)}><option>Kg</option><option>Pcs</option><option>Tonnes</option></select></td><td><input type="number" min="1" value={line.qty} onChange={event=>updateLine(index,'qty',Number(event.target.value))}/></td><td><input type="number" min="0" value={line.price} onChange={event=>updateLine(index,'price',Number(event.target.value))}/></td><td>{money(line.qty*line.price)}</td><td><input defaultValue={deliveryDate}/></td><td><button type="button" onClick={()=>setLines(lines.filter((_,lineIndex)=>lineIndex!==index))} aria-label={`Remove item ${index+1}`}><X size={14}/></button></td></tr>)}</tbody></table></div><button type="button" className="po-add-line" onClick={addLine}><Plus size={14}/> Add Item</button><div className="po-total-strip"><span>{lines.length} items</span><strong>Subtotal <b>{money(total)}</b></strong></div></section><section className="po-form-section"><div className="po-section-heading"><i className="third">3</i><div><h3>Delivery &amp; Terms</h3><p>Set expected delivery and commercial terms.</p></div></div><div className="po-form-grid"><label>Expected Delivery Date <b>*</b><span className="po-date-input"><CalendarDays size={14}/><input value={deliveryDate} onChange={event=>setDeliveryDate(event.target.value)}/></span></label><label>Payment Terms <b>*</b><select value={paymentTerms} onChange={event=>setPaymentTerms(event.target.value)}><option>30 Days</option><option>15 Days</option><option>45 Days</option><option>60 Days</option></select></label><label>Delivery Terms<select value={deliveryTerms} onChange={event=>setDeliveryTerms(event.target.value)}><option>Delivered at Place (DAP)</option><option>Ex Works (EXW)</option><option>Free Carrier (FCA)</option></select></label><label>Ship To Location<select value={shipToLocation} onChange={event=>setShipToLocation(event.target.value)}><option>Main Warehouse</option><option>Plant North</option><option>Plant Central</option><option>Plant West</option></select></label></div><label className="po-remarks">Remarks<textarea value={remarks} onChange={event=>setRemarks(event.target.value)} placeholder="Add delivery or purchase notes"/></label></section></div><footer className="po-modal-footer"><button type="button" className="button secondary" onClick={()=>setShowForm(false)}>Cancel</button><button type="button" className="button secondary" onClick={()=>saveOrder(undefined,'Draft')}>Save as Draft</button><button type="submit" className="button primary">Create Purchase Order <ChevronRight size={15}/></button></footer></form></div>}
-    {selected&&<div className="po-modal-backdrop" onMouseDown={event=>{if(event.target===event.currentTarget)setSelected(null)}}><section className="po-detail-modal" role="dialog" aria-modal="true" aria-labelledby="po-detail-title"><header className="po-detail-head"><div><span>Purchase Orders <i/> {selected.number}</span><h2 id="po-detail-title">{selected.number} <POBadge status={selected.status}/></h2><p>Supplier: {selected.supplier} <i/> Created by: {selected.createdBy||"—"} <i/> {selected.date}</p></div><div><button className="button secondary" onClick={()=>onNotify(`Edit ${selected.number}`)}>Edit</button><button className="button secondary" onClick={()=>onNotify(`Print ${selected.number}`)}><Printer size={14}/> Print</button><button className="button secondary" aria-label="Close PO details" onClick={()=>setSelected(null)}><X size={15}/></button></div></header><div className="po-detail-stats">{[['Total Value',money(selected.value),'purple'],['Total Qty',selected.qty.toLocaleString(),'green'],['Received Qty',selected.received.toLocaleString(),'blue'],['Pending Qty',Math.max(selected.qty-selected.received,0).toLocaleString(),'red'],['Expected Delivery',selected.delivery,'orange']].map(([label,value,tone],index)=><article key={label}><i className={tone}>{[<Package size={16}/>,<Truck size={16}/>,<ClipboardList size={16}/>,<CircleAlert size={16}/>,<CalendarDays size={16}/>][index]}</i><div><small>{label}</small><strong>{value}</strong></div></article>)}</div><div className="po-detail-content"><section className="po-detail-card po-info-card"><h3>PO Information</h3>{[['PO Number',selected.number],['PO Date',selected.date],['Supplier',selected.supplier],['Reference No.',selected.reference||'—'],['Currency',selected.currency],['Payment Terms',selected.paymentTerms],['Status',selected.status],['Created By',selected.createdBy||'—'],['Remarks',selected.remarks||'—']].map(([label,value])=><div key={label}><span>{label}</span><strong>{value}</strong></div>)}</section><div className="po-detail-right"><section className="po-detail-card delivery-progress"><h3>Delivery Progress</h3><div className="progress-track">{['PO Created','Sent to Supplier','Confirmed','Partially Received','Completed'].map((label,index)=><div className={index<Math.max(1,Math.min(4,Math.ceil(selected.received/Math.max(selected.qty,1)*4)))?'done':index===3?'current':''} key={label}><i>{index<Math.max(1,Math.min(4,Math.ceil(selected.received/Math.max(selected.qty,1)*4)))?'✓':index+1}</i><span>{label}</span></div>)}</div></section><section className="po-detail-card supplier-card"><h3>Supplier Information</h3><div><span className="supplier-avatar">{selected.supplier.slice(0,1)}</span><p><strong>{selected.supplier}</strong><small>GST: 27AAACG1234F1Z5</small><small>Phone: +91 98765 43210</small><small>Email: info@{selected.supplier.toLowerCase().replace(/[^a-z]/g,'')}.com</small></p><button onClick={()=>onNotify('Supplier profile opened')}>View Supplier</button></div></section></div></div><section className="po-detail-card po-detail-items"><h3>Items</h3><div className="po-lines-wrap"><table className="po-lines detail-lines"><thead><tr><th>#</th><th>Material Code</th><th>Material Name</th><th>Unit</th><th>Ordered Qty</th><th>Received Qty</th><th>Pending Qty</th><th>Unit Price</th><th>Total</th><th>Status</th></tr></thead><tbody>{selected.items.map((item,index)=><tr key={`${item.code}-${index}`}><td>{index+1}</td><td>{item.code}</td><td>{item.name}</td><td>{item.unit}</td><td>{item.qty}</td><td>{item.received}</td><td>{item.qty-item.received}</td><td>{money(item.price)}</td><td>{money(item.qty*item.price)}</td><td><POBadge status={selected.status}/></td></tr>)}</tbody></table></div></section><div className="po-detail-bottom"><section className="po-detail-card attachments-card"><h3>Attachments</h3><div><FileText size={17}/><span>Quotation_{selected.reference||'PO'}.pdf<small>245 KB</small></span><Ellipsis size={16}/></div><button onClick={()=>onNotify('Attachment added')}><Plus size={13}/> Add File</button></section><section className="po-detail-card summary-card"><h3>Total Summary</h3><div><span>Subtotal</span><strong>{money(selected.value)}</strong></div><div><span>GST (18%)</span><strong>{money(selected.value*.18)}</strong></div><div className="grand-total"><span>Grand Total</span><strong>{money(selected.value*1.18)}</strong></div></section></div></section></div>}
-  </section>
+export default function PurchaseOrdersPage({ onNotify }: PageProps) {
+  const [orders, setOrders] = useState<PurchaseOrder[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
+  const [query, setQuery] = useState("");
+  const [activeTab, setActiveTab] = useState("All");
+  const [showForm, setShowForm] = useState(false);
+  const [selected, setSelected] = useState<PurchaseOrder | null>(null);
+  const [supplier, setSupplier] = useState("");
+  const [currency, setCurrency] = useState("INR");
+  const [reference, setReference] = useState("");
+  const [deliveryTerms, setDeliveryTerms] = useState(
+    "Delivered at Place (DAP)",
+  );
+  const [shipToLocation, setShipToLocation] = useState("");
+  const [remarks, setRemarks] = useState("");
+  const [poDate, setPoDate] = useState(
+    new Date().toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    }),
+  );
+  const [deliveryDate, setDeliveryDate] = useState("");
+  const [paymentTerms, setPaymentTerms] = useState("30 Days");
+  const [lines, setLines] = useState<POItem[]>([
+    { code: "", name: "", unit: "", qty: 1, received: 0, price: 0 },
+  ]);
+  const loadOrders = () =>
+    fetch("/api/purchase-orders")
+      .then(async (response) => {
+        const data = await response.json();
+        if (!response.ok)
+          throw new Error(data.error || "Could not load purchase orders.");
+        setOrders(data);
+        setLoadError("");
+      })
+      .catch((error) =>
+        setLoadError(
+          error instanceof Error
+            ? error.message
+            : "Could not load purchase orders.",
+        ),
+      )
+      .finally(() => setLoading(false));
+  useEffect(() => {
+    void loadOrders();
+  }, []);
+  const filtered = useMemo(
+    () =>
+      orders.filter(
+        (order) =>
+          (activeTab === "All" || order.status === activeTab) &&
+          `${order.number} ${order.supplier} ${order.items.map((item) => item.name).join(" ")}`
+            .toLowerCase()
+            .includes(query.toLowerCase()),
+      ),
+    [orders, activeTab, query],
+  );
+  const total = lines.reduce((sum, item) => sum + item.qty * item.price, 0);
+  const saveOrder = async (
+    event?: FormEvent<HTMLFormElement>,
+    status: POStatus = "Open",
+  ) => {
+    event?.preventDefault();
+    try {
+      const response = await fetch("/api/purchase-orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          poDate,
+          supplier,
+          currency,
+          reference,
+          paymentTerms,
+          deliveryTerms,
+          shipToLocation,
+          remarks,
+          expectedDeliveryDate: deliveryDate,
+          status,
+          items: lines.map((item) => ({
+            code: item.code,
+            name: item.name,
+            unit: item.unit,
+            quantity: item.qty,
+            unitPrice: item.price,
+          })),
+        }),
+      });
+      const result = await response.json();
+      if (!response.ok)
+        throw new Error(result.error || "Purchase order could not be saved.");
+      setShowForm(false);
+      await loadOrders();
+      onNotify(
+        `${result.number} ${status === "Draft" ? "saved as draft" : "created"}`,
+      );
+    } catch (error) {
+      onNotify(
+        error instanceof Error
+          ? error.message
+          : "Purchase order could not be saved.",
+      );
+    }
+  };
+  const addLine = () =>
+    setLines([
+      ...lines,
+      { code: "", name: "", unit: "Pcs", qty: 1, received: 0, price: 0 },
+    ]);
+  const updateLine = (
+    index: number,
+    key: keyof POItem,
+    value: string | number,
+  ) =>
+    setLines(
+      lines.map((line, lineIndex) =>
+        lineIndex === index ? { ...line, [key]: value } : line,
+      ),
+    );
+  return (
+    <section className="purchase-page" aria-busy={loading}>
+      <div className="purchase-heading">
+        <div>
+          <h1>Purchase Orders</h1>
+          <p>
+            Create and manage purchase orders for raw materials, components and
+            consumables
+          </p>
+        </div>
+        <div className="purchase-heading-actions">
+          <label className="purchase-search">
+            <Search size={15} />
+            <input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search PO number, supplier, material..."
+            />
+          </label>
+          <button
+            className="button secondary"
+            onClick={() => onNotify("Purchase order filters opened")}
+          >
+            <Filter size={15} /> Filters
+          </button>
+          <button className="button primary" onClick={() => setShowForm(true)}>
+            <Plus size={16} /> Create Purchase Order
+          </button>
+        </div>
+      </div>
+      {loadError && (
+        <p role="alert" className="form-error">
+          {loadError}
+        </p>
+      )}
+      <div className="purchase-list-card">
+        <div className="purchase-tabs">
+          {orderTabs.map((tab) => (
+            <button
+              key={tab}
+              className={activeTab === tab ? "active" : ""}
+              onClick={() => setActiveTab(tab)}
+            >
+              {tab}
+              <em>
+                (
+                {tab === "All"
+                  ? orders.length
+                  : orders.filter((order) => order.status === tab).length}
+                )
+              </em>
+            </button>
+          ))}
+        </div>
+        <div className="purchase-table-wrap">
+          <table className="purchase-table">
+            <thead>
+              <tr>
+                <th>
+                  <input
+                    type="checkbox"
+                    aria-label="Select all purchase orders"
+                  />
+                </th>
+                <th>PO Number</th>
+                <th>PO Date</th>
+                <th>Supplier</th>
+                <th>Material Items</th>
+                <th>Total Qty</th>
+                <th>Received Qty</th>
+                <th>Pending Qty</th>
+                <th>Total Value</th>
+                <th>Expected Delivery</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((order) => (
+                <tr key={order.number} onClick={() => setSelected(order)}>
+                  <td>
+                    <input
+                      type="checkbox"
+                      aria-label={`Select ${order.number}`}
+                      onClick={(event) => event.stopPropagation()}
+                    />
+                  </td>
+                  <td>{order.number}</td>
+                  <td>{order.date}</td>
+                  <td>{order.supplier}</td>
+                  <td>{order.itemCount} Items</td>
+                  <td>{order.qty.toLocaleString()}</td>
+                  <td>{order.received.toLocaleString()}</td>
+                  <td>
+                    {Math.max(order.qty - order.received, 0).toLocaleString()}
+                  </td>
+                  <td>
+                    <strong>{money(order.value)}</strong>
+                  </td>
+                  <td>{order.delivery}</td>
+                  <td>
+                    <span
+                      className={`po-status ${order.status.toLowerCase().replace(/ /g, "-")}`}
+                    >
+                      {order.status}
+                    </span>
+                  </td>
+                  <td>
+                    <button
+                      className="row-menu"
+                      aria-label={`More actions for ${order.number}`}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        onNotify(`Actions for ${order.number}`);
+                      }}
+                    >
+                      <Ellipsis size={18} />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+              {!loading && filtered.length === 0 && (
+                <tr>
+                  <td colSpan={12}>
+                    No purchase orders saved for this tenant yet.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+        <div className="purchase-footer">
+          <span>
+            Showing 1 to {filtered.length} of{" "}
+            {activeTab === "All" ? orders.length : filtered.length} results
+          </span>
+          <div className="pagination">
+            <button aria-label="Previous page">
+              <ChevronLeft size={16} />
+            </button>
+            <button className="selected">1</button>
+            <button>2</button>
+            <button>3</button>
+            <button>4</button>
+            <button>5</button>
+            <button aria-label="Next page">
+              <ChevronRight size={16} />
+            </button>
+          </div>
+        </div>
+      </div>
+      {showForm && (
+        <div
+          className="po-modal-backdrop"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) setShowForm(false);
+          }}
+        >
+          <form
+            className="po-modal"
+            onSubmit={(event) => saveOrder(event, "Open")}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="create-po-title"
+          >
+            <header className="po-modal-header">
+              <div>
+                <span>PURCHASING</span>
+                <h2 id="create-po-title">Create Purchase Order</h2>
+                <p>Create a new purchase order for selected materials.</p>
+              </div>
+              <button
+                type="button"
+                aria-label="Close purchase order form"
+                onClick={() => setShowForm(false)}
+              >
+                <X size={19} />
+              </button>
+            </header>
+            <div className="po-modal-body">
+              <div className="po-steps">
+                <span className="active">
+                  <i>1</i>
+                  <b>Basic Information</b>
+                  <small>PO details and supplier</small>
+                </span>
+                <span>
+                  <i>2</i>
+                  <b>Items &amp; Pricing</b>
+                  <small>Select materials and quantities</small>
+                </span>
+                <span>
+                  <i>3</i>
+                  <b>Delivery &amp; Terms</b>
+                  <small>Schedule and payment terms</small>
+                </span>
+                <span>
+                  <i>4</i>
+                  <b>Review &amp; Submit</b>
+                  <small>Verify and create PO</small>
+                </span>
+              </div>
+              <section className="po-form-section">
+                <div className="po-section-heading">
+                  <i>1</i>
+                  <div>
+                    <h3>Basic Information</h3>
+                    <p>
+                      Enter purchase order details and supplier information.
+                    </p>
+                  </div>
+                </div>
+                <div className="po-form-grid">
+                  <label>
+                    PO Number <b>*</b>
+                    <div className="po-autonumber">
+                      <input value="Generated when saved" readOnly />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          onNotify("Purchase order number generated")
+                        }
+                      >
+                        Auto Generate
+                      </button>
+                    </div>
+                  </label>
+                  <label>
+                    PO Date <b>*</b>
+                    <span className="po-date-input">
+                      <CalendarDays size={14} />
+                      <input
+                        value={poDate}
+                        onChange={(event) => setPoDate(event.target.value)}
+                      />
+                    </span>
+                  </label>
+                  <label>
+                    Supplier <b>*</b>
+                    <input
+                      value={supplier}
+                      onChange={(event) => setSupplier(event.target.value)}
+                      placeholder="Supplier name"
+                      required
+                    />
+                  </label>
+                  <label>
+                    Currency <b>*</b>
+                    <select
+                      value={currency}
+                      onChange={(event) => setCurrency(event.target.value)}
+                    >
+                      <option>INR</option>
+                      <option>USD</option>
+                      <option>EUR</option>
+                    </select>
+                  </label>
+                  <label>
+                    Reference No.
+                    <input
+                      value={reference}
+                      onChange={(event) => setReference(event.target.value)}
+                      placeholder="e.g. quotation number"
+                    />
+                  </label>
+                  <label>
+                    Buyer / Created By
+                    <input
+                      value="Recorded from signed-in user"
+                      readOnly
+                      className="po-readonly"
+                    />
+                  </label>
+                </div>
+              </section>
+              <section className="po-form-section po-items-section">
+                <div className="po-section-heading">
+                  <i className="second">2</i>
+                  <div>
+                    <h3>Items &amp; Pricing</h3>
+                    <p>Add materials and quantities to this purchase order.</p>
+                  </div>
+                  <button
+                    type="button"
+                    className="po-import-button"
+                    onClick={() => onNotify("Import items from MRP")}
+                  >
+                    <Upload size={13} /> Import from MRP
+                  </button>
+                </div>
+                <div className="po-lines-wrap">
+                  <table className="po-lines">
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>Material Code</th>
+                        <th>Material Name</th>
+                        <th>Unit</th>
+                        <th>Qty</th>
+                        <th>Unit Price (₹)</th>
+                        <th>Total (₹)</th>
+                        <th>Expected Delivery</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {lines.map((line, index) => (
+                        <tr key={`${index}-${line.code}`}>
+                          <td>{index + 1}</td>
+                          <td>
+                            <input
+                              value={line.code}
+                              onChange={(event) =>
+                                updateLine(index, "code", event.target.value)
+                              }
+                              placeholder="Material code"
+                            />
+                          </td>
+                          <td>
+                            <input
+                              value={line.name}
+                              onChange={(event) =>
+                                updateLine(index, "name", event.target.value)
+                              }
+                              placeholder="Material name"
+                              required
+                            />
+                          </td>
+                          <td>
+                            <select
+                              value={line.unit}
+                              onChange={(event) =>
+                                updateLine(index, "unit", event.target.value)
+                              }
+                            >
+                              <option>Kg</option>
+                              <option>Pcs</option>
+                              <option>Tonnes</option>
+                            </select>
+                          </td>
+                          <td>
+                            <input
+                              type="number"
+                              min="1"
+                              value={line.qty}
+                              onChange={(event) =>
+                                updateLine(
+                                  index,
+                                  "qty",
+                                  Number(event.target.value),
+                                )
+                              }
+                            />
+                          </td>
+                          <td>
+                            <input
+                              type="number"
+                              min="0"
+                              value={line.price}
+                              onChange={(event) =>
+                                updateLine(
+                                  index,
+                                  "price",
+                                  Number(event.target.value),
+                                )
+                              }
+                            />
+                          </td>
+                          <td>{money(line.qty * line.price)}</td>
+                          <td>
+                            <input defaultValue={deliveryDate} />
+                          </td>
+                          <td>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setLines(
+                                  lines.filter(
+                                    (_, lineIndex) => lineIndex !== index,
+                                  ),
+                                )
+                              }
+                              aria-label={`Remove item ${index + 1}`}
+                            >
+                              <X size={14} />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <button type="button" className="po-add-line" onClick={addLine}>
+                  <Plus size={14} /> Add Item
+                </button>
+                <div className="po-total-strip">
+                  <span>{lines.length} items</span>
+                  <strong>
+                    Subtotal <b>{money(total)}</b>
+                  </strong>
+                </div>
+              </section>
+              <section className="po-form-section">
+                <div className="po-section-heading">
+                  <i className="third">3</i>
+                  <div>
+                    <h3>Delivery &amp; Terms</h3>
+                    <p>Set expected delivery and commercial terms.</p>
+                  </div>
+                </div>
+                <div className="po-form-grid">
+                  <label>
+                    Expected Delivery Date <b>*</b>
+                    <span className="po-date-input">
+                      <CalendarDays size={14} />
+                      <input
+                        value={deliveryDate}
+                        onChange={(event) =>
+                          setDeliveryDate(event.target.value)
+                        }
+                      />
+                    </span>
+                  </label>
+                  <label>
+                    Payment Terms <b>*</b>
+                    <select
+                      value={paymentTerms}
+                      onChange={(event) => setPaymentTerms(event.target.value)}
+                    >
+                      <option>30 Days</option>
+                      <option>15 Days</option>
+                      <option>45 Days</option>
+                      <option>60 Days</option>
+                    </select>
+                  </label>
+                  <label>
+                    Delivery Terms
+                    <select
+                      value={deliveryTerms}
+                      onChange={(event) => setDeliveryTerms(event.target.value)}
+                    >
+                      <option>Delivered at Place (DAP)</option>
+                      <option>Ex Works (EXW)</option>
+                      <option>Free Carrier (FCA)</option>
+                    </select>
+                  </label>
+                  <label>
+                    Ship To Location
+                    <select
+                      value={shipToLocation}
+                      onChange={(event) =>
+                        setShipToLocation(event.target.value)
+                      }
+                    >
+                      <option>Main Warehouse</option>
+                      <option>Plant North</option>
+                      <option>Plant Central</option>
+                      <option>Plant West</option>
+                    </select>
+                  </label>
+                </div>
+                <label className="po-remarks">
+                  Remarks
+                  <textarea
+                    value={remarks}
+                    onChange={(event) => setRemarks(event.target.value)}
+                    placeholder="Add delivery or purchase notes"
+                  />
+                </label>
+              </section>
+            </div>
+            <footer className="po-modal-footer">
+              <button
+                type="button"
+                className="button secondary"
+                onClick={() => setShowForm(false)}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="button secondary"
+                onClick={() => saveOrder(undefined, "Draft")}
+              >
+                Save as Draft
+              </button>
+              <button type="submit" className="button primary">
+                Create Purchase Order <ChevronRight size={15} />
+              </button>
+            </footer>
+          </form>
+        </div>
+      )}
+      {selected && (
+        <div
+          className="po-modal-backdrop"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) setSelected(null);
+          }}
+        >
+          <section
+            className="po-detail-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="po-detail-title"
+          >
+            <header className="po-detail-head">
+              <div>
+                <span>
+                  Purchase Orders <i /> {selected.number}
+                </span>
+                <h2 id="po-detail-title">
+                  {selected.number} <POBadge status={selected.status} />
+                </h2>
+                <p>
+                  Supplier: {selected.supplier} <i /> Created by:{" "}
+                  {selected.createdBy || "—"} <i /> {selected.date}
+                </p>
+              </div>
+              <div>
+                <button
+                  className="button secondary"
+                  onClick={() => onNotify(`Edit ${selected.number}`)}
+                >
+                  Edit
+                </button>
+                <button
+                  className="button secondary"
+                  onClick={() => onNotify(`Print ${selected.number}`)}
+                >
+                  <Printer size={14} /> Print
+                </button>
+                <button
+                  className="button secondary"
+                  aria-label="Close PO details"
+                  onClick={() => setSelected(null)}
+                >
+                  <X size={15} />
+                </button>
+              </div>
+            </header>
+            <div className="po-detail-stats">
+              {[
+                ["Total Value", money(selected.value), "purple"],
+                ["Total Qty", selected.qty.toLocaleString(), "green"],
+                ["Received Qty", selected.received.toLocaleString(), "blue"],
+                [
+                  "Pending Qty",
+                  Math.max(
+                    selected.qty - selected.received,
+                    0,
+                  ).toLocaleString(),
+                  "red",
+                ],
+                ["Expected Delivery", selected.delivery, "orange"],
+              ].map(([label, value, tone], index) => (
+                <article key={label}>
+                  <i className={tone}>
+                    {
+                      [
+                        <Package size={16} />,
+                        <Truck size={16} />,
+                        <ClipboardList size={16} />,
+                        <CircleAlert size={16} />,
+                        <CalendarDays size={16} />,
+                      ][index]
+                    }
+                  </i>
+                  <div>
+                    <small>{label}</small>
+                    <strong>{value}</strong>
+                  </div>
+                </article>
+              ))}
+            </div>
+            <div className="po-detail-content">
+              <section className="po-detail-card po-info-card">
+                <h3>PO Information</h3>
+                {[
+                  ["PO Number", selected.number],
+                  ["PO Date", selected.date],
+                  ["Supplier", selected.supplier],
+                  ["Reference No.", selected.reference || "—"],
+                  ["Currency", selected.currency],
+                  ["Payment Terms", selected.paymentTerms],
+                  ["Status", selected.status],
+                  ["Created By", selected.createdBy || "—"],
+                  ["Remarks", selected.remarks || "—"],
+                ].map(([label, value]) => (
+                  <div key={label}>
+                    <span>{label}</span>
+                    <strong>{value}</strong>
+                  </div>
+                ))}
+              </section>
+              <div className="po-detail-right">
+                <section className="po-detail-card delivery-progress">
+                  <h3>Delivery Progress</h3>
+                  <div className="progress-track">
+                    {[
+                      "PO Created",
+                      "Sent to Supplier",
+                      "Confirmed",
+                      "Partially Received",
+                      "Completed",
+                    ].map((label, index) => (
+                      <div
+                        className={
+                          index <
+                          Math.max(
+                            1,
+                            Math.min(
+                              4,
+                              Math.ceil(
+                                (selected.received /
+                                  Math.max(selected.qty, 1)) *
+                                  4,
+                              ),
+                            ),
+                          )
+                            ? "done"
+                            : index === 3
+                              ? "current"
+                              : ""
+                        }
+                        key={label}
+                      >
+                        <i>
+                          {index <
+                          Math.max(
+                            1,
+                            Math.min(
+                              4,
+                              Math.ceil(
+                                (selected.received /
+                                  Math.max(selected.qty, 1)) *
+                                  4,
+                              ),
+                            ),
+                          )
+                            ? "✓"
+                            : index + 1}
+                        </i>
+                        <span>{label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+                <section className="po-detail-card supplier-card">
+                  <h3>Supplier Information</h3>
+                  <div>
+                    <span className="supplier-avatar">
+                      {selected.supplier.slice(0, 1)}
+                    </span>
+                    <p>
+                      <strong>{selected.supplier}</strong>
+                      <small>GST: 27AAACG1234F1Z5</small>
+                      <small>Phone: +91 98765 43210</small>
+                      <small>
+                        Email: info@
+                        {selected.supplier.toLowerCase().replace(/[^a-z]/g, "")}
+                        .com
+                      </small>
+                    </p>
+                    <button onClick={() => onNotify("Supplier profile opened")}>
+                      View Supplier
+                    </button>
+                  </div>
+                </section>
+              </div>
+            </div>
+            <section className="po-detail-card po-detail-items">
+              <h3>Items</h3>
+              <div className="po-lines-wrap">
+                <table className="po-lines detail-lines">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Material Code</th>
+                      <th>Material Name</th>
+                      <th>Unit</th>
+                      <th>Ordered Qty</th>
+                      <th>Received Qty</th>
+                      <th>Pending Qty</th>
+                      <th>Unit Price</th>
+                      <th>Total</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {selected.items.map((item, index) => (
+                      <tr key={`${item.code}-${index}`}>
+                        <td>{index + 1}</td>
+                        <td>{item.code}</td>
+                        <td>{item.name}</td>
+                        <td>{item.unit}</td>
+                        <td>{item.qty}</td>
+                        <td>{item.received}</td>
+                        <td>{item.qty - item.received}</td>
+                        <td>{money(item.price)}</td>
+                        <td>{money(item.qty * item.price)}</td>
+                        <td>
+                          <POBadge status={selected.status} />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+            <div className="po-detail-bottom">
+              <section className="po-detail-card attachments-card">
+                <h3>Attachments</h3>
+                <div>
+                  <FileText size={17} />
+                  <span>
+                    Quotation_{selected.reference || "PO"}.pdf
+                    <small>245 KB</small>
+                  </span>
+                  <Ellipsis size={16} />
+                </div>
+                <button onClick={() => onNotify("Attachment added")}>
+                  <Plus size={13} /> Add File
+                </button>
+              </section>
+              <section className="po-detail-card summary-card">
+                <h3>Total Summary</h3>
+                <div>
+                  <span>Subtotal</span>
+                  <strong>{money(selected.value)}</strong>
+                </div>
+                <div>
+                  <span>GST (18%)</span>
+                  <strong>{money(selected.value * 0.18)}</strong>
+                </div>
+                <div className="grand-total">
+                  <span>Grand Total</span>
+                  <strong>{money(selected.value * 1.18)}</strong>
+                </div>
+              </section>
+            </div>
+          </section>
+        </div>
+      )}
+    </section>
+  );
 }
 
-function POBadge({status}:{status:POStatus}){return <span className={`po-status ${status.toLowerCase().replace(/ /g,'-')}`}>{status}</span>}
+function POBadge({ status }: { status: POStatus }) {
+  return (
+    <span className={`po-status ${status.toLowerCase().replace(/ /g, "-")}`}>
+      {status}
+    </span>
+  );
+}
