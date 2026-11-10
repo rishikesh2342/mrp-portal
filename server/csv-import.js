@@ -61,7 +61,9 @@ function uniqueKeys(rows, keyFields) {
 export async function importCsv(pool, { dataset, fileName, csvText }) {
   const handlers = {
     plants: importPlants, materials: importMaterials, finished_goods: importFinishedGoods,
-    plant_constraints: importConstraints, bom: importBom, inventory: importInventory, demand: importDemand,
+    plant_constraints: importConstraints, bom: importBom, inventory: importInventory,
+    demand: (db, data) => importDemand(db, data, 'Weekly'),
+    demand_monthly: (db, data) => importDemand(db, data, 'Monthly'),
   };
   if (!handlers[dataset]) throw new Error('Select a supported CSV upload type.');
   if (typeof csvText !== 'string' || csvText.length > 10 * 1024 * 1024) throw new Error('CSV file is missing or larger than 10 MB.');
@@ -154,10 +156,13 @@ async function importInventory(db, rows) {
     if (!result.rowCount) throw new Error(`Row ${n}: material ${row.material_code} does not exist.`);
   }
 }
-async function importDemand(db, rows) {
+async function importDemand(db, rows, expectedBucket) {
   requireColumns(rows,['plant_code','fg_code','bucket_date','bucket_type','forecast_qty']); uniqueKeys(rows,['plant_code','fg_code','bucket_date']);
   for(const [i,row] of rows.entries()) {
-    const n=i+2; date(row.bucket_date,'bucket_date',n); if(new Date(`${row.bucket_date}T00:00:00Z`).getUTCDay()!==0) throw new Error(`Row ${n}: weekly bucket_date must be a Sunday.`); if(row.bucket_type!=='Weekly') throw new Error(`Row ${n}: this upload accepts Weekly demand buckets only.`);
+    const n=i+2; date(row.bucket_date,'bucket_date',n);
+    if(row.bucket_type!==expectedBucket) throw new Error(`Row ${n}: choose ${expectedBucket} demand forecast for this file.`);
+    if(expectedBucket==='Weekly' && new Date(`${row.bucket_date}T00:00:00Z`).getUTCDay()!==0) throw new Error(`Row ${n}: weekly bucket_date must be a Sunday.`);
+    if(expectedBucket==='Monthly' && !/^\d{4}-\d{2}-01$/.test(row.bucket_date)) throw new Error(`Row ${n}: monthly bucket_date must be the first day of the month (YYYY-MM-01).`);
     number(row.forecast_qty,'forecast_qty',n);
     await db.query(`INSERT INTO mrp.demand_forecast(plant_code,fg_code,bucket_date,forecast_qty,updated_at) VALUES($1,$2,$3,$4,now())
       ON CONFLICT(plant_code,fg_code,bucket_date) DO UPDATE SET forecast_qty=EXCLUDED.forecast_qty,updated_at=now()`,[row.plant_code,row.fg_code,row.bucket_date,Number(row.forecast_qty)]);

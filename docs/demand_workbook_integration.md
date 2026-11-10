@@ -16,6 +16,8 @@ MRP uses one selected forecast scenario per run. It never adds System Forecast, 
 
 The importer maps the source Plant and Material/Product values to records already in MRP Portal. Codes that match are suggested automatically, including values with leading zero differences. Every source code must be mapped before import. A source product must correspond to a finished good in each selected plant; product codes that do not exist in Master Data must be added there first.
 
+The Demand Planning **Upload type** menu also supports CSV demand uploads. Choose **Weekly demand forecast** for Sunday-dated weeks or **Monthly demand forecast** for month-start dates. Both use the columns `plant_code,fg_code,bucket_date,bucket_type,forecast_qty`; monthly dates must be `YYYY-MM-01` and `bucket_type` must be `Monthly`, while weekly dates must be Sundays and `bucket_type` must be `Weekly`.
+
 ## Import steps
 
 1. Open **Forward MRP Plan** and choose **Import demand workbook**.

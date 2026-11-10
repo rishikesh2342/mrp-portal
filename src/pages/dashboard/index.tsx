@@ -14,7 +14,6 @@ import {
   X,
 } from "lucide-react";
 import type { PageProps } from "../types";
-import DemandWorkbookImport from "../shared/DemandWorkbookImport";
 import "./forward-mrp.css";
 
 type Country = {
@@ -450,7 +449,6 @@ export default function DashboardPage({ onNotify }: PageProps) {
           </p>
         </div>
         <div className="forward-actions">
-          <DemandWorkbookImport plants={options.plants} finishedGoods={options.finishedGoods} onNotify={onNotify} onImported={(id, bucket) => { setDemandScenarioId(id); setBucketType(bucket); void refreshDemandScenarios(); }}/>
           <button className="button secondary" onClick={openScenario}>
             <SlidersHorizontal size={15} /> Scenario inputs
           </button>

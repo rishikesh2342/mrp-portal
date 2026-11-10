@@ -1,11 +1,11 @@
 import { useRef, useState } from 'react'
 import { FileUp, LoaderCircle } from 'lucide-react'
 
-export type CsvDataset = 'plants' | 'materials' | 'finished_goods' | 'plant_constraints' | 'bom' | 'inventory' | 'demand'
+export type CsvDataset = 'plants' | 'materials' | 'finished_goods' | 'plant_constraints' | 'bom' | 'inventory' | 'demand' | 'demand_monthly'
 
 const datasetLabels: Record<CsvDataset, string> = {
   plants: 'Plant master', materials: 'Material master', finished_goods: 'Finished goods',
-  plant_constraints: 'Plant constraints', bom: 'Bill of materials', inventory: 'Inventory & stock', demand: 'Weekly demand forecast',
+  plant_constraints: 'Plant constraints', bom: 'Bill of materials', inventory: 'Inventory & stock', demand: 'Weekly demand forecast', demand_monthly: 'Monthly demand forecast',
 }
 
 export default function CsvUpload({ datasets, onNotify }: { datasets: CsvDataset[]; onNotify: (message: string) => void }) {
