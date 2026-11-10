@@ -31,6 +31,12 @@ const guides: { section: string; items: Guide[] }[] = [
         href: '/project-docs/docs/time_phased_material_plan_guide.pdf',
         format: 'PDF',
       },
+      {
+        title: 'Demand workbook import guide',
+        description: 'Import changing Excel forecast workbooks, map plant and product codes, select one scenario, and filter customer dimensions.',
+        href: '/project-docs/docs/demand_workbook_integration.md',
+        format: 'Markdown',
+      },
     ],
   },
   {

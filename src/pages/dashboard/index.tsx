@@ -14,6 +14,7 @@ import {
   X,
 } from "lucide-react";
 import type { PageProps } from "../types";
+import DemandWorkbookImport from "../shared/DemandWorkbookImport";
 import "./forward-mrp.css";
 
 type Country = {
@@ -80,6 +81,8 @@ type MRPOutput = {
   >;
   results: MRPRow[];
 };
+type DemandScenario = { import_id: string; scenario_name: string; scenario_type: string; bucket_type: "Monthly" | "Weekly"; imported_at: string; imported_rows: number };
+type ScenarioDimension = { dimension_key: string; values: { value: string; rows: number }[] };
 type Options = {
   countries: Country[];
   plants: Plant[];
@@ -130,6 +133,11 @@ export default function DashboardPage({ onNotify }: PageProps) {
   const [ready, setReady] = useState(false);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [scenarioOpen, setScenarioOpen] = useState(false);
+  const [demandScenarios, setDemandScenarios] = useState<DemandScenario[]>([]);
+  const [demandScenarioId, setDemandScenarioId] = useState("");
+  const [scenarioDimensions, setScenarioDimensions] = useState<ScenarioDimension[]>([]);
+  const [dimensionFilters, setDimensionFilters] = useState<Record<string, string>>({});
+  const [demandAggregation, setDemandAggregation] = useState("ship_to");
   const [scenario, setScenario] = useState<Scenario>({
     plantCode: "",
     fgCode: "",
@@ -162,6 +170,13 @@ export default function DashboardPage({ onNotify }: PageProps) {
       .catch((reason: Error) => setError(reason.message));
   }, []);
 
+  const refreshDemandScenarios = () => fetch("/api/demand/scenarios").then((r) => r.ok ? r.json() : []).then((rows: DemandScenario[]) => setDemandScenarios(rows));
+  useEffect(() => { void refreshDemandScenarios(); }, []);
+  useEffect(() => {
+    if (!demandScenarioId) { setScenarioDimensions([]); setDimensionFilters({}); return; }
+    fetch(`/api/demand/scenarios/${demandScenarioId}/dimensions`).then((r) => r.json()).then((rows: ScenarioDimension[]) => { setScenarioDimensions(rows); setDimensionFilters({}); });
+  }, [demandScenarioId]);
+
   async function runMrp(overrides?: {
     forecastOverrides?: object[];
     inventoryOverrides?: object[];
@@ -186,6 +201,9 @@ export default function DashboardPage({ onNotify }: PageProps) {
           horizonMonths,
           bucketType,
           planningStart,
+          demandScenarioId: demandScenarioId || null,
+          dimensionFilters,
+          demandAggregation,
           ...overrides,
         }),
       });
@@ -432,6 +450,7 @@ export default function DashboardPage({ onNotify }: PageProps) {
           </p>
         </div>
         <div className="forward-actions">
+          <DemandWorkbookImport plants={options.plants} finishedGoods={options.finishedGoods} onNotify={onNotify} onImported={(id, bucket) => { setDemandScenarioId(id); setBucketType(bucket); void refreshDemandScenarios(); }}/>
           <button className="button secondary" onClick={openScenario}>
             <SlidersHorizontal size={15} /> Scenario inputs
           </button>
@@ -451,6 +470,9 @@ export default function DashboardPage({ onNotify }: PageProps) {
       </header>
 
       <section className="forward-filters" aria-label="MRP planning filters">
+        <label>Demand scenario<select value={demandScenarioId} onChange={(e) => { const id=e.target.value; setDemandScenarioId(id); const selected=demandScenarios.find((s)=>s.import_id===id); if (selected) setBucketType(selected.bucket_type); }}><option value="">Existing demand forecast</option>{demandScenarios.map((s)=><option key={s.import_id} value={s.import_id} disabled={["actual","previous_year"].includes(s.scenario_type)}>{s.scenario_name} · {s.scenario_type.replaceAll("_"," ")}{["actual","previous_year"].includes(s.scenario_type) ? " (reference only)" : ""}</option>)}</select><small className="filter-help">One forecast scenario is used per MRP run.</small></label>
+        {demandScenarioId && <label>Demand aggregation<select value={demandAggregation} onChange={(e)=>setDemandAggregation(e.target.value)}><option value="ship_to">Ship To detail</option><option value="sold_to">Sold To</option><option value="product">Product total</option></select><small className="filter-help">Select one hierarchy level to prevent summing parent and child totals together.</small></label>}
+        {demandScenarioId && scenarioDimensions.map((dimension)=><label key={dimension.dimension_key}>{dimension.dimension_key.replaceAll("_"," ")}<select value={dimensionFilters[dimension.dimension_key] || ""} onChange={(e)=>setDimensionFilters({...dimensionFilters,[dimension.dimension_key]:e.target.value})}><option value="">All</option>{dimension.values.map((v)=><option key={v.value} value={v.value}>{v.value}</option>)}</select></label>)}
         <label>
           Country
           <select

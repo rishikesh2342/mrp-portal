@@ -61,6 +61,66 @@ function plannedQuantity(netRequirement, moq) {
   return Math.max(Number(moq || 0), netRequirement);
 }
 
+function normalizedDimensionValue(value) {
+  if (value == null) return "";
+  const text = String(value).trim();
+  return /^(n\/a|na|null|undefined)$/i.test(text) ? "" : text;
+}
+
+function dimensionValue(dimensions, keys) {
+  for (const key of keys) {
+    const value = normalizedDimensionValue(dimensions?.[key]);
+    if (value) return value;
+  }
+  return "";
+}
+
+function filterScenarioForecast(rows, dimensionFilters, aggregationLevel) {
+  const filters = Object.fromEntries(
+    Object.entries(dimensionFilters || {})
+      .map(([key, value]) => [key, Array.isArray(value) ? value.map(String) : [String(value)]])
+      .filter(([, values]) => values.length && values[0] !== ""),
+  );
+  const matching = rows.filter((row) =>
+    Object.entries(filters).every(([key, values]) =>
+      values.includes(normalizedDimensionValue(row.dimensions?.[key])),
+    ),
+  );
+  const groups = new Map();
+  for (const row of matching) {
+    const id = keyOf(row.plant_code, row.fg_code, row.bucket_date);
+    if (!groups.has(id)) groups.set(id, []);
+    groups.get(id).push(row);
+  }
+  const selected = [];
+  const level = aggregationLevel || "ship_to";
+  for (const group of groups.values()) {
+    const shipRows = group.filter((row) =>
+      dimensionValue(row.dimensions, ["ship_to", "ship_to_code", "ship_to_customer"]) !== "",
+    );
+    const soldRows = group.filter((row) =>
+      dimensionValue(row.dimensions, ["sold_to", "sold_to_code", "sold_to_customer"]) !== "",
+    );
+    const customerRows = group.filter((row) =>
+      Object.entries(row.dimensions || {}).some(([key, value]) =>
+        /customer|client|account|ship_to|sold_to/.test(key) && normalizedDimensionValue(value),
+      ),
+    );
+    const productRows = group.filter((row) => !customerRows.includes(row));
+    let chosen;
+    if (level === "sold_to") {
+      const soldToSummary = soldRows.filter((row) => !shipRows.includes(row));
+      chosen = soldToSummary.length ? soldToSummary : shipRows.length ? shipRows : productRows.length ? productRows : group;
+    } else if (level === "product") {
+      chosen = productRows.length ? productRows : shipRows.length ? shipRows : soldRows.length ? soldRows : group;
+    } else {
+      chosen = shipRows.length ? shipRows : soldRows.length ? soldRows : productRows.length ? productRows : group;
+    }
+    selected.push(...chosen);
+  }
+  return selected;
+}
+
 export async function calculateForwardMrp(client, input) {
   const countryCode = String(input.countryCode || "");
   const horizonMonths = Number(input.horizonMonths || 3);
@@ -94,6 +154,59 @@ export async function calculateForwardMrp(client, input) {
       "No active plants match the selected country and plant filters.",
     );
 
+  const demandScenarioId = input.demandScenarioId || null;
+  let demandScenario = null;
+  if (demandScenarioId) {
+    const scenarioResult = await client.query(
+      `SELECT import_id, scenario_name, scenario_type, bucket_type
+       FROM mrp.demand_scenario_imports WHERE import_id=$1 AND is_active`,
+      [demandScenarioId],
+    );
+    demandScenario = scenarioResult.rows[0] || null;
+    if (!demandScenario)
+      throw new Error("The selected forecast scenario is not active. Reload the scenario list and select the latest version.");
+    if (["actual", "previous_year"].includes(demandScenario.scenario_type))
+      throw new Error("Select a forecast scenario. Actuals and prior-year sheets are reference data.");
+    if (demandScenario.bucket_type !== bucketType)
+      throw new Error(`The selected scenario uses ${demandScenario.bucket_type.toLowerCase()} periods. Change the dashboard time bucket to match.`);
+  }
+
+  const forecastPromise = demandScenarioId
+    ? client.query(
+        `SELECT plant_code, fg_code,
+          to_char(bucket_date::date, 'YYYY-MM-DD') AS bucket_date,
+          forecast_qty, dimensions
+         FROM mrp.demand_scenario_forecasts
+         WHERE import_id=$1 AND plant_code=ANY($2::varchar[])
+           AND bucket_date >= $3::date AND bucket_date < $4::date`,
+        [
+          demandScenarioId,
+          plants,
+          iso(periods[0]),
+          iso(
+            bucketType === "Monthly"
+              ? addMonths(periods[periods.length - 1], 1)
+              : new Date(periods[periods.length - 1].getTime() + 7 * DAY_MS),
+          ),
+        ],
+      )
+    : client.query(
+        `SELECT plant_code, fg_code,
+          to_char(bucket_date::date, 'YYYY-MM-DD') AS bucket_date, forecast_qty
+         FROM mrp.demand_forecast
+         WHERE plant_code=ANY($1::varchar[])
+           AND bucket_date::date >= $2::date AND bucket_date::date < $3::date`,
+        [
+          plants,
+          iso(periods[0]),
+          iso(
+            bucketType === "Monthly"
+              ? addMonths(periods[periods.length - 1], 1)
+              : new Date(periods[periods.length - 1].getTime() + 7 * DAY_MS),
+          ),
+        ],
+      );
+
   const [
     materialsResult,
     forecastResult,
@@ -106,22 +219,7 @@ export async function calculateForwardMrp(client, input) {
     client.query(`SELECT material_code, description, category, supply_type, uom, unit_cost, scrap_pct,
       lead_time_buckets, moq, order_multiple, safety_stock_min, max_capacity
       FROM mrp.material_master WHERE active_flag ORDER BY material_code`),
-    client.query(
-      `SELECT plant_code, fg_code,
-        to_char(bucket_date::date, 'YYYY-MM-DD') AS bucket_date, forecast_qty
-      FROM mrp.demand_forecast
-      WHERE plant_code=ANY($1::varchar[])
-        AND bucket_date::date >= $2::date AND bucket_date::date < $3::date`,
-      [
-        plants,
-        iso(periods[0]),
-        iso(
-          bucketType === "Monthly"
-            ? addMonths(periods[periods.length - 1], 1)
-            : new Date(periods[periods.length - 1].getTime() + 7 * DAY_MS),
-        ),
-      ],
-    ),
+    forecastPromise,
     client.query(
       `SELECT plant_code, parent_fg_code, parent_material_code, material_code, ratio
       FROM mrp.bom_matrix WHERE active_flag AND plant_code=ANY($1::varchar[])
@@ -224,7 +322,10 @@ export async function calculateForwardMrp(client, input) {
       );
   }
   const forecastRows = new Map();
-  for (const row of forecastResult.rows) {
+  const demandRows = demandScenarioId
+    ? filterScenarioForecast(forecastResult.rows, input.dimensionFilters, input.demandAggregation)
+    : forecastResult.rows;
+  for (const row of demandRows) {
     const index = bucketIndex(row.bucket_date, periods, bucketType);
     if (index < 0) continue;
     const date = iso(periods[index]);
@@ -487,6 +588,8 @@ export async function calculateForwardMrp(client, input) {
   return {
     countryCode,
     currencyCode,
+    demandScenarioId: demandScenario?.import_id || null,
+    demandScenarioName: demandScenario?.scenario_name || null,
     horizonMonths,
     bucketType,
     planningStart: iso(periods[0]),

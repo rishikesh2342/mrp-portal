@@ -6,11 +6,64 @@ import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { calculateForwardMrp } from "./mrp-engine.js";
 import { importCsv } from "./csv-import.js";
+import { importDemandScenario } from "./scenario-demand-import.js";
 
 const { Pool } = pg;
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const app = express();
-app.use(express.json({ limit: "12mb" }));
+app.use(express.json({ limit: "32mb" }));
+
+app.post("/api/demand/scenario-import", async (req, res, next) => {
+  try {
+    const result = await importDemandScenario(pool, req.body || {});
+    res.json(result);
+  } catch (error) {
+    if (error.code && !String(error.code).startsWith("23")) return next(error);
+    res.status(400).json({ error: error.message });
+  }
+});
+
+app.get("/api/demand/scenarios", async (_req, res, next) => {
+  try {
+    const { rows } = await pool.query(`
+      SELECT i.import_id, i.file_name, i.source_sheet, i.scenario_name,
+        i.scenario_type, i.bucket_type, i.imported_at, i.imported_rows,
+        MIN(f.bucket_date) AS first_bucket, MAX(f.bucket_date) AS last_bucket
+      FROM mrp.demand_scenario_imports i
+      LEFT JOIN mrp.demand_scenario_forecasts f USING (import_id)
+      WHERE i.is_active
+      GROUP BY i.import_id
+      ORDER BY i.imported_at DESC, i.scenario_name
+    `);
+    res.json(rows);
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.get("/api/demand/scenarios/:importId/dimensions", async (req, res, next) => {
+  try {
+    const { rows } = await pool.query(`
+      WITH dimension_values AS (
+        SELECT d.key AS dimension_key, d.value AS dimension_value, COUNT(*)::int AS row_count
+        FROM mrp.demand_scenario_forecasts f
+        CROSS JOIN LATERAL jsonb_each_text(f.dimensions) d
+        WHERE f.import_id=$1
+        GROUP BY d.key, d.value
+      ), ranked AS (
+        SELECT *, ROW_NUMBER() OVER (PARTITION BY dimension_key ORDER BY row_count DESC, dimension_value) AS rank
+        FROM dimension_values
+      )
+      SELECT dimension_key, json_agg(json_build_object('value',dimension_value,'rows',row_count)
+               ORDER BY row_count DESC,dimension_value) AS values
+      FROM ranked WHERE rank <= 1000
+      GROUP BY dimension_key ORDER BY dimension_key
+    `, [req.params.importId]);
+    res.json(rows);
+  } catch (error) {
+    next(error);
+  }
+});
 
 app.post("/api/import/csv", async (req, res, next) => {
   try {
@@ -238,6 +291,9 @@ app.post("/api/mrp/run", async (req, res, next) => {
             fgCodes: req.body.fgCodes || [],
             materialCategories: req.body.materialCategories || [],
             materialCodes: req.body.materialCodes || [],
+            demandScenarioId: req.body.demandScenarioId || null,
+            dimensionFilters: req.body.dimensionFilters || {},
+            demandAggregation: req.body.demandAggregation || "ship_to",
             forecastOverrides: req.body.forecastOverrides || [],
             inventoryOverrides: req.body.inventoryOverrides || [],
           }),
@@ -381,6 +437,8 @@ async function start() {
     if (baseSchema.rows[0].table_name) {
       const operationalMigration = await readFile(new URL("../database/006_operational_mrp_job.sql", import.meta.url), "utf8");
       await pool.query(operationalMigration);
+      const scenarioDemandMigration = await readFile(new URL("../database/007_scenario_demand.sql", import.meta.url), "utf8");
+      await pool.query(scenarioDemandMigration);
       console.log("Operational MRP schema is ready.");
     } else {
       console.warn("Base MRP schema is missing. Apply schema.sql and 002_forward_mrp.sql before uploading data.");
