@@ -1,3 +1,5 @@
+import { quoteTenantSchema } from "./tenant-schemas.js";
+
 const allowedTypes = new Set([
   "system_forecast",
   "consensus_forecast",
@@ -31,8 +33,9 @@ function canonicalDimensions(value) {
   return { dimensions: sorted, key: JSON.stringify(sorted) };
 }
 
-export async function importDemandScenario(pool, input, tenantId) {
+export async function importDemandScenario(pool, input, tenantId, schemaName) {
   if (!tenantId) throw new Error("A signed-in tenant workspace is required for demand imports.");
+  const schema = quoteTenantSchema(schemaName);
   const fileName = String(input.fileName || "").trim().slice(0, 255);
   const sourceSheet = String(input.sourceSheet || "").trim().slice(0, 255);
   const scenarioName = String(input.scenarioName || sourceSheet).trim().slice(0, 255);
@@ -88,12 +91,12 @@ export async function importDemandScenario(pool, input, tenantId) {
   try {
     await client.query("BEGIN");
     await client.query(
-      `UPDATE mrp.demand_scenario_imports SET is_active=false
+      `UPDATE ${schema}.demand_scenario_imports SET is_active=false
        WHERE tenant_id=$1 AND is_active=true AND scenario_name=$2 AND source_sheet=$3 AND scenario_type=$4`,
       [tenantId, scenarioName, sourceSheet, scenarioType],
     );
     const importResult = await client.query(
-      `INSERT INTO mrp.demand_scenario_imports
+      `INSERT INTO ${schema}.demand_scenario_imports
        (tenant_id, file_name, source_sheet, scenario_name, scenario_type, bucket_type, date_format, imported_rows, import_metadata)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9::jsonb) RETURNING import_id`,
       [
@@ -136,7 +139,7 @@ export async function importDemandScenario(pool, input, tenantId) {
         return `($${base + 1},$${base + 2},$${base + 3},$${base + 4},$${base + 5},$${base + 6},$${base + 7},$${base + 8}::jsonb,$${base + 9},$${base + 10})`;
       });
       await client.query(
-        `INSERT INTO mrp.demand_scenario_forecasts
+        `INSERT INTO ${schema}.demand_scenario_forecasts
          (tenant_id,import_id,plant_code,fg_code,bucket_date,forecast_qty,uom,dimensions,dimension_key,source_row_number)
          VALUES ${tuples.join(",")}`,
         params,

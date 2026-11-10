@@ -8,6 +8,7 @@ import { calculateForwardMrp } from "./mrp-engine.js";
 import { importCsv } from "./csv-import.js";
 import { importDemandScenario } from "./scenario-demand-import.js";
 import { bootstrapDefaultTenant, bootstrapPlatformAdmin, registerTenantAuth } from "./tenant-auth.js";
+import { ensureTenantSchema, quoteTenantSchema } from "./tenant-schemas.js";
 
 const { Pool } = pg;
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
@@ -18,7 +19,7 @@ registerTenantAuth(app, pool);
 
 app.post("/api/demand/scenario-import", async (req, res, next) => {
   try {
-    const result = await importDemandScenario(pool, req.body || {}, req.tenant.tenant_id);
+    const result = await importDemandScenario(pool, req.body || {}, req.tenant.tenant_id, req.tenant.schema_name);
     res.json(result);
   } catch (error) {
     if (error.code && !String(error.code).startsWith("23")) return next(error);
@@ -28,12 +29,13 @@ app.post("/api/demand/scenario-import", async (req, res, next) => {
 
 app.get("/api/demand/scenarios", async (_req, res, next) => {
   try {
+    const schema = quoteTenantSchema(_req.tenant.schema_name);
     const { rows } = await pool.query(`
       SELECT i.import_id, i.file_name, i.source_sheet, i.scenario_name,
         i.scenario_type, i.bucket_type, i.imported_at, i.imported_rows,
         MIN(f.bucket_date) AS first_bucket, MAX(f.bucket_date) AS last_bucket
-      FROM mrp.demand_scenario_imports i
-      LEFT JOIN mrp.demand_scenario_forecasts f USING (import_id)
+      FROM ${schema}.demand_scenario_imports i
+      LEFT JOIN ${schema}.demand_scenario_forecasts f USING (import_id)
       WHERE i.tenant_id=$1 AND i.is_active
       GROUP BY i.import_id
       ORDER BY i.imported_at DESC, i.scenario_name
@@ -46,10 +48,11 @@ app.get("/api/demand/scenarios", async (_req, res, next) => {
 
 app.get("/api/demand/scenarios/:importId/dimensions", async (req, res, next) => {
   try {
+    const schema = quoteTenantSchema(req.tenant.schema_name);
     const { rows } = await pool.query(`
       WITH dimension_values AS (
         SELECT d.key AS dimension_key, d.value AS dimension_value, COUNT(*)::int AS row_count
-        FROM mrp.demand_scenario_forecasts f
+        FROM ${schema}.demand_scenario_forecasts f
         CROSS JOIN LATERAL jsonb_each_text(f.dimensions) d
         WHERE f.tenant_id=$1 AND f.import_id=$2
         GROUP BY d.key, d.value
@@ -70,7 +73,7 @@ app.get("/api/demand/scenarios/:importId/dimensions", async (req, res, next) => 
 
 app.post("/api/import/csv", async (req, res, next) => {
   try {
-    const result = await importCsv(pool, { ...(req.body || {}), tenantId: req.tenant.tenant_id });
+    const result = await importCsv(pool, { ...(req.body || {}), tenantId: req.tenant.tenant_id, schemaName: req.tenant.schema_name });
     res.json(result);
   } catch (error) {
     if (error.code && !String(error.code).startsWith("23")) return next(error);
@@ -89,11 +92,12 @@ app.get("/api/health", async (_req, res) => {
 
 app.get("/api/dashboard", async (req, res, next) => {
   try {
+    const schema = quoteTenantSchema(req.tenant.schema_name);
     const { rows } = await pool.query(
       `SELECT COUNT(DISTINCT p.plant_code)::int AS active_plants,
         COUNT(DISTINCT i.material_code)::int AS inventory_materials,
         COALESCE(SUM(i.on_hand_qty),0) AS total_on_hand
-       FROM mrp.plants p LEFT JOIN mrp.inventory_on_hand i
+       FROM ${schema}.plants p LEFT JOIN ${schema}.inventory_on_hand i
          ON i.tenant_id=p.tenant_id AND i.plant_code=p.plant_code
        WHERE p.tenant_id=$1 AND p.active_flag AND ($2::varchar IS NULL OR p.plant_code=$2)`,
       [req.tenant.tenant_id, req.query.plantId || null],
@@ -106,6 +110,7 @@ app.get("/api/dashboard", async (req, res, next) => {
 
 app.get("/api/material-requirements", async (req, res, next) => {
   try {
+    const schema = quoteTenantSchema(req.tenant.schema_name);
     const limit = Math.min(Number(req.query.limit) || 100, 500);
     const offset = Number(req.query.offset) || 0;
     const period = req.query.period ? `${req.query.period}-01` : null;
@@ -123,21 +128,21 @@ app.get("/api/material-requirements", async (req, res, next) => {
     // Use the newest completed run so this page shows the same calculation.
     const [forwardRun, forward] = await Promise.all([
       pool.query(`SELECT EXISTS (
-        SELECT 1 FROM mrp.mrp_runs r
-        WHERE r.tenant_id=$1 AND EXISTS (SELECT 1 FROM mrp.mrp_results x WHERE x.tenant_id=$1 AND x.run_id=r.run_id)
+        SELECT 1 FROM ${schema}.mrp_runs r
+        WHERE r.tenant_id=$1 AND EXISTS (SELECT 1 FROM ${schema}.mrp_results x WHERE x.tenant_id=$1 AND x.run_id=r.run_id)
       ) AS has_run`, [req.tenant.tenant_id]),
       pool.query(
       `WITH latest_run AS (
-         SELECT run_id FROM mrp.mrp_runs
-         WHERE tenant_id=$8 AND EXISTS (SELECT 1 FROM mrp.mrp_results r WHERE r.tenant_id=$8 AND r.run_id=mrp_runs.run_id)
-         ORDER BY created_at DESC LIMIT 1
+         SELECT run.run_id FROM ${schema}.mrp_runs AS run
+         WHERE run.tenant_id=$8 AND EXISTS (SELECT 1 FROM ${schema}.mrp_results r WHERE r.tenant_id=$8 AND r.run_id=run.run_id)
+         ORDER BY run.created_at DESC LIMIT 1
        ), requirement_rows AS (
          SELECT r.result_id AS requirement_id, r.run_id::text AS mrp_run_code,
            r.bucket_date AS period_date, r.material_code,
            m.description AS material_name,
            COALESCE((
              SELECT string_agg(DISTINCT b.parent_fg_code, ', ' ORDER BY b.parent_fg_code)
-             FROM mrp.bom_matrix b
+             FROM ${schema}.bom_matrix b
              WHERE b.tenant_id=$8 AND b.plant_code=r.plant_code AND b.material_code=r.material_code
                AND b.parent_fg_code IS NOT NULL AND b.active_flag
            ), 'N/A') AS product_code,
@@ -149,10 +154,10 @@ app.get("/api/material-requirements", async (req, res, next) => {
                      < COALESCE(i.safety_stock_min, m.safety_stock_min, 0) * 0.25 THEN 'High'
                 ELSE 'Medium' END AS priority,
            CASE WHEN r.planned_orders > 0 THEN 'Planned' ELSE 'Open' END AS status
-         FROM mrp.mrp_results r
+         FROM ${schema}.mrp_results r
          JOIN latest_run lr ON lr.run_id=r.run_id
-         JOIN mrp.material_master m ON m.tenant_id=$8 AND m.material_code=r.material_code
-         LEFT JOIN mrp.inventory_on_hand i ON i.tenant_id=$8 AND i.plant_code=r.plant_code AND i.material_code=r.material_code
+         JOIN ${schema}.material_master m ON m.tenant_id=$8 AND m.material_code=r.material_code
+         LEFT JOIN ${schema}.inventory_on_hand i ON i.tenant_id=$8 AND i.plant_code=r.plant_code AND i.material_code=r.material_code
          WHERE r.tenant_id=$8 AND (r.gross_req > 0 OR r.net_req > 0 OR r.planned_orders > 0)
        )
        SELECT * FROM requirement_rows
@@ -177,6 +182,7 @@ app.get("/api/material-requirements", async (req, res, next) => {
 
 app.get("/api/inventory", async (req, res, next) => {
   try {
+    const schema = quoteTenantSchema(req.tenant.schema_name);
     const { rows } = await pool.query(
       `
       SELECT m.material_code, m.description AS material_description, m.category, m.uom,
@@ -187,9 +193,9 @@ app.get("/api/inventory", async (req, res, next) => {
         p.plant_code,
         CASE WHEN COALESCE(i.on_hand_qty,0)=0 THEN 'Out of Stock'
              WHEN COALESCE(i.on_hand_qty,0)-COALESCE(i.reserved_qty,0)<COALESCE(c.min_stock_qty,i.safety_stock_min,m.safety_stock_min,0) THEN 'Low Stock' ELSE 'In Stock' END AS stock_status
-      FROM mrp.material_master m CROSS JOIN mrp.plants p
-      LEFT JOIN mrp.inventory_on_hand i ON i.tenant_id=$1 AND i.material_code=m.material_code AND i.plant_code=p.plant_code
-      LEFT JOIN mrp.plant_material_constraints c ON c.tenant_id=$1 AND c.material_code=m.material_code AND c.plant_code=p.plant_code
+      FROM ${schema}.material_master m CROSS JOIN ${schema}.plants p
+      LEFT JOIN ${schema}.inventory_on_hand i ON i.tenant_id=$1 AND i.material_code=m.material_code AND i.plant_code=p.plant_code
+      LEFT JOIN ${schema}.plant_material_constraints c ON c.tenant_id=$1 AND c.material_code=m.material_code AND c.plant_code=p.plant_code
       WHERE m.tenant_id=$1 AND p.tenant_id=$1 AND m.active_flag=true AND p.active_flag=true AND ($2::varchar IS NULL OR p.plant_code=$2)
       ORDER BY p.plant_code,m.material_code`,
       [req.tenant.tenant_id, req.query.plantCode || null],
@@ -202,11 +208,12 @@ app.get("/api/inventory", async (req, res, next) => {
 
 app.get("/api/suppliers", async (_req, res, next) => {
   try {
+    const schema = quoteTenantSchema(_req.tenant.schema_name);
     const { rows } =
       await pool.query(`SELECT supplier_id, supplier_code, supplier_name, supplier_type,
       contact_person, email, phone, location, lead_time_days, min_order_value, payment_terms,
       quality_rating, on_time_delivery_pct, rejection_rate_pct, status
-      FROM mrp.dim_supplier ORDER BY supplier_name`);
+      FROM ${schema}.dim_supplier ORDER BY supplier_name`);
     res.json(rows);
   } catch (error) {
     next(error);
@@ -215,19 +222,20 @@ app.get("/api/suppliers", async (_req, res, next) => {
 
 app.get("/api/mrp/options", async (_req, res, next) => {
   try {
+    const schema = quoteTenantSchema(_req.tenant.schema_name);
     const [countries, plants, finishedGoods, materials] = await Promise.all([
       pool.query(`SELECT c.country_code, c.country_name, c.currency_code
         FROM mrp.countries c
-        WHERE EXISTS (SELECT 1 FROM mrp.plants p
+        WHERE EXISTS (SELECT 1 FROM ${schema}.plants p
           WHERE p.tenant_id=$1 AND p.country_code=c.country_code AND p.active_flag)
         ORDER BY c.country_name`, [_req.tenant.tenant_id]),
       pool.query(
-        "SELECT plant_code, plant_name, country_code FROM mrp.plants WHERE tenant_id=$1 AND active_flag ORDER BY plant_name", [_req.tenant.tenant_id],
+        `SELECT plant_code, plant_name, country_code FROM ${schema}.plants WHERE tenant_id=$1 AND active_flag ORDER BY plant_name`, [_req.tenant.tenant_id],
       ),
-      pool.query(`SELECT plant_code, fg_code, description, product_type, uom FROM mrp.fg_master
+      pool.query(`SELECT plant_code, fg_code, description, product_type, uom FROM ${schema}.fg_master
         WHERE tenant_id=$1 AND active_flag ORDER BY plant_code, fg_code`, [_req.tenant.tenant_id]),
       pool.query(`SELECT material_code, description, category, uom, unit_cost, safety_stock_min, max_capacity
-        FROM mrp.material_master WHERE tenant_id=$1 AND active_flag ORDER BY material_code`, [_req.tenant.tenant_id]),
+        FROM ${schema}.material_master WHERE tenant_id=$1 AND active_flag ORDER BY material_code`, [_req.tenant.tenant_id]),
     ]);
     res.json({
       countries: countries.rows,
@@ -243,6 +251,7 @@ app.get("/api/mrp/options", async (_req, res, next) => {
 app.post("/api/mrp/run", async (req, res, next) => {
   let client;
   try {
+    const schema = quoteTenantSchema(req.tenant.schema_name);
     client = await pool.connect();
     await client.query("BEGIN");
     const countries = Array.isArray(req.body.countryCodes)
@@ -257,7 +266,7 @@ app.post("/api/mrp/run", async (req, res, next) => {
     const runIds = [];
     for (const countryCode of [...new Set(countries.filter(Boolean))]) {
       const eligiblePlants = await client.query(
-        "SELECT plant_code FROM mrp.plants WHERE tenant_id=$1 AND country_code=$2 AND active_flag",
+        `SELECT plant_code FROM ${schema}.plants WHERE tenant_id=$1 AND country_code=$2 AND active_flag`,
         [req.tenant.tenant_id, countryCode],
       );
       const countryPlantCodes = eligiblePlants.rows.map(
@@ -272,9 +281,10 @@ app.post("/api/mrp/run", async (req, res, next) => {
         countryCode,
         plantCodes,
         tenantId: req.tenant.tenant_id,
+        schemaName: req.tenant.schema_name,
       });
       const run = await client.query(
-        `INSERT INTO mrp.mrp_runs
+        `INSERT INTO ${schema}.mrp_runs
         (tenant_id, country_code, planning_start, horizon_months, bucket_type, created_by, scenario_inputs)
         VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING run_id`,
         [
@@ -329,7 +339,7 @@ app.post("/api/mrp/run", async (req, res, next) => {
           return `($${base + 1},$${base + 2},$${base + 3},$${base + 4},$${base + 5},$${base + 6},$${base + 7},$${base + 8},$${base + 9},$${base + 10},$${base + 11},$${base + 12},$${base + 13})`;
         });
         await client.query(
-          `INSERT INTO mrp.mrp_results
+          `INSERT INTO ${schema}.mrp_results
           (tenant_id, run_id, plant_code, material_code, bucket_date, gross_req, scheduled_receipts,
            net_req, planned_orders, projected_inventory, order_release_date, expedite_now, capacity_exceeded_flag)
           VALUES ${tuples.join(",")}`,
@@ -389,9 +399,10 @@ app.post("/api/mrp/run", async (req, res, next) => {
 
 app.get("/api/mrp/runs/:runId", async (req, res, next) => {
   try {
+    const schema = quoteTenantSchema(req.tenant.schema_name);
     const run = await pool.query(
       `SELECT run_id, country_code, planning_start, horizon_months, bucket_type, scenario_inputs, created_at
-      FROM mrp.mrp_runs WHERE tenant_id=$1 AND run_id=$2`,
+      FROM ${schema}.mrp_runs WHERE tenant_id=$1 AND run_id=$2`,
       [req.tenant.tenant_id, req.params.runId],
     );
     if (!run.rowCount)
@@ -400,7 +411,7 @@ app.get("/api/mrp/runs/:runId", async (req, res, next) => {
       `SELECT r.plant_code, r.material_code, m.description, m.category, m.uom,
       m.unit_cost, r.bucket_date, r.gross_req, r.scheduled_receipts, r.net_req, r.planned_orders,
       r.projected_inventory, r.order_release_date, r.expedite_now, r.capacity_exceeded_flag AS capacity_exceeded
-      FROM mrp.mrp_results r JOIN mrp.material_master m ON m.tenant_id=r.tenant_id AND m.material_code=r.material_code
+      FROM ${schema}.mrp_results r JOIN ${schema}.material_master m ON m.tenant_id=r.tenant_id AND m.material_code=r.material_code
       WHERE r.tenant_id=$1 AND m.tenant_id=$1 AND r.run_id=$2 ORDER BY r.plant_code, r.material_code, r.bucket_date`,
       [req.tenant.tenant_id, req.params.runId],
     );
@@ -457,6 +468,27 @@ async function start() {
       if (!platformMigration.rows[0].applied) {
         const platformAdminMigration = await readFile(new URL("../database/009_platform_admin.sql", import.meta.url), "utf8");
         await pool.query(platformAdminMigration);
+      }
+      const schemaMigration = await pool.query(
+        "SELECT EXISTS (SELECT 1 FROM public.schema_migrations WHERE version='010_tenant_schemas') AS applied",
+      );
+      if (!schemaMigration.rows[0].applied) {
+        const tenantSchemaMigration = await readFile(new URL("../database/010_tenant_schemas.sql", import.meta.url), "utf8");
+        await pool.query(tenantSchemaMigration);
+      }
+      const tenants = await pool.query(
+        "SELECT tenant_id,tenant_code,tenant_name,schema_name FROM public.tenants ORDER BY tenant_code",
+      );
+      for (const tenant of tenants.rows) {
+        const tenantClient = await pool.connect();
+        try {
+          await tenantClient.query("BEGIN");
+          await ensureTenantSchema(tenantClient, tenant, { copyExisting: true });
+          await tenantClient.query("COMMIT");
+        } catch (error) {
+          await tenantClient.query("ROLLBACK");
+          throw error;
+        } finally { tenantClient.release(); }
       }
       await bootstrapDefaultTenant(pool);
       await bootstrapPlatformAdmin(pool);

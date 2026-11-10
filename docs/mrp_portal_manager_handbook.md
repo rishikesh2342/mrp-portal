@@ -356,6 +356,8 @@ Use a scenario to answer a narrow “what if” question, such as “What if the
 
 ### Main database objects
 
+Table names below are shown in the `mrp` template schema. Runtime planning records use the same table layout inside the selected tenant schema. `mrp.countries` remains shared lookup data; each tenant schema also has its own supplier catalog.
+
 | Table | Business content |
 | --- | --- |
 | `mrp.countries` | Country code/name and reporting currency. |
@@ -370,7 +372,15 @@ Use a scenario to answer a narrow “what if” question, such as “What if the
 | `mrp.mrp_runs` | Calculation metadata, scope, scenario values, and timestamp. |
 | `mrp.mrp_results` | Per-run plant/material/bucket requirement, receipts, planned orders, projected stock, release and flags. |
 
-The repository also contains an earlier/legacy set of `dim_*` and `fact_*` tables and routines in `database/schema.sql`. The newer forward calculation uses the additive forward model under `mrp` described above. There are legacy API fallback paths; the forward Dashboard is the primary planning workflow described here.
+### Planning tenants and database schemas
+
+The portal represents one organization with multiple planning tenants. A tenant code such as `mor-cem`, `ar-cem`, `ar-mor`, `ec-cem`, or `ec-dis` identifies one planning data area. PostgreSQL stores each tenant's operational tables in its own schema, such as `tenant_mor_cem`; the MRP table structure is copied consistently into each schema. Existing data is copied into the **Holcim Group** tenant schema during the automatic migration.
+
+An administrator uses the tenant selector in the page header to choose the active tenant. Imports, demand scenarios, MRP runs, inventory views, and saved requirements operate on that tenant's schema. **Administrator access currently spans all tenants** because per-tenant authorization is a later phase. New tenants are added from the selector with a tenant code and display name; their schemas start empty and need their own planning inputs.
+
+Demand and scenario imports use the existing scenario import and forecast tables inside each tenant schema. Variable source columns and customer levels are preserved in the forecast row's JSON dimensions, so adding a scenario or customer attribute does not create a new database table. This keeps future editing and Dashboard filtering on a consistent table structure.
+
+The repository also contains an earlier/legacy set of `dim_*` and `fact_*` tables and routines in `database/schema.sql`. The newer forward calculation uses the additive forward model described above. Existing supplier rows are copied into the current tenant schema; newly added tenant schemas start with an empty supplier catalog. Purchase-order and production-plan screens remain sample/local UI rather than tenant database workflows.
 
 ### Main API endpoints
 

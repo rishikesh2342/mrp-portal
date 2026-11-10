@@ -1,3 +1,5 @@
+import { quoteTenantSchema } from "./tenant-schemas.js";
+
 const DAY_MS = 86_400_000;
 
 const dateOnly = (value) =>
@@ -124,6 +126,7 @@ function filterScenarioForecast(rows, dimensionFilters, aggregationLevel) {
 export async function calculateForwardMrp(client, input) {
   const tenantId = String(input.tenantId || "");
   if (!tenantId) throw new Error("A tenant workspace is required to run MRP.");
+  const schema = quoteTenantSchema(input.schemaName);
   const countryCode = String(input.countryCode || "");
   const horizonMonths = Number(input.horizonMonths || 3);
   const bucketType = input.bucketType || "Monthly";
@@ -146,7 +149,7 @@ export async function calculateForwardMrp(client, input) {
     ? input.plantCodes.filter(Boolean)
     : [];
   const plantsResult = await client.query(
-    `SELECT p.plant_code FROM mrp.plants p WHERE p.tenant_id=$1 AND p.country_code=$2 AND p.active_flag
+    `SELECT p.plant_code FROM ${schema}.plants p WHERE p.tenant_id=$1 AND p.country_code=$2 AND p.active_flag
      AND (cardinality($3::varchar[])=0 OR p.plant_code=ANY($3::varchar[])) ORDER BY p.plant_code`,
     [tenantId, countryCode, selectedPlantCodes],
   );
@@ -161,7 +164,7 @@ export async function calculateForwardMrp(client, input) {
   if (demandScenarioId) {
     const scenarioResult = await client.query(
       `SELECT import_id, scenario_name, scenario_type, bucket_type
-       FROM mrp.demand_scenario_imports WHERE tenant_id=$1 AND import_id=$2 AND is_active`,
+       FROM ${schema}.demand_scenario_imports WHERE tenant_id=$1 AND import_id=$2 AND is_active`,
       [tenantId, demandScenarioId],
     );
     demandScenario = scenarioResult.rows[0] || null;
@@ -178,7 +181,7 @@ export async function calculateForwardMrp(client, input) {
         `SELECT plant_code, fg_code,
           to_char(bucket_date::date, 'YYYY-MM-DD') AS bucket_date,
           forecast_qty, dimensions
-         FROM mrp.demand_scenario_forecasts
+         FROM ${schema}.demand_scenario_forecasts
          WHERE tenant_id=$1 AND import_id=$2 AND plant_code=ANY($3::varchar[])
            AND bucket_date >= $4::date AND bucket_date < $5::date`,
         [
@@ -196,7 +199,7 @@ export async function calculateForwardMrp(client, input) {
     : client.query(
         `SELECT plant_code, fg_code,
           to_char(bucket_date::date, 'YYYY-MM-DD') AS bucket_date, forecast_qty
-         FROM mrp.demand_forecast
+         FROM ${schema}.demand_forecast
          WHERE tenant_id=$1 AND plant_code=ANY($2::varchar[])
            AND bucket_date::date >= $3::date AND bucket_date::date < $4::date`,
         [
@@ -222,11 +225,11 @@ export async function calculateForwardMrp(client, input) {
   ] = await Promise.all([
     client.query(`SELECT material_code, description, category, supply_type, uom, unit_cost, scrap_pct,
       lead_time_buckets, moq, order_multiple, safety_stock_min, max_capacity
-      FROM mrp.material_master WHERE tenant_id=$1 AND active_flag ORDER BY material_code`, [tenantId]),
+      FROM ${schema}.material_master WHERE tenant_id=$1 AND active_flag ORDER BY material_code`, [tenantId]),
     forecastPromise,
     client.query(
       `SELECT plant_code, parent_fg_code, parent_material_code, material_code, ratio
-      FROM mrp.bom_matrix WHERE tenant_id=$1 AND active_flag AND plant_code=ANY($2::varchar[])
+      FROM ${schema}.bom_matrix WHERE tenant_id=$1 AND active_flag AND plant_code=ANY($2::varchar[])
         AND effective_from <= $3 AND (effective_to IS NULL OR effective_to >= $3)
       ORDER BY bom_id`,
       [tenantId, plants, iso(periods[0])],
@@ -234,12 +237,12 @@ export async function calculateForwardMrp(client, input) {
     client.query(
       `SELECT plant_code, material_code, on_hand_qty, scheduled_receipts,
       reserved_qty, in_transit_qty, in_transit_due_date,
-      safety_stock_min, max_capacity FROM mrp.inventory_on_hand
+      safety_stock_min, max_capacity FROM ${schema}.inventory_on_hand
       WHERE tenant_id=$1 AND plant_code=ANY($2::varchar[])`,
       [tenantId, plants],
     ),
     client.query(
-      `SELECT plant_code, material_code, receipt_date, quantity FROM mrp.scheduled_receipts
+      `SELECT plant_code, material_code, receipt_date, quantity FROM ${schema}.scheduled_receipts
       WHERE tenant_id=$1 AND plant_code=ANY($2::varchar[]) AND receipt_date >= $3 AND receipt_date < $4`,
       [
         tenantId,
@@ -255,11 +258,11 @@ export async function calculateForwardMrp(client, input) {
     client.query(
       `SELECT plant_code, material_code, min_stock_qty, reorder_level, max_stock_qty,
         max_storage_capacity, lead_time_buckets, moq, order_multiple
-       FROM mrp.plant_material_constraints WHERE tenant_id=$1 AND plant_code=ANY($2::varchar[])`,
+       FROM ${schema}.plant_material_constraints WHERE tenant_id=$1 AND plant_code=ANY($2::varchar[])`,
       [tenantId, plants],
     ),
     client.query(
-      `SELECT plant_code, fg_code, product_type FROM mrp.fg_master
+      `SELECT plant_code, fg_code, product_type FROM ${schema}.fg_master
       WHERE tenant_id=$1 AND plant_code=ANY($2::varchar[]) AND active_flag`,
       [tenantId, plants],
     ),

@@ -68,8 +68,8 @@ const pageFor = (path: string): Page =>
     .flatMap((group) => group.items)
     .find((item) => routeFor(item.label) === path)?.label ?? "Dashboard";
 export default function App() {
-  type SignedInUser = { email: string; display_name: string; tenant_id: string; tenant_name: string; role: string };
-  type TenantOption = { tenant_id: string; tenant_name: string };
+  type SignedInUser = { email: string; display_name: string; tenant_id: string; tenant_code: string; tenant_name: string; role: string };
+  type TenantOption = { tenant_id: string; tenant_code: string; tenant_name: string };
   const [page, setPage] = useState<Page>(() =>
     pageFor(window.location.pathname),
   );
@@ -82,6 +82,11 @@ export default function App() {
   const [authChecked, setAuthChecked] = useState(false);
   const [tenantOptions, setTenantOptions] = useState<TenantOption[]>([]);
   const [tenantMenuOpen, setTenantMenuOpen] = useState(false);
+  const [tenantCreateOpen, setTenantCreateOpen] = useState(false);
+  const [newTenantCode, setNewTenantCode] = useState("");
+  const [newTenantName, setNewTenantName] = useState("");
+  const [tenantCreateError, setTenantCreateError] = useState("");
+  const [tenantCreateBusy, setTenantCreateBusy] = useState(false);
   useEffect(() => {
     const syncRoute = () => {
       setIsLoginRoute(window.location.pathname === "/login");
@@ -165,15 +170,14 @@ export default function App() {
               <X size={17} />
             </button>
           </div>
-          <button className="workspace-select">
+          <div className="workspace-select">
             <span className="workspace-icon">
               <Building2 size={16} />
             </span>
             <span className="workspace-text">
-              {authUser.tenant_name}<small>Company workspace</small>
+              {authUser.tenant_name}<small>Tenant · {authUser.tenant_code.toUpperCase()}</small>
             </span>
-            <ChevronDown size={15} />
-          </button>
+          </div>
           <div className="side-scroll">
             {groups.map((group) => (
               <section className="nav-group" key={group.title}>
@@ -252,7 +256,7 @@ export default function App() {
               <i />
             </button>
             <span className="top-divider" />
-            {authUser.role === "platform_admin" ? (
+            {authUser.role === "platform_admin" || authUser.role === "admin" ? (
               <div className="tenant-switcher">
                 <button className="org-switch" onClick={async () => {
                   if (!tenantMenuOpen && tenantOptions.length === 0) {
@@ -268,7 +272,7 @@ export default function App() {
                   setTenantMenuOpen(!tenantMenuOpen);
                 }} aria-expanded={tenantMenuOpen}>
                   <span className="org-logo">{authUser.tenant_name.slice(0,1).toUpperCase()}</span>
-                  <span>{authUser.tenant_name}<small className="platform-admin-label">Platform admin · choose workspace</small></span>
+                  <span>{authUser.tenant_name}<small className="platform-admin-label">Administrator · choose tenant</small></span>
                   <ChevronDown size={15} />
                 </button>
                 {tenantMenuOpen && <div className="tenant-menu" role="menu">
@@ -284,7 +288,8 @@ export default function App() {
                     } catch (error) {
                       notify(error instanceof Error ? error.message : "Could not switch workspace.");
                     }
-                  }}>{tenant.tenant_name}</button>)}
+                  }}>{tenant.tenant_code.toUpperCase()} · {tenant.tenant_name}</button>)}
+                  <button role="menuitem" className="tenant-add-action" onClick={() => { setTenantMenuOpen(false); setTenantCreateError(""); setTenantCreateOpen(true); }}>+ Add tenant</button>
                 </div>}
               </div>
             ) : (
@@ -312,6 +317,32 @@ export default function App() {
           <ModulePage page={page} onNotify={notify} onNavigate={changePage} />
         </div>
       </main>
+      {tenantCreateOpen && <div className="tenant-modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setTenantCreateOpen(false); }}>
+        <form className="tenant-create-modal" onSubmit={async (event) => {
+          event.preventDefault(); setTenantCreateBusy(true); setTenantCreateError("");
+          try {
+            const createResponse = await fetch("/api/admin/tenants", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ tenantCode: newTenantCode, tenantName: newTenantName }) });
+            const created = await createResponse.json();
+            if (!createResponse.ok) throw new Error(created.error || "Could not create tenant.");
+            const switchResponse = await fetch("/api/admin/active-tenant", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ tenantId: created.tenant.tenant_id }) });
+            if (!switchResponse.ok) {
+              const switchError = await switchResponse.json();
+              throw new Error(switchError.error || "Tenant created, but could not switch into it.");
+            }
+            window.location.reload();
+          } catch (error) {
+            setTenantCreateError(error instanceof Error ? error.message : "Could not create tenant.");
+          } finally { setTenantCreateBusy(false); }
+        }}>
+          <div className="tenant-modal-heading"><div><span>NEW PLANNING TENANT</span><h2>Add tenant</h2></div><button type="button" aria-label="Close" onClick={() => setTenantCreateOpen(false)}>×</button></div>
+          <p>Each tenant gets its own PostgreSQL schema and starts with empty planning data.</p>
+          <label>Tenant code<input required maxLength={40} pattern="[a-z0-9]+(-[a-z0-9]+)*" value={newTenantCode} onChange={(event) => setNewTenantCode(event.target.value.toLowerCase())} placeholder="mor-cem" /></label>
+          <small className="tenant-code-help">Use lowercase letters, numbers, and hyphens.</small>
+          <label>Tenant name<input required maxLength={160} value={newTenantName} onChange={(event) => setNewTenantName(event.target.value)} placeholder="Morocco Cement" /></label>
+          {tenantCreateError && <div className="auth-error" role="alert">{tenantCreateError}</div>}
+          <div className="tenant-modal-actions"><button type="button" onClick={() => setTenantCreateOpen(false)}>Cancel</button><button type="submit" disabled={tenantCreateBusy}>{tenantCreateBusy ? "Creating…" : "Create and open tenant"}</button></div>
+        </form>
+      </div>}
       {toast && (
         <div className="toast">
           <Check size={15} />
@@ -335,11 +366,8 @@ function ModulePage({
   return <Component onNotify={onNotify} onNavigate={onNavigate} />;
 }
 
-function Login({ onLogin }: { onLogin: (user: { email:string; display_name:string; tenant_id:string; tenant_name:string; role:string }) => void }) {
+function Login({ onLogin }: { onLogin: (user: { email:string; display_name:string; tenant_id:string; tenant_code:string; tenant_name:string; role:string }) => void }) {
   const [showPassword, setShowPassword] = useState(false);
-  const [creatingTenant, setCreatingTenant] = useState(false);
-  const [tenantName, setTenantName] = useState("");
-  const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [authError, setAuthError] = useState("");
@@ -348,9 +376,9 @@ function Login({ onLogin }: { onLogin: (user: { email:string; display_name:strin
     event.preventDefault();
     setSubmitting(true); setAuthError("");
     try {
-      const response = await fetch(creatingTenant ? "/api/auth/signup" : "/api/auth/login", {
+      const response = await fetch("/api/auth/login", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tenantName, displayName, email, password }),
+        body: JSON.stringify({ email, password }),
       });
       const body = await response.json();
       if (!response.ok) throw new Error(body.error || "Could not sign in.");
@@ -427,17 +455,13 @@ function Login({ onLogin }: { onLogin: (user: { email:string; display_name:strin
               <LockKeyhole size={19} />
             </span>
             <span className="eyebrow">YOUR WORKSPACE</span>
-            <h2>{creatingTenant ? "Create a company workspace" : "Welcome back"}</h2>
-            <p>{creatingTenant ? "Set up a separate, private planning space for your company." : "Sign in to continue to your planning workspace."}</p>
+            <h2>Welcome back</h2>
+            <p>Sign in to continue to your planning workspace.</p>
           </div>
           <form
             className="login-form"
             onSubmit={(e) => void submit(e)}
           >
-            {creatingTenant && <>
-              <label>Company name<input required value={tenantName} onChange={(e)=>setTenantName(e.target.value)} placeholder="Your company"/></label>
-              <label>Your name<input required value={displayName} onChange={(e)=>setDisplayName(e.target.value)} placeholder="Workspace administrator"/></label>
-            </>}
             <label>
               Work email
               <input
@@ -455,8 +479,7 @@ function Login({ onLogin }: { onLogin: (user: { email:string; display_name:strin
                 <input
                   type={showPassword ? "text" : "password"}
                   required
-                  minLength={creatingTenant ? 10 : 1}
-                  autoComplete={creatingTenant ? "new-password" : "current-password"}
+                  autoComplete="current-password"
                   value={password}
                   onChange={(e)=>setPassword(e.target.value)}
                   placeholder="Enter your password"
@@ -469,7 +492,7 @@ function Login({ onLogin }: { onLogin: (user: { email:string; display_name:strin
                 </button>
               </span>
             </label>
-            {!creatingTenant && <div className="form-options">
+            <div className="form-options">
               <label className="remember">
                 <input type="checkbox" defaultChecked />
                 <span />
@@ -478,14 +501,12 @@ function Login({ onLogin }: { onLogin: (user: { email:string; display_name:strin
               <button type="button" className="forgot-link">
                 Forgot password?
               </button>
-            </div>}
+            </div>
             {authError && <div className="auth-error" role="alert">{authError}</div>}
             <button className="button primary login-submit" type="submit" disabled={submitting}>
-              {submitting ? "Please wait…" : creatingTenant ? "Create workspace" : "Sign in"} <ChevronRight size={16} />
+              {submitting ? "Please wait…" : "Sign in"} <ChevronRight size={16} />
             </button>
-            <button type="button" className="forgot-link auth-mode-toggle" onClick={()=>{setCreatingTenant(!creatingTenant);setAuthError("")}}>
-              {creatingTenant ? "Already have a workspace? Sign in" : "New company? Create a workspace"}
-            </button>
+            <p className="login-help">New tenants are created by an administrator after signing in.</p>
             <p className="login-help">
               Having trouble signing in?{" "}
               <button>

@@ -1,5 +1,6 @@
 import { createHash, randomBytes, scrypt as scryptCallback, timingSafeEqual } from "node:crypto";
 import { promisify } from "node:util";
+import { ensureTenantSchema } from "./tenant-schemas.js";
 
 const scrypt = promisify(scryptCallback);
 const COOKIE_NAME = "mrp_session";
@@ -87,45 +88,15 @@ async function createSession(pool, user) {
 }
 
 export function registerTenantAuth(app, pool) {
-  app.post("/api/auth/signup", async (req, res, next) => {
-    const tenantName = String(req.body.tenantName || "").trim().slice(0, 160);
-    const displayName = String(req.body.displayName || "").trim().slice(0, 160);
-    const email = String(req.body.email || "").trim().toLowerCase().slice(0, 255);
-    const password = String(req.body.password || "");
-    if (!tenantName || !displayName || !/^\S+@\S+\.\S+$/.test(email) || password.length < 10)
-      return res.status(400).json({ error: "Enter company name, your name, a valid email, and a password with at least 10 characters." });
-    const slugBase = tenantName.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 150) || "workspace";
-    const client = await pool.connect();
-    try {
-      await client.query("BEGIN");
-      const tenantSlug = `${slugBase}-${randomBytes(3).toString("hex")}`;
-      const tenantResult = await client.query(
-        `INSERT INTO public.tenants(tenant_name,tenant_slug) VALUES($1,$2) RETURNING tenant_id,tenant_name`,
-        [tenantName, tenantSlug],
-      );
-      const tenant = tenantResult.rows[0];
-      const passwordHash = await createPasswordHash(password);
-      const userResult = await client.query(
-        `INSERT INTO public.tenant_users(tenant_id,email,password_hash,display_name,role)
-         VALUES($1,$2,$3,$4,'admin') RETURNING user_id,tenant_id,email,display_name,role`,
-        [tenant.tenant_id, email, passwordHash, displayName],
-      );
-      await client.query("COMMIT");
-      const token = await createSession(pool, userResult.rows[0]);
-      setSessionCookie(res, token);
-      res.status(201).json({ user: { ...userResult.rows[0], tenant_name: tenant.tenant_name } });
-    } catch (error) {
-      await client.query("ROLLBACK");
-      if (error.code === "23505") return res.status(409).json({ error: "An account with this email already exists." });
-      next(error);
-    } finally { client.release(); }
-  });
+  app.post("/api/auth/signup", (_req, res) =>
+    res.status(403).json({ error: "Tenant creation is available to signed-in administrators from the tenant selector." }),
+  );
 
   app.post("/api/auth/login", async (req, res, next) => {
     try {
       const email = String(req.body.email || "").trim().toLowerCase();
       const result = await pool.query(
-        `SELECT u.user_id,u.tenant_id,u.email,u.display_name,u.role,u.password_hash,t.tenant_name
+        `SELECT u.user_id,u.tenant_id,u.email,u.display_name,u.role,u.password_hash,t.tenant_name,t.tenant_code,t.schema_name
          FROM public.tenant_users u JOIN public.tenants t USING(tenant_id)
          WHERE u.email=$1 AND u.active_flag AND t.active_flag`, [email],
       );
@@ -151,14 +122,15 @@ export function registerTenantAuth(app, pool) {
   app.use("/api", async (req, res, next) => {
     if (req.path === "/health") return next();
     const token = sessionToken(req);
-    if (!token) return res.status(401).json({ error: "Sign in to a company workspace to continue." });
+    if (!token) return res.status(401).json({ error: "Sign in to a planning workspace to continue." });
     try {
       const result = await pool.query(
-        `SELECT u.user_id,u.tenant_id AS home_tenant_id,s.tenant_id,u.email,u.display_name,u.role,t.tenant_name
+        `SELECT u.user_id,u.tenant_id AS home_tenant_id,s.tenant_id,u.email,u.display_name,u.role,
+          t.tenant_name,t.tenant_code,t.schema_name
          FROM public.tenant_sessions s JOIN public.tenant_users u ON u.user_id=s.user_id
          JOIN public.tenants t ON t.tenant_id=s.tenant_id
          WHERE s.session_hash=$1 AND s.expires_at>now() AND u.active_flag AND t.active_flag
-           AND (u.role='platform_admin' OR u.tenant_id=s.tenant_id)`,
+           AND (u.role IN ('platform_admin','admin') OR u.tenant_id=s.tenant_id)`,
         [hashToken(token)],
       );
       if (!result.rowCount) {
@@ -170,18 +142,43 @@ export function registerTenantAuth(app, pool) {
     } catch (error) { next(error); }
   });
   app.get("/api/admin/tenants", async (req, res, next) => {
-    if (req.tenant.role !== "platform_admin")
-      return res.status(403).json({ error: "Platform administrator access is required." });
+    if (!['admin','platform_admin'].includes(req.tenant.role))
+      return res.status(403).json({ error: "Administrator access is required." });
     try {
       const { rows } = await pool.query(
-        "SELECT tenant_id,tenant_name FROM public.tenants WHERE active_flag ORDER BY tenant_name",
+        "SELECT tenant_id,tenant_code,tenant_name FROM public.tenants WHERE active_flag ORDER BY tenant_code",
       );
       res.json({ tenants: rows, activeTenantId: req.tenant.tenant_id });
     } catch (error) { next(error); }
   });
+  app.post("/api/admin/tenants", async (req, res, next) => {
+    if (!['admin','platform_admin'].includes(req.tenant.role))
+      return res.status(403).json({ error: "Administrator access is required to add tenants." });
+    const tenantCode = String(req.body.tenantCode || "").trim().toLowerCase();
+    const tenantName = String(req.body.tenantName || "").trim().slice(0, 160);
+    if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(tenantCode) || tenantCode.length > 40 || !tenantName)
+      return res.status(400).json({ error: "Enter a tenant code such as mor-cem and a tenant name." });
+    const schemaName = `tenant_${tenantCode.replace(/-/g, "_")}`;
+    const client = await pool.connect();
+    try {
+      await client.query("BEGIN");
+      const { rows } = await client.query(
+        `INSERT INTO public.tenants(tenant_name,tenant_slug,tenant_code,schema_name)
+         VALUES($1,$2,$3,$4) RETURNING tenant_id,tenant_code,tenant_name,schema_name`,
+        [tenantName, tenantCode, tenantCode, schemaName],
+      );
+      await ensureTenantSchema(client, rows[0]);
+      await client.query("COMMIT");
+      res.status(201).json({ tenant: rows[0] });
+    } catch (error) {
+      await client.query("ROLLBACK");
+      if (error.code === "23505") return res.status(409).json({ error: "That tenant code is already in use." });
+      next(error);
+    } finally { client.release(); }
+  });
   app.post("/api/admin/active-tenant", async (req, res, next) => {
-    if (req.tenant.role !== "platform_admin")
-      return res.status(403).json({ error: "Platform administrator access is required." });
+    if (!['admin','platform_admin'].includes(req.tenant.role))
+      return res.status(403).json({ error: "Administrator access is required." });
     const tenantId = String(req.body.tenantId || "");
     const token = sessionToken(req);
     try {
