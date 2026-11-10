@@ -77,7 +77,8 @@ Open **Dashboard** and set:
 - Planning horizon: **12 months**.
 - Time buckets: **Monthly**.
 - Planning start date: **2026-11-01**.
-- Demand aggregation: **Ship To detail** for these sample rows.
+
+**Where to find Demand aggregation:** first select one of the imported workbook scenarios in the **Demand scenario** dropdown. The **Demand aggregation** dropdown then appears immediately below it in the planning filters. It is hidden when **Existing demand forecast** is selected because that forecast has no workbook customer dimensions. Choose **Ship To detail** for this sample.
 
 Click **Run MRP** once per scenario. The application runs one selected scenario at a time. If the scenario list does not update after import, use **Refresh list** beneath the selector.
 
