@@ -66,8 +66,19 @@ const pageFor = (path: string): Page =>
     .flatMap((group) => group.items)
     .find((item) => routeFor(item.label) === path)?.label ?? "Dashboard";
 export default function App() {
-  type SignedInUser = { email: string; display_name: string; tenant_id: string; tenant_code: string; tenant_name: string; role: string };
-  type TenantOption = { tenant_id: string; tenant_code: string; tenant_name: string };
+  type SignedInUser = {
+    email: string;
+    display_name: string;
+    tenant_id: string;
+    tenant_code: string;
+    tenant_name: string;
+    role: string;
+  };
+  type TenantOption = {
+    tenant_id: string;
+    tenant_code: string;
+    tenant_name: string;
+  };
   const [page, setPage] = useState<Page>(() =>
     pageFor(window.location.pathname),
   );
@@ -102,30 +113,35 @@ export default function App() {
     return () => window.removeEventListener("popstate", syncRoute);
   }, []);
   useEffect(() => {
-    fetch("/api/auth/me").then(async (response) => {
-      if (!response.ok) return null;
-      const body = await response.json();
-      return body.user as SignedInUser;
-    }).then((user) => {
-      setAuthUser(user);
-      if (!user) {
+    fetch("/api/auth/me")
+      .then(async (response) => {
+        if (!response.ok) return null;
+        const body = await response.json();
+        return body.user as SignedInUser;
+      })
+      .then((user) => {
+        setAuthUser(user);
+        if (!user) {
+          history.replaceState({}, "", "/login");
+          setIsLoginRoute(true);
+        } else if (window.location.pathname === "/login") {
+          history.replaceState({}, "", routeFor("Dashboard"));
+          setIsLoginRoute(false);
+        }
+      })
+      .catch(() => {
         history.replaceState({}, "", "/login");
         setIsLoginRoute(true);
-      } else if (window.location.pathname === "/login") {
-        history.replaceState({}, "", routeFor("Dashboard"));
-        setIsLoginRoute(false);
-      }
-    }).catch(() => {
-      history.replaceState({}, "", "/login");
-      setIsLoginRoute(true);
-    }).finally(() => setAuthChecked(true));
+      })
+      .finally(() => setAuthChecked(true));
   }, []);
   const changePage = (target: Page) => {
     history.pushState({}, "", routeFor(target));
     setPage(target);
     setSidebarOpen(true);
   };
-  if (!authChecked) return <div className="auth-loading">Loading workspace…</div>;
+  if (!authChecked)
+    return <div className="auth-loading">Loading workspace…</div>;
   if (isLoginRoute || !authUser)
     return (
       <Login
@@ -173,7 +189,8 @@ export default function App() {
               <Building2 size={16} />
             </span>
             <span className="workspace-text">
-              {authUser.tenant_name}<small>Tenant · {authUser.tenant_code.toUpperCase()}</small>
+              {authUser.tenant_name}
+              <small>Tenant · {authUser.tenant_code.toUpperCase()}</small>
             </span>
           </div>
           <div className="side-scroll">
@@ -198,21 +215,34 @@ export default function App() {
             ))}
           </div>
           <div className="sidebar-bottom">
-            <button className="nav-item" onClick={() => changePage("Project Guides")}>
+            <button
+              className="nav-item"
+              onClick={() => changePage("Project Guides")}
+            >
               <CircleHelp size={17} />
               <span>Help & project guides</span>
             </button>
             <div className="profile-mini">
-              <div className="avatar">{authUser.display_name.split(/\s+/).map((part) => part[0]).join("").slice(0,2).toUpperCase()}</div>
+              <div className="avatar">
+                {authUser.display_name
+                  .split(/\s+/)
+                  .map((part) => part[0])
+                  .join("")
+                  .slice(0, 2)
+                  .toUpperCase()}
+              </div>
               <div className="profile-name">
-                {authUser.display_name}<small>{authUser.role}</small>
+                {authUser.display_name}
+                <small>{authUser.role}</small>
               </div>
               <MoreHorizontal size={17} />
             </div>
           </div>
         </aside>
       )}
-      <main className={`main-area ${sidebarOpen ? "with-sidebar" : "sidebar-closed"}`}>
+      <main
+        className={`main-area ${sidebarOpen ? "with-sidebar" : "sidebar-closed"}`}
+      >
         <header className="topbar">
           <div className="top-left">
             <button
@@ -223,8 +253,6 @@ export default function App() {
               <Menu size={19} />
             </button>
             <div className="breadcrumbs">
-              <span>Demand planning</span>
-              <ChevronRight size={14} />
               <strong>{page}</strong>
             </div>
           </div>
@@ -235,11 +263,7 @@ export default function App() {
             <button
               className="icon-button notification-button"
               aria-label="Notifications"
-              onClick={() =>
-                notify(
-                  "You're all caught up.",
-                )
-              }
+              onClick={() => notify("You're all caught up.")}
             >
               <Bell size={18} />
               <i />
@@ -247,43 +271,101 @@ export default function App() {
             <span className="top-divider" />
             {authUser.role === "platform_admin" || authUser.role === "admin" ? (
               <div className="tenant-switcher">
-                <button className="org-switch" onClick={async () => {
-                  if (!tenantMenuOpen && tenantOptions.length === 0) {
-                    try {
-                      const response = await fetch("/api/admin/tenants");
-                      const body = await response.json();
-                      if (!response.ok) throw new Error(body.error || "Could not load workspaces.");
-                      setTenantOptions(body.tenants);
-                    } catch (error) {
-                      notify(error instanceof Error ? error.message : "Could not load workspaces.");
+                <button
+                  className="org-switch"
+                  onClick={async () => {
+                    if (!tenantMenuOpen && tenantOptions.length === 0) {
+                      try {
+                        const response = await fetch("/api/admin/tenants");
+                        const body = await response.json();
+                        if (!response.ok)
+                          throw new Error(
+                            body.error || "Could not load workspaces.",
+                          );
+                        setTenantOptions(body.tenants);
+                      } catch (error) {
+                        notify(
+                          error instanceof Error
+                            ? error.message
+                            : "Could not load workspaces.",
+                        );
+                      }
                     }
-                  }
-                  setTenantMenuOpen(!tenantMenuOpen);
-                }} aria-expanded={tenantMenuOpen}>
-                  <span className="org-logo">{authUser.tenant_name.slice(0,1).toUpperCase()}</span>
-                  <span>{authUser.tenant_name}<small className="platform-admin-label">Administrator · choose tenant</small></span>
+                    setTenantMenuOpen(!tenantMenuOpen);
+                  }}
+                  aria-expanded={tenantMenuOpen}
+                >
+                  <span className="org-logo">
+                    {authUser.tenant_name.slice(0, 1).toUpperCase()}
+                  </span>
+                  <span>
+                    {authUser.tenant_name}
+                    <small className="platform-admin-label">
+                      Administrator · choose tenant
+                    </small>
+                  </span>
                   <ChevronDown size={15} />
                 </button>
-                {tenantMenuOpen && <div className="tenant-menu" role="menu">
-                  {tenantOptions.map((tenant) => <button key={tenant.tenant_id} role="menuitem" disabled={tenant.tenant_id === authUser.tenant_id} onClick={async () => {
-                    try {
-                      const response = await fetch("/api/admin/active-tenant", {
-                        method: "POST", headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ tenantId: tenant.tenant_id }),
-                      });
-                      const body = await response.json();
-                      if (!response.ok) throw new Error(body.error || "Could not switch workspace.");
-                      window.location.reload();
-                    } catch (error) {
-                      notify(error instanceof Error ? error.message : "Could not switch workspace.");
-                    }
-                  }}>{tenant.tenant_code.toUpperCase()} · {tenant.tenant_name}</button>)}
-                  <button role="menuitem" className="tenant-add-action" onClick={() => { setTenantMenuOpen(false); setTenantCreateError(""); setTenantCreateOpen(true); }}>+ Add tenant</button>
-                </div>}
+                {tenantMenuOpen && (
+                  <div className="tenant-menu" role="menu">
+                    {tenantOptions.map((tenant) => (
+                      <button
+                        key={tenant.tenant_id}
+                        role="menuitem"
+                        disabled={tenant.tenant_id === authUser.tenant_id}
+                        onClick={async () => {
+                          try {
+                            const response = await fetch(
+                              "/api/admin/active-tenant",
+                              {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({
+                                  tenantId: tenant.tenant_id,
+                                }),
+                              },
+                            );
+                            const body = await response.json();
+                            if (!response.ok)
+                              throw new Error(
+                                body.error || "Could not switch workspace.",
+                              );
+                            window.location.reload();
+                          } catch (error) {
+                            notify(
+                              error instanceof Error
+                                ? error.message
+                                : "Could not switch workspace.",
+                            );
+                          }
+                        }}
+                      >
+                        {tenant.tenant_code.toUpperCase()} ·{" "}
+                        {tenant.tenant_name}
+                      </button>
+                    ))}
+                    <button
+                      role="menuitem"
+                      className="tenant-add-action"
+                      onClick={() => {
+                        setTenantMenuOpen(false);
+                        setTenantCreateError("");
+                        setTenantCreateOpen(true);
+                      }}
+                    >
+                      + Add tenant
+                    </button>
+                  </div>
+                )}
               </div>
             ) : (
-              <div className="org-switch" aria-label={`Workspace: ${authUser.tenant_name}`}>
-                <span className="org-logo">{authUser.tenant_name.slice(0,1).toUpperCase()}</span>
+              <div
+                className="org-switch"
+                aria-label={`Workspace: ${authUser.tenant_name}`}
+              >
+                <span className="org-logo">
+                  {authUser.tenant_name.slice(0, 1).toUpperCase()}
+                </span>
                 <span>{authUser.tenant_name}</span>
               </div>
             )}
@@ -298,40 +380,131 @@ export default function App() {
                 setIsLoginRoute(true);
               }}
             >
-              {authUser.display_name.split(/\s+/).map((part) => part[0]).join("").slice(0,2).toUpperCase()}
+              {authUser.display_name
+                .split(/\s+/)
+                .map((part) => part[0])
+                .join("")
+                .slice(0, 2)
+                .toUpperCase()}
             </button>
           </div>
         </header>
-        <div className={`page-wrap ${page.toLowerCase().replace(/ /g, "-")}-wrap`}>
+        <div
+          className={`page-wrap ${page.toLowerCase().replace(/ /g, "-")}-wrap`}
+        >
           <ModulePage page={page} onNotify={notify} onNavigate={changePage} />
         </div>
       </main>
-      {tenantCreateOpen && <div className="tenant-modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setTenantCreateOpen(false); }}>
-        <form className="tenant-create-modal" onSubmit={async (event) => {
-          event.preventDefault(); setTenantCreateBusy(true); setTenantCreateError("");
-          try {
-            const createResponse = await fetch("/api/admin/tenants", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ tenantCode: newTenantCode, tenantName: newTenantName }) });
-            const created = await createResponse.json();
-            if (!createResponse.ok) throw new Error(created.error || "Could not create tenant.");
-            const switchResponse = await fetch("/api/admin/active-tenant", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ tenantId: created.tenant.tenant_id }) });
-            if (!switchResponse.ok) {
-              const switchError = await switchResponse.json();
-              throw new Error(switchError.error || "Tenant created, but could not switch into it.");
-            }
-            window.location.reload();
-          } catch (error) {
-            setTenantCreateError(error instanceof Error ? error.message : "Could not create tenant.");
-          } finally { setTenantCreateBusy(false); }
-        }}>
-          <div className="tenant-modal-heading"><div><span>NEW PLANNING TENANT</span><h2>Add tenant</h2></div><button type="button" aria-label="Close" onClick={() => setTenantCreateOpen(false)}>×</button></div>
-          <p>Each tenant gets its own PostgreSQL schema and starts with empty planning data.</p>
-          <label>Tenant code<input required maxLength={40} pattern="[a-z0-9]+(-[a-z0-9]+)*" value={newTenantCode} onChange={(event) => setNewTenantCode(event.target.value.toLowerCase())} placeholder="mor-cem" /></label>
-          <small className="tenant-code-help">Use lowercase letters, numbers, and hyphens.</small>
-          <label>Tenant name<input required maxLength={160} value={newTenantName} onChange={(event) => setNewTenantName(event.target.value)} placeholder="Morocco Cement" /></label>
-          {tenantCreateError && <div className="auth-error" role="alert">{tenantCreateError}</div>}
-          <div className="tenant-modal-actions"><button type="button" onClick={() => setTenantCreateOpen(false)}>Cancel</button><button type="submit" disabled={tenantCreateBusy}>{tenantCreateBusy ? "Creating…" : "Create and open tenant"}</button></div>
-        </form>
-      </div>}
+      {tenantCreateOpen && (
+        <div
+          className="tenant-modal-backdrop"
+          role="presentation"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget)
+              setTenantCreateOpen(false);
+          }}
+        >
+          <form
+            className="tenant-create-modal"
+            onSubmit={async (event) => {
+              event.preventDefault();
+              setTenantCreateBusy(true);
+              setTenantCreateError("");
+              try {
+                const createResponse = await fetch("/api/admin/tenants", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    tenantCode: newTenantCode,
+                    tenantName: newTenantName,
+                  }),
+                });
+                const created = await createResponse.json();
+                if (!createResponse.ok)
+                  throw new Error(created.error || "Could not create tenant.");
+                const switchResponse = await fetch("/api/admin/active-tenant", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ tenantId: created.tenant.tenant_id }),
+                });
+                if (!switchResponse.ok) {
+                  const switchError = await switchResponse.json();
+                  throw new Error(
+                    switchError.error ||
+                      "Tenant created, but could not switch into it.",
+                  );
+                }
+                window.location.reload();
+              } catch (error) {
+                setTenantCreateError(
+                  error instanceof Error
+                    ? error.message
+                    : "Could not create tenant.",
+                );
+              } finally {
+                setTenantCreateBusy(false);
+              }
+            }}
+          >
+            <div className="tenant-modal-heading">
+              <div>
+                <span>NEW PLANNING TENANT</span>
+                <h2>Add tenant</h2>
+              </div>
+              <button
+                type="button"
+                aria-label="Close"
+                onClick={() => setTenantCreateOpen(false)}
+              >
+                ×
+              </button>
+            </div>
+            <p>
+              Each tenant gets its own PostgreSQL schema and starts with empty
+              planning data.
+            </p>
+            <label>
+              Tenant code
+              <input
+                required
+                maxLength={40}
+                pattern="[a-z0-9]+(-[a-z0-9]+)*"
+                value={newTenantCode}
+                onChange={(event) =>
+                  setNewTenantCode(event.target.value.toLowerCase())
+                }
+                placeholder="mor-cem"
+              />
+            </label>
+            <small className="tenant-code-help">
+              Use lowercase letters, numbers, and hyphens.
+            </small>
+            <label>
+              Tenant name
+              <input
+                required
+                maxLength={160}
+                value={newTenantName}
+                onChange={(event) => setNewTenantName(event.target.value)}
+                placeholder="Morocco Cement"
+              />
+            </label>
+            {tenantCreateError && (
+              <div className="auth-error" role="alert">
+                {tenantCreateError}
+              </div>
+            )}
+            <div className="tenant-modal-actions">
+              <button type="button" onClick={() => setTenantCreateOpen(false)}>
+                Cancel
+              </button>
+              <button type="submit" disabled={tenantCreateBusy}>
+                {tenantCreateBusy ? "Creating…" : "Create and open tenant"}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
       {toast && (
         <div className="toast">
           <Check size={15} />
@@ -355,7 +528,18 @@ function ModulePage({
   return <Component onNotify={onNotify} onNavigate={onNavigate} />;
 }
 
-function Login({ onLogin }: { onLogin: (user: { email:string; display_name:string; tenant_id:string; tenant_code:string; tenant_name:string; role:string }) => void }) {
+function Login({
+  onLogin,
+}: {
+  onLogin: (user: {
+    email: string;
+    display_name: string;
+    tenant_id: string;
+    tenant_code: string;
+    tenant_name: string;
+    role: string;
+  }) => void;
+}) {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -363,18 +547,24 @@ function Login({ onLogin }: { onLogin: (user: { email:string; display_name:strin
   const [submitting, setSubmitting] = useState(false);
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setSubmitting(true); setAuthError("");
+    setSubmitting(true);
+    setAuthError("");
     try {
       const response = await fetch("/api/auth/login", {
-        method: "POST", headers: { "Content-Type": "application/json" },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
       const body = await response.json();
       if (!response.ok) throw new Error(body.error || "Could not sign in.");
       onLogin(body.user);
     } catch (error) {
-      setAuthError(error instanceof Error ? error.message : "Could not sign in.");
-    } finally { setSubmitting(false); }
+      setAuthError(
+        error instanceof Error ? error.message : "Could not sign in.",
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
   return (
     <main className="login-page">
@@ -422,11 +612,7 @@ function Login({ onLogin }: { onLogin: (user: { email:string; display_name:strin
           </div>
         </div>
         <div className="story-bottom">
-          <span>
-            Trusted planning for teams that build
-            what's
-            next.
-          </span>
+          <span>Trusted planning for teams that build what's next.</span>
           <div className="story-avatars">
             <i>JD</i>
             <i>AL</i>
@@ -447,10 +633,7 @@ function Login({ onLogin }: { onLogin: (user: { email:string; display_name:strin
             <h2>Welcome back</h2>
             <p>Sign in to continue to your planning workspace.</p>
           </div>
-          <form
-            className="login-form"
-            onSubmit={(e) => void submit(e)}
-          >
+          <form className="login-form" onSubmit={(e) => void submit(e)}>
             <label>
               Work email
               <input
@@ -458,7 +641,7 @@ function Login({ onLogin }: { onLogin: (user: { email:string; display_name:strin
                 required
                 autoComplete="email"
                 value={email}
-                onChange={(e)=>setEmail(e.target.value)}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@company.com"
               />
             </label>
@@ -470,7 +653,7 @@ function Login({ onLogin }: { onLogin: (user: { email:string; display_name:strin
                   required
                   autoComplete="current-password"
                   value={password}
-                  onChange={(e)=>setPassword(e.target.value)}
+                  onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
                 />
                 <button
@@ -491,11 +674,22 @@ function Login({ onLogin }: { onLogin: (user: { email:string; display_name:strin
                 Forgot password?
               </button>
             </div>
-            {authError && <div className="auth-error" role="alert">{authError}</div>}
-            <button className="button primary login-submit" type="submit" disabled={submitting}>
-              {submitting ? "Please wait…" : "Sign in"} <ChevronRight size={16} />
+            {authError && (
+              <div className="auth-error" role="alert">
+                {authError}
+              </div>
+            )}
+            <button
+              className="button primary login-submit"
+              type="submit"
+              disabled={submitting}
+            >
+              {submitting ? "Please wait…" : "Sign in"}{" "}
+              <ChevronRight size={16} />
             </button>
-            <p className="login-help">New tenants are created by an administrator after signing in.</p>
+            <p className="login-help">
+              New tenants are created by an administrator after signing in.
+            </p>
             <p className="login-help">
               Having trouble signing in?{" "}
               <button>
@@ -505,10 +699,7 @@ function Login({ onLogin }: { onLogin: (user: { email:string; display_name:strin
           </form>
         </div>
         <footer className="login-footer">
-          <span>
-            (c)
-            2026 Meridian Planning Cloud
-          </span>
+          <span>(c) 2026 Meridian Planning Cloud</span>
           <span>
             <LockKeyhole size={12} /> Secure, encrypted sign in
           </span>
