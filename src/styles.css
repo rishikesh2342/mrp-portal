@@ -67,3 +67,19 @@
   text-decoration: underline;
   cursor: pointer;
 }
+
+/* Keep Demand Planning header actions on one baseline without wrapping labels. */
+.demand-heading-actions {
+  align-items: flex-end;
+  flex-wrap: nowrap;
+}
+.demand-heading-actions > .button,
+.demand-heading-actions .csv-upload > .button {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+@media (max-width: 1000px) {
+  .demand-heading-actions {
+    flex-wrap: wrap;
+  }
+}
