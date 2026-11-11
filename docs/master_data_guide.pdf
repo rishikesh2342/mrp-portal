@@ -1,0 +1,920 @@
+%PDF-1.4
+%MRPGuide
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [5 0 R 7 0 R 9 0 R 11 0 R 13 0 R 15 0 R] /Count 6 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 6 0 R >>
+endobj
+6 0 obj
+<< /Length 2383 >>
+stream
+0.09 0.212 0.365 rg
+0 0 595 842 re f
+0.263 0.725 0.671 rg
+0 830 595 12 re f
+BT /F2 8 Tf 0.651 0.867 0.831 rg 1 0 0 1 48 786 Tm (MRP PORTAL  /  VISUAL OPERATING GUIDE) Tj ET
+BT /F2 35 Tf 1 1 1 rg 1 0 0 1 48 666 Tm (MASTER) Tj ET
+BT /F2 35 Tf 0.502 0.831 0.773 rg 1 0 0 1 48 621 Tm (DATA) Tj ET
+BT /F1 12 Tf 0.878 0.918 0.965 rg 1 0 0 1 49 587 Tm (A visual guide to the five data domains, every supported upload field,) Tj ET
+BT /F1 12 Tf 0.878 0.918 0.965 rg 1 0 0 1 49 569 Tm (and how master records feed a tenant MRP plan.) Tj ET
+0.141 0.286 0.435 rg
+0.294 0.431 0.565 RG
+1 w
+48 361 499 146 re B
+BT /F2 8.3 Tf 0.651 0.867 0.831 rg 1 0 0 1 68 477 Tm (IMPORTANT: SAMPLE DISPLAY VS. REAL TENANT DATA) Tj ET
+BT /F1 10 Tf 1 1 1 rg 1 0 0 1 68 451 Tm (The Master Data grid and its counts are currently hard-coded demonstration rows. CSV) Tj ET
+BT /F1 10 Tf 1 1 1 rg 1 0 0 1 68 436 Tm (upload is a separate working flow that writes supported records into the selected) Tj ET
+BT /F1 10 Tf 1 1 1 rg 1 0 0 1 68 421 Tm (tenant database. The grid does not yet display uploaded records.) Tj ET
+0.231 0.373 0.506 rg
+68 373 210 24 re f
+BT /F2 7.2 Tf 1 1 1 rg 1 0 0 1 79 381 Tm (DEMO GRID  !=  DATABASE CATALOG) Tj ET
+BT /F2 8 Tf 0.651 0.867 0.831 rg 1 0 0 1 48 316 Tm (THE PLANNING FLOW) Tj ET
+0.141 0.286 0.435 rg
+0.365 0.49 0.608 RG
+1 w
+48 254 69 33 re B
+BT /F2 7 Tf 1 1 1 rg 1 0 0 1 55 266 Tm (Plant) Tj ET
+0.141 0.286 0.435 rg
+0.365 0.49 0.608 RG
+1 w
+131 254 83 33 re B
+BT /F2 7 Tf 1 1 1 rg 1 0 0 1 138 266 Tm (Materials) Tj ET
+0.141 0.286 0.435 rg
+0.365 0.49 0.608 RG
+1 w
+228 254 126 33 re B
+BT /F2 7 Tf 1 1 1 rg 1 0 0 1 235 266 Tm (Products + BOM) Tj ET
+0.141 0.286 0.435 rg
+0.365 0.49 0.608 RG
+1 w
+365 254 96 33 re B
+BT /F2 7 Tf 1 1 1 rg 1 0 0 1 372 266 Tm (Constraints) Tj ET
+0.141 0.286 0.435 rg
+0.365 0.49 0.608 RG
+1 w
+471 254 76 33 re B
+BT /F2 7 Tf 1 1 1 rg 1 0 0 1 478 266 Tm (Stock + demand) Tj ET
+BT /F1 9 Tf 0.863 0.906 0.957 rg 1 0 0 1 48 223 Tm (Then MRP explodes demand through the BOM, nets it against stock and receipts,) Tj ET
+BT /F1 9 Tf 0.863 0.906 0.957 rg 1 0 0 1 48 207 Tm (and applies safety stock, order sizing, lead time, and capacity checks.) Tj ET
+0.365 0.49 0.608 RG
+0.8 w 48 61 m 547 61 l S
+BT /F1 7.5 Tf 0.718 0.788 0.863 rg 1 0 0 1 48 42 Tm (Purpose  |  fields  |  sources  |  calculation flow) Tj ET
+BT /F2 8 Tf 0.651 0.867 0.831 rg 1 0 0 1 514 42 Tm (01) Tj ET
+
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 8 0 R >>
+endobj
+8 0 obj
+<< /Length 6991 >>
+stream
+0.965 0.973 0.984 rg
+0 0 595 842 re f
+0.086 0.475 0.91 rg
+0 833 595 9 re f
+BT /F2 8 Tf 0.396 0.478 0.58 rg 1 0 0 1 40 808 Tm (MRP PORTAL  /  MASTER DATA GUIDE) Tj ET
+BT /F2 8 Tf 0.086 0.475 0.91 rg 1 0 0 1 40 773 Tm (01 / READ THE PAGE CORRECTLY) Tj ET
+BT /F2 23 Tf 0.09 0.212 0.365 rg 1 0 0 1 40 742 Tm (Screen map) Tj ET
+BT /F1 8.5 Tf 0.396 0.478 0.58 rg 1 0 0 1 40 722 Tm (Understand which controls are operational before relying on the displayed values.) Tj ET
+0.851 0.89 0.937 RG
+1 w 40 709 m 555 709 l S
+1 1 1 rg
+0.863 0.898 0.937 RG
+1 w
+40 603 248 91 re B
+0.086 0.475 0.91 rg
+40 603 4 91 re f
+BT /F2 6.5 Tf 0.086 0.475 0.91 rg 1 0 0 1 53 677 Tm (DATABASE-BACKED) Tj ET
+BT /F2 10 Tf 0.09 0.212 0.365 rg 1 0 0 1 53 660 Tm (Working tenant path) Tj ET
+BT /F1 7.2 Tf 0.373 0.443 0.533 rg 1 0 0 1 53 643 Tm (Select the tenant, select an upload type, and upload a) Tj ET
+BT /F1 7.2 Tf 0.373 0.443 0.533 rg 1 0 0 1 53 633 Tm (valid CSV. The server validates fields and references,) Tj ET
+BT /F1 7.2 Tf 0.373 0.443 0.533 rg 1 0 0 1 53 623 Tm (then writes records to that tenant schema.) Tj ET
+1 1 1 rg
+0.863 0.898 0.937 RG
+1 w
+300 603 255 91 re B
+0.086 0.475 0.91 rg
+300 603 4 91 re f
+BT /F2 6.5 Tf 0.086 0.475 0.91 rg 1 0 0 1 313 677 Tm (FRONTEND SAMPLE) Tj ET
+BT /F2 10 Tf 0.09 0.212 0.365 rg 1 0 0 1 313 660 Tm (Demo display path) Tj ET
+BT /F1 7.2 Tf 0.373 0.443 0.533 rg 1 0 0 1 313 643 Tm (Grid rows, counts, owners, statuses, KPIs, sync time, data) Tj ET
+BT /F1 7.2 Tf 0.373 0.443 0.533 rg 1 0 0 1 313 633 Tm (score, Add/Edit, Toggle and Export are local sample UI, not) Tj ET
+BT /F1 7.2 Tf 0.373 0.443 0.533 rg 1 0 0 1 313 623 Tm (persisted tenant data.) Tj ET
+BT /F2 8 Tf 0.086 0.475 0.91 rg 1 0 0 1 40 578 Tm (HEADER + CONTROLS) Tj ET
+0.91 0.941 0.973 rg
+0.851 0.89 0.937 RG
+1 w
+40 544 515 23 re B
+BT /F2 7.2 Tf 0.208 0.318 0.435 rg 1 0 0 1 45 552 Tm (CONTROL) Tj ET
+BT /F2 7.2 Tf 0.208 0.318 0.435 rg 1 0 0 1 160 552 Tm (WHAT IT DOES) Tj ET
+1 1 1 rg
+0.894 0.918 0.945 RG
+1 w
+40 524 515 20 re B
+BT /F2 7.8 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 532 Tm (Tenant selector) Tj ET
+BT /F1 7.8 Tf 0.278 0.365 0.471 rg 1 0 0 1 160 532 Tm (Sets tenant context for CSV API uploads; verify before every upload.) Tj ET
+0.953 0.969 0.984 rg
+0.894 0.918 0.945 RG
+1 w
+40 504 515 20 re B
+BT /F2 7.8 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 512 Tm (Export) Tj ET
+BT /F1 7.8 Tf 0.278 0.365 0.471 rg 1 0 0 1 160 512 Tm (Downloads filtered demo rows; it is not a database export.) Tj ET
+1 1 1 rg
+0.894 0.918 0.945 RG
+1 w
+40 484 515 20 re B
+BT /F2 7.8 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 492 Tm (Upload type) Tj ET
+BT /F1 7.8 Tf 0.278 0.365 0.471 rg 1 0 0 1 160 492 Tm (Plant master, Material master, Finished goods, Plant constraints, or BOM.) Tj ET
+0.953 0.969 0.984 rg
+0.894 0.918 0.945 RG
+1 w
+40 464 515 20 re B
+BT /F2 7.8 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 472 Tm (Upload CSV) Tj ET
+BT /F1 7.8 Tf 0.278 0.365 0.471 rg 1 0 0 1 160 472 Tm (Uploads selected CSV and reports success or validation/reference errors.) Tj ET
+1 1 1 rg
+0.894 0.918 0.945 RG
+1 w
+40 444 515 20 re B
+BT /F2 7.8 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 452 Tm (Add [record]) Tj ET
+BT /F1 7.8 Tf 0.278 0.365 0.471 rg 1 0 0 1 160 452 Tm (Opens generic demo form; browser-only state, not a database create.) Tj ET
+0.953 0.969 0.984 rg
+0.894 0.918 0.945 RG
+1 w
+40 424 515 20 re B
+BT /F2 7.8 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 432 Tm (Search / status) Tj ET
+BT /F1 7.8 Tf 0.278 0.365 0.471 rg 1 0 0 1 160 432 Tm (Filters displayed demo rows by text and sample status.) Tj ET
+1 1 1 rg
+0.894 0.918 0.945 RG
+1 w
+40 404 515 20 re B
+BT /F2 7.8 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 412 Tm (Row actions) Tj ET
+BT /F1 7.8 Tf 0.278 0.365 0.471 rg 1 0 0 1 160 412 Tm (Edit/Toggle are local; Copy code copies the displayed identifier.) Tj ET
+0.953 0.969 0.984 rg
+0.894 0.918 0.945 RG
+1 w
+40 384 515 20 re B
+BT /F2 7.8 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 392 Tm (Checkbox / pages) Tj ET
+BT /F1 7.8 Tf 0.278 0.365 0.471 rg 1 0 0 1 160 392 Tm (Visual sample controls; no connected bulk or database pagination.) Tj ET
+BT /F2 8 Tf 0.086 0.475 0.91 rg 1 0 0 1 40 367 Tm (GRID COLUMNS) Tj ET
+0.91 0.941 0.973 rg
+0.851 0.89 0.937 RG
+1 w
+40 334 515 23 re B
+BT /F2 7.2 Tf 0.208 0.318 0.435 rg 1 0 0 1 45 342 Tm (FIELD) Tj ET
+BT /F2 7.2 Tf 0.208 0.318 0.435 rg 1 0 0 1 200 342 Tm (MEANING) Tj ET
+1 1 1 rg
+0.894 0.918 0.945 RG
+1 w
+40 314 515 20 re B
+BT /F2 7.5 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 322 Tm (Code / Name) Tj ET
+BT /F1 7.5 Tf 0.278 0.365 0.471 rg 1 0 0 1 200 322 Tm (Business identifier and readable label for the sample row.) Tj ET
+0.953 0.969 0.984 rg
+0.894 0.918 0.945 RG
+1 w
+40 294 515 20 re B
+BT /F2 7.5 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 302 Tm (Category / Type) Tj ET
+BT /F1 7.5 Tf 0.278 0.365 0.471 rg 1 0 0 1 200 302 Tm (Grouping whose meaning changes with the selected domain.) Tj ET
+1 1 1 rg
+0.894 0.918 0.945 RG
+1 w
+40 274 515 20 re B
+BT /F2 7.5 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 282 Tm (Unit) Tj ET
+BT /F1 7.5 Tf 0.278 0.365 0.471 rg 1 0 0 1 200 282 Tm (UOM for items; demo table may reuse it for lead time, location, or value.) Tj ET
+0.953 0.969 0.984 rg
+0.894 0.918 0.945 RG
+1 w
+40 254 515 20 re B
+BT /F2 7.5 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 262 Tm (Planning attributes) Tj ET
+BT /F1 7.5 Tf 0.278 0.365 0.471 rg 1 0 0 1 200 262 Tm (Short demo note; real import uses individual typed CSV columns.) Tj ET
+1 1 1 rg
+0.894 0.918 0.945 RG
+1 w
+40 234 515 20 re B
+BT /F2 7.5 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 242 Tm (Updated / Owner / Status) Tj ET
+BT /F1 7.5 Tf 0.278 0.365 0.471 rg 1 0 0 1 200 242 Tm (Illustrative labels, not tenant audit or activation state.) Tj ET
+0.953 0.969 0.984 rg
+0.894 0.918 0.945 RG
+1 w
+40 214 515 20 re B
+BT /F2 7.5 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 222 Tm (Master records / Active) Tj ET
+BT /F1 7.5 Tf 0.278 0.365 0.471 rg 1 0 0 1 200 222 Tm (Counts over local demo arrays, not uploaded tenant rows.) Tj ET
+1 1 1 rg
+0.894 0.918 0.945 RG
+1 w
+40 194 515 20 re B
+BT /F2 7.5 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 202 Tm (Needs review / Last sync) Tj ET
+BT /F1 7.5 Tf 0.278 0.365 0.471 rg 1 0 0 1 200 202 Tm (Static demonstration metrics; no live quality scan or sync timestamp.) Tj ET
+0.953 0.969 0.984 rg
+0.894 0.918 0.945 RG
+1 w
+40 174 515 20 re B
+BT /F2 7.5 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 182 Tm (Data quality) Tj ET
+BT /F1 7.5 Tf 0.278 0.365 0.471 rg 1 0 0 1 200 182 Tm (Fixed sample percentage; not computed from database validation.) Tj ET
+BT /F2 7.6 Tf 0.086 0.475 0.91 rg 1 0 0 1 40 121 Tm (ADD / EDIT FORM) Tj ET
+BT /F1 7.2 Tf 0.373 0.443 0.533 rg 1 0 0 1 40 106 Tm (Code and Name are required. Category/Type, Unit or Value, and Planning attributes/Notes are generic optional inputs. They do not map) Tj ET
+BT /F1 7.2 Tf 0.373 0.443 0.533 rg 1 0 0 1 40 96 Tm (all database columns and remain local demo state.) Tj ET
+0.851 0.89 0.937 RG
+0.8 w 40 36 m 555 36 l S
+BT /F1 7 Tf 0.396 0.478 0.58 rg 1 0 0 1 40 19 Tm (Master Data | current screen behavior) Tj ET
+BT /F2 8 Tf 0.086 0.475 0.91 rg 1 0 0 1 536 19 Tm (02) Tj ET
+
+endstream
+endobj
+9 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 10 0 R >>
+endobj
+10 0 obj
+<< /Length 7015 >>
+stream
+0.965 0.973 0.984 rg
+0 0 595 842 re f
+0.086 0.475 0.91 rg
+0 833 595 9 re f
+BT /F2 8 Tf 0.396 0.478 0.58 rg 1 0 0 1 40 808 Tm (MRP PORTAL  /  MASTER DATA GUIDE) Tj ET
+BT /F2 8 Tf 0.086 0.475 0.91 rg 1 0 0 1 40 773 Tm (02 / THE FIVE DATA DOMAINS) Tj ET
+BT /F2 23 Tf 0.09 0.212 0.365 rg 1 0 0 1 40 742 Tm (Purpose, source, and use) Tj ET
+BT /F1 8.5 Tf 0.396 0.478 0.58 rg 1 0 0 1 40 722 Tm (These are page groupings, not five physical database tables.) Tj ET
+0.851 0.89 0.937 RG
+1 w 40 709 m 555 709 l S
+1 1 1 rg
+0.863 0.898 0.937 RG
+1 w
+40 575 250 119 re B
+0.086 0.475 0.91 rg
+40 575 4 119 re f
+BT /F2 7 Tf 0.086 0.475 0.91 rg 1 0 0 1 53 677 Tm (1 / MATERIALS) Tj ET
+BT /F2 9.5 Tf 0.09 0.212 0.365 rg 1 0 0 1 53 660 Tm (Components and supply items) Tj ET
+BT /F1 7.1 Tf 0.373 0.443 0.533 rg 1 0 0 1 53 644 Tm (Demo examples: RM-0045 Aluminum Sheet, MT-0012 Motor) Tj ET
+BT /F1 7.1 Tf 0.373 0.443 0.533 rg 1 0 0 1 53 635 Tm (Assembly, PK-3011 Packaging Box, SP-7781 Screw M6, RM-1120) Tj ET
+BT /F1 7.1 Tf 0.373 0.443 0.533 rg 1 0 0 1 53 626 Tm (Copper Wire, EL-2204 Control Relay.) Tj ET
+BT /F2 7.1 Tf 0.086 0.463 0.416 rg 1 0 0 1 53 615 Tm (Actual MRP source: Material master CSV. Defines unit, cost,) Tj ET
+BT /F2 7.1 Tf 0.086 0.463 0.416 rg 1 0 0 1 53 606 Tm (scrap, sourcing and replenishment policy.) Tj ET
+1 1 1 rg
+0.863 0.898 0.937 RG
+1 w
+305 575 250 119 re B
+0.086 0.475 0.91 rg
+305 575 4 119 re f
+BT /F2 7 Tf 0.086 0.475 0.91 rg 1 0 0 1 318 677 Tm (2 / PRODUCTS + BOMS) Tj ET
+BT /F2 9.5 Tf 0.09 0.212 0.365 rg 1 0 0 1 318 660 Tm (Forecastable products and recipes) Tj ET
+BT /F1 7.1 Tf 0.373 0.443 0.533 rg 1 0 0 1 318 644 Tm (Demo products: PRD-1001 Control Panel, PRD-1002 Switch) Tj ET
+BT /F1 7.1 Tf 0.373 0.443 0.533 rg 1 0 0 1 318 635 Tm (Assembly, PRD-1003 Power Module, PRD-1004 Enclosure Unit.) Tj ET
+BT /F2 7.1 Tf 0.086 0.463 0.416 rg 1 0 0 1 318 624 Tm (Actual MRP sources: Finished goods + Bill of materials) Tj ET
+BT /F2 7.1 Tf 0.086 0.463 0.416 rg 1 0 0 1 318 615 Tm (CSVs. BOM ratios translate product demand into components.) Tj ET
+1 1 1 rg
+0.863 0.898 0.937 RG
+1 w
+40 443 250 119 re B
+0.91 0.639 0.235 rg
+40 443 4 119 re f
+BT /F2 7 Tf 0.086 0.475 0.91 rg 1 0 0 1 53 545 Tm (3 / SUPPLIERS) Tj ET
+BT /F2 9.5 Tf 0.09 0.212 0.365 rg 1 0 0 1 53 528 Tm (Vendor identity and performance) Tj ET
+BT /F1 7.1 Tf 0.373 0.443 0.533 rg 1 0 0 1 53 512 Tm (Demo examples: SUP-001 ABC Suppliers, SUP-002 Global) Tj ET
+BT /F1 7.1 Tf 0.373 0.443 0.533 rg 1 0 0 1 53 503 Tm (Traders, SUP-004 PackRight Solutions.) Tj ET
+BT /F2 7.1 Tf 0.086 0.463 0.416 rg 1 0 0 1 53 492 Tm (Current state: hard-coded sample only. No Supplier upload) Tj ET
+BT /F2 7.1 Tf 0.086 0.463 0.416 rg 1 0 0 1 53 483 Tm (or database CRUD path exists on this page.) Tj ET
+1 1 1 rg
+0.863 0.898 0.937 RG
+1 w
+305 443 250 119 re B
+0.086 0.475 0.91 rg
+305 443 4 119 re f
+BT /F2 7 Tf 0.086 0.475 0.91 rg 1 0 0 1 318 545 Tm (4 / LOCATIONS) Tj ET
+BT /F2 9.5 Tf 0.09 0.212 0.365 rg 1 0 0 1 318 528 Tm (Sites, plants and warehouses) Tj ET
+BT /F1 7.1 Tf 0.373 0.443 0.533 rg 1 0 0 1 318 512 Tm (Demo examples: LOC-001 Main Warehouse, LOC-002 Plant North,) Tj ET
+BT /F1 7.1 Tf 0.373 0.443 0.533 rg 1 0 0 1 318 503 Tm (LOC-003 Plant Central.) Tj ET
+BT /F2 7.1 Tf 0.086 0.463 0.416 rg 1 0 0 1 318 492 Tm (Actual MRP source: Plant master CSV. Plant code scopes) Tj ET
+BT /F2 7.1 Tf 0.086 0.463 0.416 rg 1 0 0 1 318 483 Tm (demand, stock, products, BOM and constraints.) Tj ET
+1 1 1 rg
+0.863 0.898 0.937 RG
+1 w
+40 311 250 119 re B
+0.086 0.475 0.91 rg
+40 311 4 119 re f
+BT /F2 7 Tf 0.086 0.475 0.91 rg 1 0 0 1 53 413 Tm (5 / PLANNING PARAMETERS) Tj ET
+BT /F2 9.5 Tf 0.09 0.212 0.365 rg 1 0 0 1 53 396 Tm (Replenishment policy values) Tj ET
+BT /F1 7.1 Tf 0.373 0.443 0.533 rg 1 0 0 1 53 380 Tm (Demo examples: Default service level, Planning time fence,) Tj ET
+BT /F1 7.1 Tf 0.373 0.443 0.533 rg 1 0 0 1 53 371 Tm (Default calendar.) Tj ET
+BT /F2 7.1 Tf 0.086 0.463 0.416 rg 1 0 0 1 53 360 Tm (Actual MRP sources: Material master + Plant constraints.) Tj ET
+BT /F2 7.1 Tf 0.086 0.463 0.416 rg 1 0 0 1 53 351 Tm (The demo items themselves are not applied.) Tj ET
+1 1 1 rg
+0.863 0.898 0.937 RG
+1 w
+305 311 250 119 re B
+0.086 0.475 0.91 rg
+305 311 4 119 re f
+BT /F2 7 Tf 0.086 0.475 0.91 rg 1 0 0 1 318 413 Tm (OTHER PLANNING INPUTS) Tj ET
+BT /F2 9.5 Tf 0.09 0.212 0.365 rg 1 0 0 1 318 396 Tm (Stock and forecast) Tj ET
+BT /F1 7.1 Tf 0.373 0.443 0.533 rg 1 0 0 1 318 380 Tm (These are not Master Data tabs. Inventory and Demand) Tj ET
+BT /F1 7.1 Tf 0.373 0.443 0.533 rg 1 0 0 1 318 371 Tm (Planning provide changing, time-phased operating data.) Tj ET
+BT /F2 7.1 Tf 0.086 0.463 0.416 rg 1 0 0 1 318 360 Tm (Actual sources: Inventory CSV + weekly/monthly demand CSV) Tj ET
+BT /F2 7.1 Tf 0.086 0.463 0.416 rg 1 0 0 1 318 351 Tm (or imported workbook scenario.) Tj ET
+1 0.961 0.91 rg
+0.937 0.831 0.675 RG
+1 w
+40 178 515 112 re B
+BT /F2 8 Tf 0.584 0.376 0.055 rg 1 0 0 1 56 265 Tm (WHERE DO THE VISIBLE RECORDS COME FROM?) Tj ET
+BT /F1 8.6 Tf 0.463 0.325 0.129 rg 1 0 0 1 56 245 Tm (The example codes and names above are seeded in the frontend source for screen demonstration. They do not) Tj ET
+BT /F1 8.6 Tf 0.463 0.325 0.129 rg 1 0 0 1 56 233 Tm (come from SAP, ERP, a vendor integration, or the selected tenant database. A CSV upload may succeed even) Tj ET
+BT /F1 8.6 Tf 0.463 0.325 0.129 rg 1 0 0 1 56 221 Tm (though the static grid does not refresh.) Tj ET
+BT /F2 8 Tf 0.086 0.475 0.91 rg 1 0 0 1 40 173 Tm (DOMAIN TO REAL UPLOAD TYPE) Tj ET
+0.91 0.941 0.973 rg
+0.851 0.89 0.937 RG
+1 w
+40 137 515 23 re B
+BT /F2 7.2 Tf 0.208 0.318 0.435 rg 1 0 0 1 45 145 Tm (PAGE DOMAIN) Tj ET
+BT /F2 7.2 Tf 0.208 0.318 0.435 rg 1 0 0 1 235 145 Tm (TENANT DATABASE INPUT) Tj ET
+1 1 1 rg
+0.894 0.918 0.945 RG
+1 w
+40 119 515 18 re B
+BT /F2 7.5 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 125 Tm (Materials) Tj ET
+BT /F1 7.5 Tf 0.278 0.365 0.471 rg 1 0 0 1 235 125 Tm (Material master) Tj ET
+0.953 0.969 0.984 rg
+0.894 0.918 0.945 RG
+1 w
+40 101 515 18 re B
+BT /F2 7.5 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 107 Tm (Products) Tj ET
+BT /F1 7.5 Tf 0.278 0.365 0.471 rg 1 0 0 1 235 107 Tm (Finished goods + Bill of materials) Tj ET
+1 1 1 rg
+0.894 0.918 0.945 RG
+1 w
+40 83 515 18 re B
+BT /F2 7.5 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 89 Tm (Locations) Tj ET
+BT /F1 7.5 Tf 0.278 0.365 0.471 rg 1 0 0 1 235 89 Tm (Plant master) Tj ET
+0.953 0.969 0.984 rg
+0.894 0.918 0.945 RG
+1 w
+40 65 515 18 re B
+BT /F2 7.5 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 71 Tm (Planning Parameters) Tj ET
+BT /F1 7.5 Tf 0.278 0.365 0.471 rg 1 0 0 1 235 71 Tm (Material master + Plant constraints) Tj ET
+1 1 1 rg
+0.894 0.918 0.945 RG
+1 w
+40 47 515 18 re B
+BT /F2 7.5 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 53 Tm (Suppliers) Tj ET
+BT /F1 7.5 Tf 0.278 0.365 0.471 rg 1 0 0 1 235 53 Tm (No upload type currently supported) Tj ET
+0.851 0.89 0.937 RG
+0.8 w 40 36 m 555 36 l S
+BT /F1 7 Tf 0.396 0.478 0.58 rg 1 0 0 1 40 19 Tm (Master Data | demo examples vs. MRP source data) Tj ET
+BT /F2 8 Tf 0.086 0.475 0.91 rg 1 0 0 1 536 19 Tm (03) Tj ET
+
+endstream
+endobj
+11 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 12 0 R >>
+endobj
+12 0 obj
+<< /Length 6522 >>
+stream
+0.965 0.973 0.984 rg
+0 0 595 842 re f
+0.086 0.475 0.91 rg
+0 833 595 9 re f
+BT /F2 8 Tf 0.396 0.478 0.58 rg 1 0 0 1 40 808 Tm (MRP PORTAL  /  MASTER DATA GUIDE) Tj ET
+BT /F2 8 Tf 0.086 0.475 0.91 rg 1 0 0 1 40 773 Tm (03 / CSV FIELD REFERENCE) Tj ET
+BT /F2 23 Tf 0.09 0.212 0.365 rg 1 0 0 1 40 742 Tm (Plant + material master) Tj ET
+BT /F1 8.5 Tf 0.396 0.478 0.58 rg 1 0 0 1 40 722 Tm (Upload these foundation records first; later files depend on their identifiers.) Tj ET
+0.851 0.89 0.937 RG
+1 w 40 709 m 555 709 l S
+1 1 1 rg
+0.863 0.898 0.937 RG
+1 w
+40 648 515 49 re B
+0.086 0.475 0.91 rg
+40 648 4 49 re f
+BT /F2 10 Tf 0.09 0.212 0.365 rg 1 0 0 1 53 677 Tm (PLANT MASTER) Tj ET
+BT /F1 7.4 Tf 0.373 0.443 0.533 rg 1 0 0 1 53 659 Tm (Answers: where does planning take place? Country code and plant code are shared references for tenant operations.) Tj ET
+0.91 0.941 0.973 rg
+0.851 0.89 0.937 RG
+1 w
+40 615 515 23 re B
+BT /F2 7.2 Tf 0.208 0.318 0.435 rg 1 0 0 1 45 623 Tm (CSV FIELD) Tj ET
+BT /F2 7.2 Tf 0.208 0.318 0.435 rg 1 0 0 1 170 623 Tm (MEANING + MRP USE) Tj ET
+1 1 1 rg
+0.894 0.918 0.945 RG
+1 w
+40 595 515 20 re B
+BT /F2 7.5 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 603 Tm (plant_code) Tj ET
+BT /F1 7.5 Tf 0.278 0.365 0.471 rg 1 0 0 1 170 603 Tm (Stable plant key referenced by products, BOM, inventory, constraints, and demand.) Tj ET
+0.953 0.969 0.984 rg
+0.894 0.918 0.945 RG
+1 w
+40 575 515 20 re B
+BT /F2 7.5 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 583 Tm (plant_name) Tj ET
+BT /F1 7.5 Tf 0.278 0.365 0.471 rg 1 0 0 1 170 583 Tm (Readable name for the facility.) Tj ET
+1 1 1 rg
+0.894 0.918 0.945 RG
+1 w
+40 549 515 26 re B
+BT /F2 7.5 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 563 Tm (country_code) Tj ET
+BT /F1 7.5 Tf 0.278 0.365 0.471 rg 1 0 0 1 170 563 Tm (Three-letter country code for country filter and currency context; country must be configured or) Tj ET
+BT /F1 7.5 Tf 0.278 0.365 0.471 rg 1 0 0 1 170 554 Tm (supplied with supported metadata.) Tj ET
+0.953 0.969 0.984 rg
+0.894 0.918 0.945 RG
+1 w
+40 529 515 20 re B
+BT /F2 7.5 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 537 Tm (location) Tj ET
+BT /F1 7.5 Tf 0.278 0.365 0.471 rg 1 0 0 1 170 537 Tm (Descriptive city, region, or site location.) Tj ET
+1 1 1 rg
+0.894 0.918 0.945 RG
+1 w
+40 509 515 20 re B
+BT /F2 7.5 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 517 Tm (active_flag) Tj ET
+BT /F1 7.5 Tf 0.278 0.365 0.471 rg 1 0 0 1 170 517 Tm (true/false; inactive plants are excluded from planning options.) Tj ET
+1 1 1 rg
+0.863 0.898 0.937 RG
+1 w
+40 449 515 48 re B
+0.086 0.475 0.91 rg
+40 449 4 48 re f
+BT /F2 10 Tf 0.09 0.212 0.365 rg 1 0 0 1 53 477 Tm (MATERIAL MASTER) Tj ET
+BT /F1 7.4 Tf 0.373 0.443 0.533 rg 1 0 0 1 53 459 Tm (Answers: what item is needed, in what unit, and with what supply and replenishment policy?) Tj ET
+0.91 0.941 0.973 rg
+0.851 0.89 0.937 RG
+1 w
+40 422 515 23 re B
+BT /F2 7.2 Tf 0.208 0.318 0.435 rg 1 0 0 1 45 430 Tm (CSV FIELD) Tj ET
+BT /F2 7.2 Tf 0.208 0.318 0.435 rg 1 0 0 1 170 430 Tm (MEANING + MRP USE) Tj ET
+1 1 1 rg
+0.894 0.918 0.945 RG
+1 w
+40 402 515 20 re B
+BT /F2 7.2 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 410 Tm (material_code) Tj ET
+BT /F1 7.2 Tf 0.278 0.365 0.471 rg 1 0 0 1 170 410 Tm (Unique tenant item key referenced by BOM, inventory, and constraints.) Tj ET
+0.953 0.969 0.984 rg
+0.894 0.918 0.945 RG
+1 w
+40 382 515 20 re B
+BT /F2 7.2 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 390 Tm (description) Tj ET
+BT /F1 7.2 Tf 0.278 0.365 0.471 rg 1 0 0 1 170 390 Tm (Readable material name.) Tj ET
+1 1 1 rg
+0.894 0.918 0.945 RG
+1 w
+40 362 515 20 re B
+BT /F2 7.2 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 370 Tm (category) Tj ET
+BT /F1 7.2 Tf 0.278 0.365 0.471 rg 1 0 0 1 170 370 Tm (Raw, Packing, or Intermediate; classification and filtering.) Tj ET
+0.953 0.969 0.984 rg
+0.894 0.918 0.945 RG
+1 w
+40 342 515 20 re B
+BT /F2 7.2 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 350 Tm (supply_type) Tj ET
+BT /F1 7.2 Tf 0.278 0.365 0.471 rg 1 0 0 1 170 350 Tm (BUY = procure externally. MAKE = manufacture internally; MAKE materials may have their own BOM.) Tj ET
+1 1 1 rg
+0.894 0.918 0.945 RG
+1 w
+40 322 515 20 re B
+BT /F2 7.2 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 330 Tm (uom) Tj ET
+BT /F1 7.2 Tf 0.278 0.365 0.471 rg 1 0 0 1 170 330 Tm (Stock/planning unit such as ton, kg, or each. Keep coherent with BOM and stock.) Tj ET
+0.953 0.969 0.984 rg
+0.894 0.918 0.945 RG
+1 w
+40 302 515 20 re B
+BT /F2 7.2 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 310 Tm (unit_cost) Tj ET
+BT /F1 7.2 Tf 0.278 0.365 0.471 rg 1 0 0 1 170 310 Tm (Cost per unit used in planned procurement value and spend reporting.) Tj ET
+1 1 1 rg
+0.894 0.918 0.945 RG
+1 w
+40 282 515 20 re B
+BT /F2 7.2 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 290 Tm (scrap_pct) Tj ET
+BT /F1 7.2 Tf 0.278 0.365 0.471 rg 1 0 0 1 170 290 Tm (Loss fraction from 0 up to but not including 1; 0.02 means 2% extra consumption.) Tj ET
+0.953 0.969 0.984 rg
+0.894 0.918 0.945 RG
+1 w
+40 262 515 20 re B
+BT /F2 7.2 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 270 Tm (lead_time_buckets) Tj ET
+BT /F1 7.2 Tf 0.278 0.365 0.471 rg 1 0 0 1 170 270 Tm (Weekly/monthly replenishment buckets; interpretation follows the run time-bucket type.) Tj ET
+1 1 1 rg
+0.894 0.918 0.945 RG
+1 w
+40 242 515 20 re B
+BT /F2 7.2 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 250 Tm (moq) Tj ET
+BT /F1 7.2 Tf 0.278 0.365 0.471 rg 1 0 0 1 170 250 Tm (Minimum order quantity applied when net requirement is positive.) Tj ET
+0.953 0.969 0.984 rg
+0.894 0.918 0.945 RG
+1 w
+40 222 515 20 re B
+BT /F2 7.2 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 230 Tm (order_multiple) Tj ET
+BT /F1 7.2 Tf 0.278 0.365 0.471 rg 1 0 0 1 170 230 Tm (Order increment to round suggested quantity upward to.) Tj ET
+1 1 1 rg
+0.894 0.918 0.945 RG
+1 w
+40 202 515 20 re B
+BT /F2 7.2 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 210 Tm (safety_stock_min) Tj ET
+BT /F1 7.2 Tf 0.278 0.365 0.471 rg 1 0 0 1 170 210 Tm (Default projected-stock floor; plant constraints may override it.) Tj ET
+0.953 0.969 0.984 rg
+0.894 0.918 0.945 RG
+1 w
+40 182 515 20 re B
+BT /F2 7.2 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 190 Tm (max_capacity) Tj ET
+BT /F1 7.2 Tf 0.278 0.365 0.471 rg 1 0 0 1 170 190 Tm (Default capacity ceiling for alerts; plant constraints may override it.) Tj ET
+0.918 0.961 0.949 rg
+0.741 0.878 0.843 RG
+1 w
+40 53 515 29 re B
+BT /F2 7.4 Tf 0.208 0.4 0.357 rg 1 0 0 1 51 64 Tm (Keep units consistent: BOM consumption and stock must use compatible UOMs.) Tj ET
+0.851 0.89 0.937 RG
+0.8 w 40 36 m 555 36 l S
+BT /F1 7 Tf 0.396 0.478 0.58 rg 1 0 0 1 40 19 Tm (Master Data | plant and material fields) Tj ET
+BT /F2 8 Tf 0.086 0.475 0.91 rg 1 0 0 1 536 19 Tm (04) Tj ET
+
+endstream
+endobj
+13 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 14 0 R >>
+endobj
+14 0 obj
+<< /Length 7321 >>
+stream
+0.965 0.973 0.984 rg
+0 0 595 842 re f
+0.086 0.475 0.91 rg
+0 833 595 9 re f
+BT /F2 8 Tf 0.396 0.478 0.58 rg 1 0 0 1 40 808 Tm (MRP PORTAL  /  MASTER DATA GUIDE) Tj ET
+BT /F2 8 Tf 0.086 0.475 0.91 rg 1 0 0 1 40 773 Tm (04 / CSV FIELD REFERENCE) Tj ET
+BT /F2 23 Tf 0.09 0.212 0.365 rg 1 0 0 1 40 742 Tm (Products + replenishment policy) Tj ET
+BT /F1 8.5 Tf 0.396 0.478 0.58 rg 1 0 0 1 40 722 Tm (These records connect forecasted finished goods to the materials that must be supplied.) Tj ET
+0.851 0.89 0.937 RG
+1 w 40 709 m 555 709 l S
+BT /F2 8 Tf 0.086 0.475 0.91 rg 1 0 0 1 40 689 Tm (FINISHED GOODS) Tj ET
+0.91 0.941 0.973 rg
+0.851 0.89 0.937 RG
+1 w
+40 655 515 23 re B
+BT /F2 7.2 Tf 0.208 0.318 0.435 rg 1 0 0 1 45 663 Tm (CSV FIELD) Tj ET
+BT /F2 7.2 Tf 0.208 0.318 0.435 rg 1 0 0 1 170 663 Tm (MEANING + MRP USE) Tj ET
+1 1 1 rg
+0.894 0.918 0.945 RG
+1 w
+40 635 515 20 re B
+BT /F2 7.2 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 643 Tm (plant_code) Tj ET
+BT /F1 7.2 Tf 0.278 0.365 0.471 rg 1 0 0 1 170 643 Tm (Plant where product is planned; must exist.) Tj ET
+0.953 0.969 0.984 rg
+0.894 0.918 0.945 RG
+1 w
+40 615 515 20 re B
+BT /F2 7.2 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 623 Tm (fg_code) Tj ET
+BT /F1 7.2 Tf 0.278 0.365 0.471 rg 1 0 0 1 170 623 Tm (Finished-good key used by demand and BOM parent.) Tj ET
+1 1 1 rg
+0.894 0.918 0.945 RG
+1 w
+40 595 515 20 re B
+BT /F2 7.2 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 603 Tm (description) Tj ET
+BT /F1 7.2 Tf 0.278 0.365 0.471 rg 1 0 0 1 170 603 Tm (Readable product name.) Tj ET
+0.953 0.969 0.984 rg
+0.894 0.918 0.945 RG
+1 w
+40 575 515 20 re B
+BT /F2 7.2 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 583 Tm (product_type) Tj ET
+BT /F1 7.2 Tf 0.278 0.365 0.471 rg 1 0 0 1 170 583 Tm (Bulk or Bagged; supports product-type filtering.) Tj ET
+1 1 1 rg
+0.894 0.918 0.945 RG
+1 w
+40 555 515 20 re B
+BT /F2 7.2 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 563 Tm (uom) Tj ET
+BT /F1 7.2 Tf 0.278 0.365 0.471 rg 1 0 0 1 170 563 Tm (Forecast/output unit coherent with demand and BOM ratio.) Tj ET
+0.953 0.969 0.984 rg
+0.894 0.918 0.945 RG
+1 w
+40 535 515 20 re B
+BT /F2 7.2 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 543 Tm (active_flag) Tj ET
+BT /F1 7.2 Tf 0.278 0.365 0.471 rg 1 0 0 1 170 543 Tm (true/false; only active products are available for planning.) Tj ET
+BT /F2 8 Tf 0.086 0.475 0.91 rg 1 0 0 1 40 521 Tm (BILL OF MATERIALS \(BOM\)) Tj ET
+0.91 0.941 0.973 rg
+0.851 0.89 0.937 RG
+1 w
+40 485 515 23 re B
+BT /F2 7.2 Tf 0.208 0.318 0.435 rg 1 0 0 1 45 493 Tm (CSV FIELD) Tj ET
+BT /F2 7.2 Tf 0.208 0.318 0.435 rg 1 0 0 1 200 493 Tm (MEANING + MRP USE) Tj ET
+1 1 1 rg
+0.894 0.918 0.945 RG
+1 w
+40 465 515 20 re B
+BT /F2 7.1 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 473 Tm (plant_code) Tj ET
+BT /F1 7.1 Tf 0.278 0.365 0.471 rg 1 0 0 1 200 473 Tm (Plant-specific product structure.) Tj ET
+0.953 0.969 0.984 rg
+0.894 0.918 0.945 RG
+1 w
+40 445 515 20 re B
+BT /F2 7.1 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 453 Tm (fg_code) Tj ET
+BT /F1 7.1 Tf 0.278 0.365 0.471 rg 1 0 0 1 200 453 Tm (Parent finished good; must exist at the same plant.) Tj ET
+1 1 1 rg
+0.894 0.918 0.945 RG
+1 w
+40 425 515 20 re B
+BT /F2 7.1 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 433 Tm (component_material_code) Tj ET
+BT /F1 7.1 Tf 0.278 0.365 0.471 rg 1 0 0 1 200 433 Tm (Consumed child material; must exist in Material master.) Tj ET
+0.953 0.969 0.984 rg
+0.894 0.918 0.945 RG
+1 w
+40 405 515 20 re B
+BT /F2 7.1 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 413 Tm (quantity_per_fg) Tj ET
+BT /F1 7.1 Tf 0.278 0.365 0.471 rg 1 0 0 1 200 413 Tm (Component quantity needed per one parent unit; core BOM ratio.) Tj ET
+1 1 1 rg
+0.894 0.918 0.945 RG
+1 w
+40 385 515 20 re B
+BT /F2 7.1 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 393 Tm (quantity_uom) Tj ET
+BT /F1 7.1 Tf 0.278 0.365 0.471 rg 1 0 0 1 200 393 Tm (Source unit for component quantity; keep consistent with material.) Tj ET
+0.953 0.969 0.984 rg
+0.894 0.918 0.945 RG
+1 w
+40 365 515 20 re B
+BT /F2 7.1 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 373 Tm (scrap_factor) Tj ET
+BT /F1 7.1 Tf 0.278 0.365 0.471 rg 1 0 0 1 200 373 Tm (Optional source field. Current import/calculation ignores it; material scrap_pct is used.) Tj ET
+1 0.961 0.91 rg
+0.937 0.831 0.675 RG
+1 w
+40 315 515 42 re B
+BT /F2 7.4 Tf 0.584 0.376 0.055 rg 1 0 0 1 51 341 Tm (BOM upload replaces all existing components for every parent included.) Tj ET
+BT /F1 7.2 Tf 0.463 0.325 0.129 rg 1 0 0 1 51 327 Tm (Upload complete component rows; a partial file removes omitted components.) Tj ET
+BT /F2 8 Tf 0.086 0.475 0.91 rg 1 0 0 1 40 300 Tm (PLANT CONSTRAINTS) Tj ET
+0.91 0.941 0.973 rg
+0.851 0.89 0.937 RG
+1 w
+40 264 515 23 re B
+BT /F2 7.2 Tf 0.208 0.318 0.435 rg 1 0 0 1 45 272 Tm (CSV FIELD) Tj ET
+BT /F2 7.2 Tf 0.208 0.318 0.435 rg 1 0 0 1 200 272 Tm (MEANING + MRP USE) Tj ET
+1 1 1 rg
+0.894 0.918 0.945 RG
+1 w
+40 244 515 20 re B
+BT /F2 7.1 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 252 Tm (plant_code + material_code) Tj ET
+BT /F1 7.1 Tf 0.278 0.365 0.471 rg 1 0 0 1 200 252 Tm (Plant/material pair the rule applies to; both must exist.) Tj ET
+0.953 0.969 0.984 rg
+0.894 0.918 0.945 RG
+1 w
+40 224 515 20 re B
+BT /F2 7.1 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 232 Tm (min_stock_qty) Tj ET
+BT /F1 7.1 Tf 0.278 0.365 0.471 rg 1 0 0 1 200 232 Tm (Plant-level projected stock floor used as safety-stock target.) Tj ET
+1 1 1 rg
+0.894 0.918 0.945 RG
+1 w
+40 204 515 20 re B
+BT /F2 7.1 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 212 Tm (reorder_level) Tj ET
+BT /F1 7.1 Tf 0.278 0.365 0.471 rg 1 0 0 1 200 212 Tm (Stored reorder point; not used by current forward netting formula.) Tj ET
+0.953 0.969 0.984 rg
+0.894 0.918 0.945 RG
+1 w
+40 184 515 20 re B
+BT /F2 7.1 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 192 Tm (max_stock_qty) Tj ET
+BT /F1 7.1 Tf 0.278 0.365 0.471 rg 1 0 0 1 200 192 Tm (Maximum stock reference and fallback capacity limit.) Tj ET
+1 1 1 rg
+0.894 0.918 0.945 RG
+1 w
+40 164 515 20 re B
+BT /F2 7.1 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 172 Tm (max_storage_capacity) Tj ET
+BT /F1 7.1 Tf 0.278 0.365 0.471 rg 1 0 0 1 200 172 Tm (Storage limit used for capacity alert when provided.) Tj ET
+0.953 0.969 0.984 rg
+0.894 0.918 0.945 RG
+1 w
+40 144 515 20 re B
+BT /F2 7.1 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 152 Tm (lead_time_buckets) Tj ET
+BT /F1 7.1 Tf 0.278 0.365 0.471 rg 1 0 0 1 200 152 Tm (Plant/material lead-time override; material default is fallback.) Tj ET
+1 1 1 rg
+0.894 0.918 0.945 RG
+1 w
+40 124 515 20 re B
+BT /F2 7.1 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 132 Tm (moq) Tj ET
+BT /F1 7.1 Tf 0.278 0.365 0.471 rg 1 0 0 1 200 132 Tm (Plant/material minimum-order override.) Tj ET
+0.953 0.969 0.984 rg
+0.894 0.918 0.945 RG
+1 w
+40 104 515 20 re B
+BT /F2 7.1 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 112 Tm (order_multiple) Tj ET
+BT /F1 7.1 Tf 0.278 0.365 0.471 rg 1 0 0 1 200 112 Tm (Plant/material order-increment override.) Tj ET
+1 1 1 rg
+0.894 0.918 0.945 RG
+1 w
+40 84 515 20 re B
+BT /F2 7.1 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 92 Tm (uom) Tj ET
+BT /F1 7.1 Tf 0.278 0.365 0.471 rg 1 0 0 1 200 92 Tm (Optional reference unit for constraint quantities.) Tj ET
+BT /F1 7 Tf 0.463 0.325 0.129 rg 1 0 0 1 40 59 Tm (Demo service level, planning time fence, and calendar are not currently applied by forward MRP.) Tj ET
+0.851 0.89 0.937 RG
+0.8 w 40 36 m 555 36 l S
+BT /F1 7 Tf 0.396 0.478 0.58 rg 1 0 0 1 40 19 Tm (Master Data | product, BOM, and constraints) Tj ET
+BT /F2 8 Tf 0.086 0.475 0.91 rg 1 0 0 1 536 19 Tm (05) Tj ET
+
+endstream
+endobj
+15 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 16 0 R >>
+endobj
+16 0 obj
+<< /Length 7147 >>
+stream
+0.965 0.973 0.984 rg
+0 0 595 842 re f
+0.086 0.475 0.91 rg
+0 833 595 9 re f
+BT /F2 8 Tf 0.396 0.478 0.58 rg 1 0 0 1 40 808 Tm (MRP PORTAL  /  MASTER DATA GUIDE) Tj ET
+BT /F2 8 Tf 0.086 0.475 0.91 rg 1 0 0 1 40 773 Tm (05 / FROM UPLOAD TO DECISION) Tj ET
+BT /F2 23 Tf 0.09 0.212 0.365 rg 1 0 0 1 40 742 Tm (How MRP uses master data) Tj ET
+BT /F1 8.5 Tf 0.396 0.478 0.58 rg 1 0 0 1 40 722 Tm (The order below satisfies reference checks and produces traceable time-phased requirements.) Tj ET
+0.851 0.89 0.937 RG
+1 w 40 709 m 555 709 l S
+1 1 1 rg
+0.863 0.898 0.937 RG
+1 w
+40 638 119 51 re B
+0.906 0.945 1 rg
+40 665 24 24 re f
+BT /F2 8 Tf 0.086 0.475 0.91 rg 1 0 0 1 48 673 Tm (1) Tj ET
+BT /F2 6.6 Tf 0.09 0.212 0.365 rg 1 0 0 1 71 673 Tm (PLANT) Tj ET
+BT /F1 7 Tf 0.396 0.478 0.58 rg 1 0 0 1 48 650 Tm (site + country) Tj ET
+1 1 1 rg
+0.863 0.898 0.937 RG
+1 w
+172 638 119 51 re B
+0.906 0.945 1 rg
+172 665 24 24 re f
+BT /F2 8 Tf 0.086 0.475 0.91 rg 1 0 0 1 180 673 Tm (2) Tj ET
+BT /F2 6.6 Tf 0.09 0.212 0.365 rg 1 0 0 1 203 673 Tm (MATERIALS) Tj ET
+BT /F1 7 Tf 0.396 0.478 0.58 rg 1 0 0 1 180 650 Tm (items + policy) Tj ET
+1 1 1 rg
+0.863 0.898 0.937 RG
+1 w
+304 638 119 51 re B
+0.906 0.945 1 rg
+304 665 24 24 re f
+BT /F2 8 Tf 0.086 0.475 0.91 rg 1 0 0 1 312 673 Tm (3) Tj ET
+BT /F2 6.6 Tf 0.09 0.212 0.365 rg 1 0 0 1 335 673 Tm (PRODUCTS) Tj ET
+BT /F1 7 Tf 0.396 0.478 0.58 rg 1 0 0 1 312 650 Tm (finished goods) Tj ET
+1 1 1 rg
+0.863 0.898 0.937 RG
+1 w
+436 638 119 51 re B
+0.906 0.945 1 rg
+436 665 24 24 re f
+BT /F2 8 Tf 0.086 0.475 0.91 rg 1 0 0 1 444 673 Tm (4) Tj ET
+BT /F2 6.6 Tf 0.09 0.212 0.365 rg 1 0 0 1 467 673 Tm (CONSTRAINTS) Tj ET
+BT /F1 7 Tf 0.396 0.478 0.58 rg 1 0 0 1 444 650 Tm (plant overrides) Tj ET
+1 1 1 rg
+0.863 0.898 0.937 RG
+1 w
+40 575 119 51 re B
+0.906 0.945 1 rg
+40 602 24 24 re f
+BT /F2 8 Tf 0.086 0.475 0.91 rg 1 0 0 1 48 610 Tm (5) Tj ET
+BT /F2 6.6 Tf 0.09 0.212 0.365 rg 1 0 0 1 71 610 Tm (BOM) Tj ET
+BT /F1 7 Tf 0.396 0.478 0.58 rg 1 0 0 1 48 587 Tm (complete recipe) Tj ET
+1 1 1 rg
+0.863 0.898 0.937 RG
+1 w
+172 575 119 51 re B
+0.906 0.945 1 rg
+172 602 24 24 re f
+BT /F2 8 Tf 0.086 0.475 0.91 rg 1 0 0 1 180 610 Tm (6) Tj ET
+BT /F2 6.6 Tf 0.09 0.212 0.365 rg 1 0 0 1 203 610 Tm (STOCK) Tj ET
+BT /F1 7 Tf 0.396 0.478 0.58 rg 1 0 0 1 180 587 Tm (on-hand + receipts) Tj ET
+1 1 1 rg
+0.863 0.898 0.937 RG
+1 w
+304 575 119 51 re B
+0.906 0.945 1 rg
+304 602 24 24 re f
+BT /F2 8 Tf 0.086 0.475 0.91 rg 1 0 0 1 312 610 Tm (7) Tj ET
+BT /F2 6.6 Tf 0.09 0.212 0.365 rg 1 0 0 1 335 610 Tm (DEMAND) Tj ET
+BT /F1 7 Tf 0.396 0.478 0.58 rg 1 0 0 1 312 587 Tm (forecast periods) Tj ET
+1 1 1 rg
+0.863 0.898 0.937 RG
+1 w
+436 575 119 51 re B
+0.906 0.945 1 rg
+436 602 24 24 re f
+BT /F2 8 Tf 0.086 0.475 0.91 rg 1 0 0 1 444 610 Tm (8) Tj ET
+BT /F2 6.6 Tf 0.09 0.212 0.365 rg 1 0 0 1 467 610 Tm (RUN MRP) Tj ET
+BT /F1 7 Tf 0.396 0.478 0.58 rg 1 0 0 1 444 587 Tm (selected tenant) Tj ET
+0.09 0.212 0.365 rg
+40 476 515 79 re f
+BT /F2 7.5 Tf 0.651 0.867 0.831 rg 1 0 0 1 58 529 Tm (GROSS COMPONENT REQUIREMENT) Tj ET
+BT /F2 14 Tf 1 1 1 rg 1 0 0 1 58 502 Tm (Forecast x BOM ratio x \(1 + material scrap_pct\)) Tj ET
+BT /F1 7.5 Tf 0.863 0.906 0.957 rg 1 0 0 1 58 486 Tm (Aggregated by plant, material, and planning time bucket.) Tj ET
+1 1 1 rg
+0.863 0.898 0.937 RG
+1 w
+40 356 250 101 re B
+0.086 0.475 0.91 rg
+40 356 4 101 re f
+BT /F2 6.5 Tf 0.086 0.475 0.91 rg 1 0 0 1 53 440 Tm (CALCULATION) Tj ET
+BT /F2 10 Tf 0.09 0.212 0.365 rg 1 0 0 1 53 423 Tm (NET + SIZE) Tj ET
+BT /F1 7.2 Tf 0.373 0.443 0.533 rg 1 0 0 1 53 406 Tm (Net scheduled and in-transit receipts and gross) Tj ET
+BT /F1 7.2 Tf 0.373 0.443 0.533 rg 1 0 0 1 53 396 Tm (requirements against projected stock. If stock would fall) Tj ET
+BT /F1 7.2 Tf 0.373 0.443 0.533 rg 1 0 0 1 53 386 Tm (below the minimum, the gap is net requirement. Apply MOQ) Tj ET
+BT /F1 7.2 Tf 0.373 0.443 0.533 rg 1 0 0 1 53 376 Tm (and order multiple; use lead time for release timing.) Tj ET
+1 1 1 rg
+0.863 0.898 0.937 RG
+1 w
+305 356 250 101 re B
+0.086 0.475 0.91 rg
+305 356 4 101 re f
+BT /F2 6.5 Tf 0.086 0.475 0.91 rg 1 0 0 1 318 440 Tm (OUTPUT) Tj ET
+BT /F2 10 Tf 0.09 0.212 0.365 rg 1 0 0 1 318 423 Tm (ALERT + REVIEW) Tj ET
+BT /F1 7.2 Tf 0.373 0.443 0.533 rg 1 0 0 1 318 406 Tm (Capacity alert when projected stock exceeds configured) Tj ET
+BT /F1 7.2 Tf 0.373 0.443 0.533 rg 1 0 0 1 318 396 Tm (capacity. Expedite alert when release is due by the first) Tj ET
+BT /F1 7.2 Tf 0.373 0.443 0.533 rg 1 0 0 1 318 386 Tm (bucket. MRP creates recommendations; it does not send a) Tj ET
+BT /F1 7.2 Tf 0.373 0.443 0.533 rg 1 0 0 1 318 376 Tm (supplier order.) Tj ET
+BT /F2 8 Tf 0.086 0.475 0.91 rg 1 0 0 1 40 331 Tm (RECOMMENDED UPLOAD ORDER) Tj ET
+0.91 0.941 0.973 rg
+0.851 0.89 0.937 RG
+1 w
+40 296 515 23 re B
+BT /F2 7.2 Tf 0.208 0.318 0.435 rg 1 0 0 1 45 304 Tm (STEP) Tj ET
+BT /F2 7.2 Tf 0.208 0.318 0.435 rg 1 0 0 1 117 304 Tm (ACTION) Tj ET
+1 1 1 rg
+0.894 0.918 0.945 RG
+1 w
+40 276 515 20 re B
+BT /F2 7.5 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 284 Tm (1) Tj ET
+BT /F1 7.5 Tf 0.278 0.365 0.471 rg 1 0 0 1 117 284 Tm (Plant master) Tj ET
+0.953 0.969 0.984 rg
+0.894 0.918 0.945 RG
+1 w
+40 256 515 20 re B
+BT /F2 7.5 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 264 Tm (2) Tj ET
+BT /F1 7.5 Tf 0.278 0.365 0.471 rg 1 0 0 1 117 264 Tm (Material master) Tj ET
+1 1 1 rg
+0.894 0.918 0.945 RG
+1 w
+40 236 515 20 re B
+BT /F2 7.5 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 244 Tm (3) Tj ET
+BT /F1 7.5 Tf 0.278 0.365 0.471 rg 1 0 0 1 117 244 Tm (Finished goods) Tj ET
+0.953 0.969 0.984 rg
+0.894 0.918 0.945 RG
+1 w
+40 216 515 20 re B
+BT /F2 7.5 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 224 Tm (4) Tj ET
+BT /F1 7.5 Tf 0.278 0.365 0.471 rg 1 0 0 1 117 224 Tm (Plant constraints) Tj ET
+1 1 1 rg
+0.894 0.918 0.945 RG
+1 w
+40 196 515 20 re B
+BT /F2 7.5 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 204 Tm (5) Tj ET
+BT /F1 7.5 Tf 0.278 0.365 0.471 rg 1 0 0 1 117 204 Tm (Bill of materials) Tj ET
+0.953 0.969 0.984 rg
+0.894 0.918 0.945 RG
+1 w
+40 176 515 20 re B
+BT /F2 7.5 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 184 Tm (6) Tj ET
+BT /F1 7.5 Tf 0.278 0.365 0.471 rg 1 0 0 1 117 184 Tm (Inventory & stock) Tj ET
+1 1 1 rg
+0.894 0.918 0.945 RG
+1 w
+40 156 515 20 re B
+BT /F2 7.5 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 164 Tm (7) Tj ET
+BT /F1 7.5 Tf 0.278 0.365 0.471 rg 1 0 0 1 117 164 Tm (Demand / scenario) Tj ET
+0.953 0.969 0.984 rg
+0.894 0.918 0.945 RG
+1 w
+40 136 515 20 re B
+BT /F2 7.5 Tf 0.141 0.341 0.537 rg 1 0 0 1 45 144 Tm (8) Tj ET
+BT /F1 7.5 Tf 0.278 0.365 0.471 rg 1 0 0 1 117 144 Tm (Run MRP) Tj ET
+1 0.961 0.91 rg
+0.937 0.831 0.675 RG
+1 w
+40 49 515 49 re B
+BT /F2 7.3 Tf 0.584 0.376 0.055 rg 1 0 0 1 51 80 Tm (CURRENT FORMULA BOUNDARIES) Tj ET
+BT /F1 6.6 Tf 0.463 0.325 0.129 rg 1 0 0 1 51 63 Tm (Reserved stock is not deducted; reorder_level is stored but not netted; BOM scrap_factor is ignored.) Tj ET
+BT /F1 6.6 Tf 0.463 0.325 0.129 rg 1 0 0 1 51 53 Tm (Material scrap_pct is applied. Maximum capacity flags excess stock but does not cap order quantity.) Tj ET
+0.851 0.89 0.937 RG
+0.8 w 40 36 m 555 36 l S
+BT /F1 7 Tf 0.396 0.478 0.58 rg 1 0 0 1 40 19 Tm (Master Data | upload order, formula, and limits) Tj ET
+BT /F2 8 Tf 0.086 0.475 0.91 rg 1 0 0 1 536 19 Tm (06) Tj ET
+
+endstream
+endobj
+xref
+0 17
+0000000000 65535 f 
+0000000019 00000 n 
+0000000068 00000 n 
+0000000158 00000 n 
+0000000255 00000 n 
+0000000357 00000 n 
+0000000493 00000 n 
+0000002928 00000 n 
+0000003064 00000 n 
+0000010107 00000 n 
+0000010244 00000 n 
+0000017312 00000 n 
+0000017450 00000 n 
+0000024025 00000 n 
+0000024163 00000 n 
+0000031537 00000 n 
+0000031675 00000 n 
+trailer
+<< /Size 17 /Root 1 0 R >>
+startxref
+38875
+%%EOF

@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Master Data | MRP Portal Guide</title>
+<style>
+@page{size:A4;margin:12mm 13mm 13mm}*{box-sizing:border-box}body{margin:0;background:#e9eff6;color:#20334e;font:10pt Arial,Helvetica,sans-serif;line-height:1.42}.page{position:relative;width:184mm;min-height:272mm;margin:8mm auto;padding:12mm;background:#f7f9fc;break-after:page;overflow:hidden}.page:last-child{break-after:auto}.cover{background:#17365d;color:#fff;padding:16mm}.cover:after{content:"";position:absolute;width:145mm;height:145mm;border:1px solid #ffffff20;border-radius:50%;right:-55mm;top:30mm;box-shadow:0 0 0 18mm #ffffff08,0 0 0 38mm #ffffff06}.brand{font-size:9pt;font-weight:bold;letter-spacing:2px;color:#9fd6d0}.kicker{font-size:8pt;font-weight:bold;letter-spacing:1.7px;text-transform:uppercase;color:#3988ed;margin:0 0 5mm}.cover .kicker{color:#83d2c1;margin-top:29mm}.cover h1{font-size:33pt;line-height:1.07;letter-spacing:-1px;margin:0 0 5mm;max-width:140mm}.cover .sub{font-size:13pt;color:#d8e7f7;max-width:135mm}.cover .callout{position:relative;z-index:1;margin-top:20mm;padding:7mm;background:#ffffff12;border:1px solid #ffffff38;border-radius:4mm;max-width:148mm}.cover .callout b{display:block;color:#a8e2d6;font-size:11pt;margin-bottom:2mm}.cover .tag{display:inline-block;margin-top:3mm;padding:2mm 3mm;border:1px solid #ffffff50;border-radius:20mm;font-size:8pt;color:#e5effb}.cover .footer{position:absolute;bottom:12mm;left:16mm;right:16mm;color:#acc2dc;font-size:8pt;display:flex;justify-content:space-between}.cover-flow{position:relative;z-index:1;display:flex;gap:2mm;align-items:center;flex-wrap:wrap;margin-top:12mm;max-width:150mm}.cover-flow span{background:#ffffff18;border:1px solid #ffffff30;border-radius:2mm;padding:2.3mm 3mm;font-size:8.5pt}.cover-flow i{font-style:normal;color:#8bd6cb}.section-title{display:flex;align-items:flex-end;justify-content:space-between;border-bottom:1px solid #dce5ef;padding-bottom:3mm;margin-bottom:5mm}.section-title h2{margin:0;font-size:22pt;letter-spacing:-.5px;color:#17365d}.section-title small{font-size:8pt;color:#71839a}.lede{font-size:10.5pt;color:#536985;margin:0 0 5mm}.alert{padding:4mm 5mm;border-radius:3mm;border:1px solid #f1c98f;background:#fff6e8;color:#6c4a19;margin:4mm 0 5mm}.alert strong{color:#8a5200}.good{border-color:#b6e2d5;background:#edf9f5;color:#315d54}.bluebox{border:1px solid #c9dcf6;background:#eef5ff;border-radius:3mm;padding:4mm 5mm}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:4mm}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:3mm}.card{background:#fff;border:1px solid #dce5ef;border-radius:3mm;padding:4mm;break-inside:avoid}.card h3{font-size:11pt;color:#183b66;margin:0 0 2mm}.card p{margin:0;color:#536783;font-size:9pt}.pill{display:inline-block;padding:1mm 2.5mm;background:#e9f2ff;color:#286bb2;border-radius:10mm;font-size:7pt;font-weight:bold;letter-spacing:.4px;text-transform:uppercase;margin-bottom:2mm}.demo{background:#fff4e8;border:1px solid #f2d0a3;border-radius:2mm;padding:3mm 4mm;color:#76501b;font-size:8.5pt}.live{background:#ecf8f4;border:1px solid #b8e2d6;border-radius:2mm;padding:3mm 4mm;color:#35665b;font-size:8.5pt}table{width:100%;border-collapse:collapse;background:#fff;border:1px solid #dce5ef;border-radius:2mm;overflow:hidden;font-size:8pt;line-height:1.28}thead{background:#eaf1f8;color:#334d6d}th{text-align:left;font-size:7.5pt;padding:2.2mm 2.5mm}td{vertical-align:top;padding:2mm 2.5mm;border-top:1px solid #e6edf4}td:first-child{font-family:Consolas,monospace;font-weight:bold;color:#245789;white-space:nowrap}tr{break-inside:avoid}.compact td{padding:1.55mm 2.2mm}.compact th{padding:1.8mm 2.2mm}.table-note{font-size:8pt;color:#71839a;margin:2mm 0 4mm}.bar{height:2mm;border-radius:5mm;background:linear-gradient(90deg,#1e7af0 0 72%,#dce9f7 72%);margin:2mm 0}.domain-card{min-height:38mm}.domain-card .example{font-size:8pt;color:#75859a;margin-top:2mm}.domain-card .mapping{font-size:8pt;color:#166d8d;margin-top:2mm;font-weight:bold}.sequence{display:flex;align-items:stretch;gap:2mm;flex-wrap:wrap;margin:4mm 0}.step{flex:1 1 28mm;min-width:24mm;background:#fff;border:1px solid #dbe5f0;border-radius:2.5mm;padding:3mm;text-align:center}.step b{display:block;color:#17365d;font-size:8.5pt}.step small{display:block;color:#71839a;font-size:7pt;margin-top:1mm}.arrow{align-self:center;color:#287ce0;font-size:15pt}.formula{padding:5mm;border-radius:3mm;background:#17365d;color:#fff;text-align:center;font-size:11pt;font-weight:bold;margin:4mm 0}.formula small{display:block;font-size:8pt;font-weight:normal;color:#c7d9ef;margin-top:2mm}.footer{position:absolute;bottom:6mm;left:12mm;right:12mm;border-top:1px solid #dce5ef;padding-top:2mm;display:flex;justify-content:space-between;color:#8291a4;font-size:7pt}.page-num{font-weight:bold;color:#4179b8}.icon-num{width:7mm;height:7mm;border-radius:50%;display:inline-grid;place-items:center;background:#1979ed;color:#fff;font-size:8pt;font-weight:bold;margin-right:2mm}.list{padding-left:5mm;margin:2mm 0;color:#536783}.list li{margin:1.5mm 0}.small{font-size:8pt;color:#667b96}.mt{margin-top:4mm}.field-table td:nth-child(2){width:73%}.three-col td:first-child{width:30%}.source{font-size:8pt;color:#7789a0;margin-top:3mm}@media print{body{background:#fff}.page{margin:0;width:auto;min-height:272mm;box-shadow:none}.cover{-webkit-print-color-adjust:exact;print-color-adjust:exact}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style>
+</head>
+<body>
+<section class="page cover">
+  <div class="brand">MRP PORTAL <span style="font-weight:normal;letter-spacing:1px"> / OPERATING GUIDE</span></div>
+  <p class="kicker">A visual handbook for planners and managers</p>
+  <h1>Master Data</h1>
+  <p class="sub">What each domain means, where the data comes from, and how it flows into a material plan.</p>
+  <div class="callout"><b>Read this before trusting the screen counts</b>The Master Data grid and its domain examples are currently demo rows stored in the page. CSV upload is a separate working flow that writes supported records to the selected tenant's database. The grid does not yet display those uploaded records.<div class="tag">Demo display != database catalog</div></div>
+  <div class="cover-flow"><span>Plant</span><i>→</i><span>Materials</span><i>→</i><span>Products + BOM</span><i>→</i><span>Constraints</span><i>→</i><span>Inventory + demand</span><i>→</i><span>MRP plan</span></div>
+  <div class="footer" style="border-color:#ffffff30"><span>MRP Portal | Master Data guide</span><span>Purpose • fields • sources • planning flow</span></div>
+</section>
+
+<section class="page">
+  <p class="kicker">01 / Read the page correctly</p><div class="section-title"><h2>Screen map</h2><small>What is connected, and what is illustrative</small></div>
+  <p class="lede">Master data is the reusable foundation that tells MRP what can be planned and how materials relate. The page has navigation and upload controls, but not all displayed actions are connected to tenant storage yet.</p>
+  <div class="grid2">
+    <div class="live"><b>Working tenant-backed path</b><br>Choose a tenant → choose an upload type → upload a correctly formatted CSV. The server validates columns and references, then writes to that tenant's schema. Success toast gives the uploaded row count.</div>
+    <div class="demo"><b>Demo-only display path</b><br>Grid rows, owners, statuses, KPI totals, last-sync time, data-quality score, Add/Edit, Toggle status, and Export are local sample UI. They do not read or modify tenant master tables.</div>
+  </div>
+  <h3 class="mt">Header and workspace controls</h3>
+  <table><thead><tr><th>Control</th><th>Meaning / current behavior</th></tr></thead><tbody>
+    <tr><td>Tenant selector</td><td>Chooses the tenant context for the CSV API. Check the tenant name before each upload.</td></tr>
+    <tr><td>Export</td><td>Downloads the filtered demo grid, not a database extract.</td></tr>
+    <tr><td>Upload type</td><td>Selects Plant master, Material master, Finished goods, Plant constraints, or Bill of materials.</td></tr>
+    <tr><td>Upload CSV</td><td>Posts the selected file to the backend. Validation/reference errors stop the import; success reports rows uploaded.</td></tr>
+    <tr><td>Add Material / Product / ...</td><td>Opens a generic demo form. Current Add and Edit changes exist only in browser state.</td></tr>
+  </tbody></table>
+  <h3 class="mt">Summary cards</h3>
+  <div class="grid2">
+    <div class="card"><h3>Master records / Active records</h3><p>Counts across hard-coded sample arrays. They do not measure uploaded tenant rows.</p></div>
+    <div class="card"><h3>Needs review / Last sync</h3><p>Illustrative review count and fixed sync text. No live database validation or sync timestamp is behind them.</p></div>
+  </div>
+  <h3 class="mt">Catalog table and tools</h3>
+  <table class="compact"><thead><tr><th>Column / control</th><th>Meaning in the screen</th></tr></thead><tbody>
+    <tr><td>Code / Name</td><td>Identifier and readable label for the displayed record.</td></tr>
+    <tr><td>Category / Type</td><td>Domain-specific grouping (for example Raw, Packing, Bulk, or Bagged).</td></tr>
+    <tr><td>Unit</td><td>Material/product unit; demo UI repurposes it as lead time, location, or value in other domains.</td></tr>
+    <tr><td>Planning attributes</td><td>Short demo note. Real CSV imports use separate typed fields.</td></tr>
+    <tr><td>Last updated / Owner / Status</td><td>Sample labels only; they do not describe tenant database audit data.</td></tr>
+    <tr><td>Search / All statuses</td><td>Filters current demo rows by text and sample status.</td></tr>
+    <tr><td>Checkbox / row actions</td><td>Selection is visual. Edit and Toggle are local-only; Copy code copies the identifier.</td></tr>
+    <tr><td>Page buttons / Data quality</td><td>Presentation sample controls and fixed score, not database pagination or a computed quality measure.</td></tr>
+  </tbody></table>
+  <div class="footer"><span>Master Data | current implementation notes</span><span class="page-num">02</span></div>
+</section>
+
+<section class="page">
+  <p class="kicker">02 / The five data domains</p><div class="section-title"><h2>What each domain is for</h2><small>The left panel groups records by planner task</small></div>
+  <p class="lede">The five visible domains are screen categories, not five physical database tables. Here are the sample items shown and the real source used by MRP.</p>
+  <div class="grid2">
+    <div class="card domain-card"><span class="pill">1 • Materials</span><h3>Purchased or made components</h3><p>Defines item identity, unit, cost, scrap, sourcing, replenishment and capacity defaults. MRP needs these values to calculate and size supply.</p><div class="example">Demo: RM-0045 Aluminum Sheet, MT-0012 Motor Assembly, PK-3011 Packaging Box, SP-7781 Screw M6, RM-1120 Copper Wire, EL-2204 Control Relay.</div><div class="mapping">Actual source: Material master CSV</div></div>
+    <div class="card domain-card"><span class="pill">2 • Products &amp; BOMs</span><h3>Finished goods and recipes</h3><p>Finished goods receive forecast demand. A BOM links each product to component materials and quantities per product unit.</p><div class="example">Demo products: PRD-1001 Control Panel, PRD-1002 Switch Assembly, PRD-1003 Power Module, PRD-1004 Enclosure Unit.</div><div class="mapping">Actual sources: Finished goods + Bill of materials CSVs</div></div>
+    <div class="card domain-card"><span class="pill">3 • Suppliers</span><h3>Vendor reference and performance</h3><p>Supplier identity, lead time, terms, quality and delivery performance can support purchasing decisions.</p><div class="example">Demo: SUP-001 ABC Suppliers, SUP-002 Global Traders, SUP-004 PackRight Solutions.</div><div class="mapping">Current state: demo only; no Supplier upload/CRUD path here</div></div>
+    <div class="card domain-card"><span class="pill">4 • Locations</span><h3>Sites and facilities</h3><p>Locations shown in the page are sample warehouses and plants. MRP uses a plant code to scope stock, products, BOM, demand and constraints.</p><div class="example">Demo: LOC-001 Main Warehouse, LOC-002 Plant North, LOC-003 Plant Central.</div><div class="mapping">Actual MRP source: Plant master CSV</div></div>
+    <div class="card domain-card"><span class="pill">5 • Planning Parameters</span><h3>Replenishment policies</h3><p>Safety stock, maximum capacity, lead time, minimum order and order increment influence when and how much to plan.</p><div class="example">Demo: Default service level, Planning time fence, Default calendar.</div><div class="mapping">Actual MRP sources: Material master + Plant constraints CSV</div></div>
+    <div class="card domain-card"><span class="pill">Also needed</span><h3>Operational planning inputs</h3><p>Inventory provides opening stock and receipts. Demand Planning provides forecast by finished good and period. These are not Master Data domains.</p><div class="mapping">Actual sources: Inventory CSV + monthly/weekly demand CSV or scenario workbook</div></div>
+  </div>
+  <div class="alert mt"><strong>Do not confuse sample names with company records.</strong> The codes and people shown above are seeded in the frontend source file for screen demonstration. They do not come from SAP, ERP, a supplier feed, or the selected tenant database.</div>
+  <div class="footer"><span>Master Data | domain map and source-of-truth</span><span class="page-num">03</span></div>
+</section>
+
+<section class="page">
+  <p class="kicker">03 / CSV fields that define the foundation</p><div class="section-title"><h2>Plant + material master</h2><small>Upload these before dependent files</small></div>
+  <div class="bluebox"><b>Plant master answers:</b> where will planning take place? <b>Material master answers:</b> what item is needed, in what unit, and with what supply policy?</div>
+  <h3 class="mt">Plant master</h3>
+  <table class="field-table"><thead><tr><th>CSV field</th><th>Meaning and planning use</th></tr></thead><tbody>
+    <tr><td>plant_code</td><td>Stable facility key referenced by finished goods, BOM, inventory, constraints and demand.</td></tr>
+    <tr><td>plant_name</td><td>Readable facility label.</td></tr>
+    <tr><td>country_code</td><td>Three-letter country code; supports country filtering and currency context. Country must be configured or supplied using supported metadata.</td></tr>
+    <tr><td>location</td><td>Descriptive city, region or site location.</td></tr>
+    <tr><td>active_flag</td><td>true/false. Inactive facilities are excluded from planning options.</td></tr>
+  </tbody></table>
+  <h3 class="mt">Material master</h3>
+  <table class="field-table compact"><thead><tr><th>CSV field</th><th>Meaning and planning use</th></tr></thead><tbody>
+    <tr><td>material_code</td><td>Unique tenant item key referenced by BOM, inventory and plant constraints.</td></tr>
+    <tr><td>description</td><td>Readable material name.</td></tr>
+    <tr><td>category</td><td>Raw, Packing, or Intermediate. Classifies and filters requirements.</td></tr>
+    <tr><td>supply_type</td><td>BUY = procure externally. MAKE = manufacture internally; a MAKE material may have its own BOM.</td></tr>
+    <tr><td>uom</td><td>Stock/planning unit such as ton, kg, or each. Keep consistent with BOM and inventory quantities.</td></tr>
+    <tr><td>unit_cost</td><td>Cost per unit used in planned procurement value and spend reporting.</td></tr>
+    <tr><td>scrap_pct</td><td>Loss fraction from 0 up to but not including 1; 0.02 means 2% extra consumption.</td></tr>
+    <tr><td>lead_time_buckets</td><td>Number of weekly or monthly buckets to replenish; interpretation follows run bucket type.</td></tr>
+    <tr><td>moq</td><td>Minimum order quantity applied when there is a net requirement.</td></tr>
+    <tr><td>order_multiple</td><td>Quantity increment to round an order up to (for example, 100-unit increments).</td></tr>
+    <tr><td>safety_stock_min</td><td>Default projected inventory floor. Plant constraints can override it.</td></tr>
+    <tr><td>max_capacity</td><td>Default stock/capacity ceiling for capacity alerts; plant constraints can override it.</td></tr>
+  </tbody></table>
+  <div class="alert mt"><strong>Units must agree.</strong> A BOM quantity expressed as each cannot be applied safely to a material stored in kg unless the source data defines the conversion consistently.</div>
+  <div class="footer"><span>Master Data | plant and material fields</span><span class="page-num">04</span></div>
+</section>
+
+<section class="page">
+  <p class="kicker">04 / Product structure + policy</p><div class="section-title"><h2>Finished goods, BOM, constraints</h2><small>These connect demand to supply</small></div>
+  <h3>Finished goods</h3>
+  <table class="field-table compact"><thead><tr><th>CSV field</th><th>Meaning and planning use</th></tr></thead><tbody>
+    <tr><td>plant_code</td><td>Plant where the product is planned/made; must exist first.</td></tr>
+    <tr><td>fg_code</td><td>Finished-good key used by demand and BOM parent rows.</td></tr>
+    <tr><td>description</td><td>Readable product name.</td></tr>
+    <tr><td>product_type</td><td>Bulk or Bagged; supports product-type filtering.</td></tr>
+    <tr><td>uom</td><td>Forecast/output unit, coherent with demand and BOM ratio.</td></tr>
+    <tr><td>active_flag</td><td>true/false; only active products are selectable for planning.</td></tr>
+  </tbody></table>
+  <h3 class="mt">Bill of materials (BOM)</h3>
+  <table class="field-table compact"><thead><tr><th>CSV field</th><th>Meaning and planning use</th></tr></thead><tbody>
+    <tr><td>plant_code</td><td>Plant-specific product structure.</td></tr>
+    <tr><td>fg_code</td><td>Parent finished good; must exist for the same plant.</td></tr>
+    <tr><td>component_material_code</td><td>Child material consumed by the product; must exist in Material master.</td></tr>
+    <tr><td>quantity_per_fg</td><td>Quantity of component needed per one finished-good unit; the core BOM ratio.</td></tr>
+    <tr><td>quantity_uom</td><td>Source unit for the component ratio; use the material's unit.</td></tr>
+    <tr><td>scrap_factor</td><td>Optional source field; current importer/calculation does not use it. Scrap is applied from Material master `scrap_pct`.</td></tr>
+  </tbody></table>
+  <div class="alert"><strong>BOM upload replaces included parents.</strong> The importer deletes existing component rows for each finished-good parent found in the file, then inserts the supplied rows. Upload all component lines for each included parent, not a partial delta.</div>
+  <h3>Plant constraints</h3>
+  <table class="field-table compact"><thead><tr><th>CSV field</th><th>Meaning and planning use</th></tr></thead><tbody>
+    <tr><td>plant_code + material_code</td><td>The plant/material pair the rule belongs to; both must exist.</td></tr>
+    <tr><td>min_stock_qty</td><td>Plant-level projected stock floor (the safety-stock target in forward MRP).</td></tr>
+    <tr><td>reorder_level</td><td>Stored reorder-point reference. It is not used by the current forward netting formula.</td></tr>
+    <tr><td>max_stock_qty</td><td>Maximum stock reference and fallback capacity limit.</td></tr>
+    <tr><td>max_storage_capacity</td><td>Storage limit used for capacity alert when provided.</td></tr>
+    <tr><td>lead_time_buckets</td><td>Plant/material lead-time override; material default is fallback.</td></tr>
+    <tr><td>moq</td><td>Plant/material minimum-order override.</td></tr>
+    <tr><td>order_multiple</td><td>Plant/material order-increment override.</td></tr>
+    <tr><td>uom</td><td>Optional reference unit for constraint quantities.</td></tr>
+  </tbody></table>
+  <p class="table-note">Generic demo parameters such as service level, planning time fence and calendar are not currently uploaded or applied by this forward MRP engine.</p>
+  <div class="footer"><span>Master Data | product structure and policy</span><span class="page-num">05</span></div>
+</section>
+
+<section class="page">
+  <p class="kicker">05 / How the records become a plan</p><div class="section-title"><h2>Upload-to-MRP flow</h2><small>For one selected tenant</small></div>
+  <div class="sequence"><div class="step"><b>1. Plant</b><small>facility + country</small></div><span class="arrow">→</span><div class="step"><b>2. Materials</b><small>items + supply rules</small></div><span class="arrow">→</span><div class="step"><b>3. Finished goods</b><small>forecastable products</small></div></div>
+  <div class="sequence"><div class="step"><b>4. Constraints</b><small>plant-level policy</small></div><span class="arrow">→</span><div class="step"><b>5. BOM</b><small>complete component recipe</small></div><span class="arrow">→</span><div class="step"><b>6. Inventory</b><small>on-hand + receipts</small></div><span class="arrow">→</span><div class="step"><b>7. Demand</b><small>forecast by product/period</small></div></div>
+  <div class="sequence"><div class="step"><b>8. Run MRP</b><small>one tenant, selected scenario</small></div><span class="arrow">→</span><div class="step"><b>9. Review plan</b><small>orders, dates, risks</small></div></div>
+  <p class="small">Order matters because database references are checked. Plant must exist before finished goods. Plant and product/material references must exist before BOM, inventory, constraints or demand imports.</p>
+  <div class="formula">Forecast x BOM ratio x (1 + material scrap) = gross component requirement<small>The engine aggregates component requirements for each plant, material and time bucket.</small></div>
+  <div class="grid2">
+    <div class="card"><h3>Netting and replenishment</h3><p>For each bucket, MRP uses projected stock plus scheduled and dated in-transit receipts, then subtracts gross requirement. If projected stock would fall below the minimum, the difference becomes net requirement. Suggested quantity observes MOQ and order multiple; lead time determines release date.</p></div>
+    <div class="card"><h3>Alerts and limits</h3><p>Projected stock above configured capacity raises a capacity alert. An order whose release is due by the first bucket can be flagged for expedite. Maximum capacity is checked, not used to cap the recommended order quantity.</p></div>
+  </div>
+  <div class="alert mt"><strong>Current formula boundaries:</strong> reorder_level is stored but not used in forward netting. Reserved stock is displayed in Inventory but is not deducted by this MRP formula. BOM `scrap_factor` is ignored; material `scrap_pct` is used.</div>
+  <h3>What to check after upload</h3>
+  <ul class="list"><li>Confirm the correct tenant is selected and every upload reports success.</li><li>Upload complete parent BOMs and check that all product/material codes match exactly.</li><li>Check inventory and forecast units and dates before running.</li><li>Use Dashboard to select country, plant, horizon, bucket type, planning start date, and one demand scenario.</li><li>Review time-phased material rows, planned order quantity, release date, projected stock, expedite, and capacity flags.</li></ul>
+  <div class="bluebox"><b>Recommended starting order:</b> Plant master → Material master → Finished goods → Plant constraints → Bill of materials → Inventory &amp; stock → Demand forecast/scenario → Run MRP.</div>
+  <p class="source">Data examples, accepted fields, and limitations in this visual guide are based on the current portal source. For exact CSV examples, see the Tenant Validation Guide in Project Guides.</p>
+  <div class="footer"><span>Master Data | planning flow and current boundaries</span><span class="page-num">06</span></div>
+</section>
+</body>
+</html>

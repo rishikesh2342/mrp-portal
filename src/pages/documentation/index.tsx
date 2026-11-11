@@ -43,6 +43,18 @@ const guides: { section: string; items: Guide[] }[] = [
         href: '/project-docs/docs/tenant_validation_guide.md',
         format: 'Markdown',
       },
+      {
+        title: 'Master Data guide',
+        description: 'Explains the Master Data tabs, fields, tenant CSV imports, demo-only page values, and how master records feed MRP.',
+        href: '/project-docs/docs/master_data_guide.pdf',
+        format: 'PDF',
+      },
+      {
+        title: 'Inventory guide',
+        description: 'Explains Inventory page fields, CSV columns, tenant data behavior, detail tabs, and how stock and receipts affect MRP.',
+        href: '/project-docs/docs/inventory_guide.pdf',
+        format: 'PDF',
+      },
     ],
   },
   {
@@ -87,6 +99,12 @@ const guides: { section: string; items: Guide[] }[] = [
         title: 'Time-phased plan guide · editable',
         description: 'Editable source version of the material-plan explanation.',
         href: '/project-docs/docs/time_phased_material_plan_guide.md',
+        format: 'Markdown',
+      },
+      {
+        title: 'Inventory guide · editable',
+        description: 'Editable field reference for the Inventory page and its CSV workflow.',
+        href: '/project-docs/docs/inventory_guide.md',
         format: 'Markdown',
       },
       {
