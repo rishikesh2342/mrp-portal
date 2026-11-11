@@ -172,8 +172,13 @@ export async function calculateForwardMrp(client, input) {
       throw new Error("The selected forecast scenario could not be found for this tenant. Reload the scenario list and select an available version.");
     if (["actual", "previous_year"].includes(demandScenario.scenario_type))
       throw new Error("Select a forecast scenario. Actuals and prior-year sheets are reference data.");
-    if (demandScenario.bucket_type !== bucketType)
-      throw new Error(`The selected scenario uses ${demandScenario.bucket_type.toLowerCase()} periods. Change the dashboard time bucket to match.`);
+    if (demandScenario.bucket_type !== bucketType) {
+      const error = new Error(
+        `The selected scenario uses ${demandScenario.bucket_type.toLowerCase()} periods. Change the dashboard time bucket to match, or select a ${bucketType.toLowerCase()} scenario.`,
+      );
+      error.status = 400;
+      throw error;
+    }
   }
 
   const forecastPromise = demandScenarioId

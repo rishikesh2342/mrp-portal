@@ -6,7 +6,6 @@ import {
   Bell,
   BookOpen,
   Building2,
-  CalendarDays,
   Check,
   ChevronDown,
   ChevronRight,
@@ -20,7 +19,6 @@ import {
   Menu,
   MoreHorizontal,
   Package,
-  Search,
   Settings,
   ShoppingCart,
   Sparkles,
@@ -215,9 +213,7 @@ export default function App() {
         </aside>
       )}
       <main className={`main-area ${sidebarOpen ? "with-sidebar" : "sidebar-closed"}`}>
-        <header
-          className={`topbar ${page === "Dashboard" ? "topbar-dashboard" : page === "Material Requirement" ? "topbar-material-requirement" : ""}`}
-        >
+        <header className="topbar">
           <div className="top-left">
             <button
               className="icon-button menu-toggle"
@@ -231,15 +227,8 @@ export default function App() {
               <ChevronRight size={14} />
               <strong>{page}</strong>
             </div>
-            <label className="global-search">
-              <Search size={17} />
-              <input placeholder="Search material, part number, supplier..." />
-            </label>
           </div>
           <div className="top-actions">
-            <button className="dashboard-month">
-              <CalendarDays size={16} /> Nov 2026 <ChevronDown size={14} />
-            </button>
             <div className="env-badge">
               <i /> Production <span>v2.14</span>
             </div>

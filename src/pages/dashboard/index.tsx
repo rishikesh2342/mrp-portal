@@ -6,6 +6,7 @@ import {
   CalendarDays,
   ChevronDown,
   ChevronRight,
+  Download,
   Factory,
   Package,
   Play,
@@ -189,6 +190,15 @@ export default function DashboardPage({ onNotify }: PageProps) {
     forecastOverrides?: object[];
     inventoryOverrides?: object[];
   }) {
+    const selectedScenario = demandScenarios.find(
+      (row) => row.import_id === demandScenarioId,
+    );
+    if (selectedScenario && selectedScenario.bucket_type !== bucketType) {
+      setError(
+        `The selected scenario uses ${selectedScenario.bucket_type.toLowerCase()} periods. Set Time buckets to ${selectedScenario.bucket_type.toLowerCase()} before running MRP.`,
+      );
+      return;
+    }
     if (!countryCodes.length) {
       setError("Select a country to calculate material requirements.");
       return;
@@ -376,6 +386,46 @@ export default function DashboardPage({ onNotify }: PageProps) {
             },
           ];
     void runMrp({ forecastOverrides, inventoryOverrides });
+  };
+
+  const exportTimePhasedPlan = () => {
+    if (!output) return;
+    const scenarioName = demandScenarios.find(
+      (row) => row.import_id === demandScenarioId,
+    )?.scenario_name || "Existing demand forecast";
+    const headers = [
+      "run_ids", "scenario_id", "scenario_name", "country_code", "bucket_type", "planning_start", "horizon_months",
+      "plant_code", "material_code", "description", "category", "uom", "on_hand_qty", "safety_stock_min", "max_capacity",
+      "bucket_index", "bucket_label", "bucket_date", "gross_requirement", "scheduled_receipts", "net_requirement",
+      "planned_order_qty", "projected_inventory", "order_release_date", "expedite_now", "capacity_exceeded",
+    ];
+    const csvCell = (value: string | number | boolean | null) =>
+      `"${String(value ?? "").replace(/"/g, '""')}"`;
+    const rows = output.results.map((row) => {
+      const bucket = output.buckets[row.bucketIndex];
+      const plant = options.plants.find((item) => item.plant_code === row.plantCode);
+      return [
+        output.runIds.join(";"), demandScenarioId, scenarioName,
+        plant?.country_code || output.countryCodes[0] || "", output.bucketType,
+        output.planningStart, output.horizonMonths, row.plantCode, row.materialCode,
+        row.description, row.category, row.uom, row.onHand, row.safetyStock,
+        row.maxCapacity, row.bucketIndex, bucket?.label || "", row.bucketDate,
+        row.grossRequirement, row.scheduledReceipts, row.netRequirement,
+        row.plannedOrders, row.projectedInventory, row.orderReleaseDate,
+        row.expediteNow, row.capacityExceeded,
+      ];
+    });
+    const csv = [headers, ...rows].map((row) => row.map(csvCell).join(",")).join("\r\n");
+    const blob = new Blob([`\uFEFF${csv}`], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `forward-mrp-plan-${output.planningStart}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    onNotify(`Exported ${rows.length.toLocaleString()} time-phased plan rows`);
   };
 
   const capacityRows = materialGroups
@@ -581,10 +631,16 @@ export default function DashboardPage({ onNotify }: PageProps) {
             onChange={(event) =>
               setBucketType(event.target.value as "Monthly" | "Weekly")
             }
+            disabled={Boolean(demandScenarioId)}
           >
             <option>Monthly</option>
             <option>Weekly</option>
           </select>
+          {demandScenarioId && (
+            <small className="filter-help">
+              Time bucket is set by the selected forecast scenario.
+            </small>
+          )}
         </label>
         <label>
           Planning start date
@@ -874,10 +930,15 @@ export default function DashboardPage({ onNotify }: PageProps) {
                   orders. Expand a material for requirement and release detail.
                 </p>
               </div>
-              <span>
-                <CalendarDays size={15} />
-                {output.buckets.length} buckets
-              </span>
+              <div className="forward-matrix-heading-actions">
+                <button className="button secondary" onClick={exportTimePhasedPlan}>
+                  <Download size={15} /> Export CSV
+                </button>
+                <span>
+                  <CalendarDays size={15} />
+                  {output.buckets.length} buckets
+                </span>
+              </div>
             </div>
             <div className="forward-table-scroll">
               <table className="forward-matrix">

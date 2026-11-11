@@ -303,10 +303,20 @@
   padding: 13px 15px;
   border-bottom: 1px solid var(--fm-line);
 }
-.forward-matrix-heading > span {
+.forward-matrix-heading-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+.forward-matrix-heading-actions > span {
   justify-content: flex-end;
   color: #62758d;
   font-size: 10px;
+  white-space: nowrap;
+}
+.forward-matrix-heading-actions .button {
+  height: 32px;
   white-space: nowrap;
 }
 .forward-table-scroll {
@@ -562,6 +572,10 @@
   .forward-matrix-heading {
     align-items: flex-start;
     flex-direction: column;
+  }
+  .forward-matrix-heading-actions {
+    width: 100%;
+    justify-content: space-between;
   }
 }
 @media (max-width: 520px) {

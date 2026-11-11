@@ -549,11 +549,12 @@ if (existsSync(resolve(webDist, "index.html"))) {
 
 app.use((error, _req, res, _next) => {
   console.error(error);
+  const status = error.status || 500;
   const message =
-    process.env.NODE_ENV === "production"
-      ? "MRP request failed"
-      : error.message;
-  res.status(error.status || 500).json({ error: message });
+    status < 500 || process.env.NODE_ENV !== "production"
+      ? error.message
+      : "MRP request failed";
+  res.status(status).json({ error: message });
 });
 
 const port = Number(process.env.PORT || process.env.API_PORT || 3001);
