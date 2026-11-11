@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import type { ChangeEvent, FormEvent, ReactNode } from "react";
 import {
   Activity,
@@ -109,7 +109,7 @@ const axisFmt = (value: number) =>
     maximumFractionDigits: 1,
   }).format(value);
 
-export default function DashboardPage({ onNotify }: PageProps) {
+const DashboardPage = memo(function DashboardPage({ onNotify }: PageProps) {
   const [options, setOptions] = useState<Options>({
     countries: [],
     plants: [],
@@ -1144,7 +1144,9 @@ export default function DashboardPage({ onNotify }: PageProps) {
       )}
     </section>
   );
-}
+});
+
+export default DashboardPage;
 
 function MultiSelectFilter({
   label,

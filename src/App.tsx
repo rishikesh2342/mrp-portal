@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import {
   ArrowDown,
@@ -82,6 +82,9 @@ export default function App() {
   const [page, setPage] = useState<Page>(() =>
     pageFor(window.location.pathname),
   );
+  const [dashboardMounted, setDashboardMounted] = useState(
+    () => pageFor(window.location.pathname) === "Dashboard",
+  );
   const [isLoginRoute, setIsLoginRoute] = useState(
     () => window.location.pathname === "/login",
   );
@@ -96,10 +99,22 @@ export default function App() {
   const [newTenantName, setNewTenantName] = useState("");
   const [tenantCreateError, setTenantCreateError] = useState("");
   const [tenantCreateBusy, setTenantCreateBusy] = useState(false);
+  const notify = useCallback((message: string) => {
+    setToast(message);
+    window.setTimeout(() => setToast(""), 2400);
+  }, []);
+  const changePage = useCallback((target: Page) => {
+    history.pushState({}, "", routeFor(target));
+    setPage(target);
+    if (target === "Dashboard") setDashboardMounted(true);
+    setSidebarOpen(true);
+  }, []);
   useEffect(() => {
     const syncRoute = () => {
       setIsLoginRoute(window.location.pathname === "/login");
-      setPage(pageFor(window.location.pathname));
+      const nextPage = pageFor(window.location.pathname);
+      setPage(nextPage);
+      if (nextPage === "Dashboard") setDashboardMounted(true);
     };
     if (window.location.pathname === "/")
       history.replaceState({}, "", routeFor("Dashboard"));
@@ -135,11 +150,6 @@ export default function App() {
       })
       .finally(() => setAuthChecked(true));
   }, []);
-  const changePage = (target: Page) => {
-    history.pushState({}, "", routeFor(target));
-    setPage(target);
-    setSidebarOpen(true);
-  };
   if (!authChecked)
     return <div className="auth-loading">Loading workspace…</div>;
   if (isLoginRoute || !authUser)
@@ -150,14 +160,11 @@ export default function App() {
           history.pushState({}, "", routeFor("Dashboard"));
           setIsLoginRoute(false);
           setPage("Dashboard");
+          setDashboardMounted(true);
         }}
       />
     );
-
-  const notify = (message: string) => {
-    setToast(message);
-    window.setTimeout(() => setToast(""), 2400);
-  };
+  const DashboardPage = pageComponents.Dashboard;
   return (
     <div className="app-shell">
       {sidebarOpen && (
@@ -392,7 +399,14 @@ export default function App() {
         <div
           className={`page-wrap ${page.toLowerCase().replace(/ /g, "-")}-wrap`}
         >
-          <ModulePage page={page} onNotify={notify} onNavigate={changePage} />
+          {dashboardMounted && (
+            <div hidden={page !== "Dashboard"}>
+              <DashboardPage onNotify={notify} onNavigate={changePage} />
+            </div>
+          )}
+          {page !== "Dashboard" && (
+            <ModulePage page={page} onNotify={notify} onNavigate={changePage} />
+          )}
         </div>
       </main>
       {tenantCreateOpen && (
