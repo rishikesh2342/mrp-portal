@@ -55,6 +55,12 @@ const guides: { section: string; items: Guide[] }[] = [
         href: '/project-docs/docs/inventory_guide.pdf',
         format: 'PDF',
       },
+      {
+        title: 'Forward MRP Plan dashboard guide',
+        description: 'A plain-language guide to every Dashboard filter, scenario input, KPI, chart, table field, and the current MRP calculation rules.',
+        href: '/project-docs/docs/forward_mrp_dashboard_guide.pdf',
+        format: 'PDF',
+      },
     ],
   },
   {
@@ -105,6 +111,12 @@ const guides: { section: string; items: Guide[] }[] = [
         title: 'Inventory guide · editable',
         description: 'Editable field reference for the Inventory page and its CSV workflow.',
         href: '/project-docs/docs/inventory_guide.md',
+        format: 'Markdown',
+      },
+      {
+        title: 'Forward MRP Plan guide · editable',
+        description: 'Editable field-by-field explanation of Dashboard planning inputs and results.',
+        href: '/project-docs/docs/forward_mrp_dashboard_guide.md',
         format: 'Markdown',
       },
       {

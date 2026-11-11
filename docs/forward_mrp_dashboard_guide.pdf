@@ -1,0 +1,433 @@
+%PDF-1.4
+%MRPGuide
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [5 0 R 7 0 R 9 0 R 11 0 R 13 0 R 15 0 R] /Count 6 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 6 0 R >>
+endobj
+6 0 obj
+<< /Length 2019 >>
+stream
+0.09 0.212 0.365 rg 0 0 595 842 re f
+0.263 0.725 0.671 rg 0 0 595 12 re f
+BT /F2 8 Tf 0.651 0.867 0.831 rg 1 0 0 1 48 784 Tm (MRP PORTAL  /  VISUAL OPERATING GUIDE) Tj ET
+BT /F2 31 Tf 1 1 1 rg 1 0 0 1 48 677 Tm (DASHBOARD) Tj ET
+BT /F2 25 Tf 0.502 0.831 0.773 rg 1 0 0 1 48 635 Tm (FORWARD MRP PLAN) Tj ET
+
+BT /F1 11 Tf 0.878 0.918 0.965 rg 1 0 0 1 49 592 Tm (A plain-language field guide to the planning controls, demand scenarios, charts, KPI cards, and time-phased material table.) Tj ET
+0.141 0.286 0.435 rg 48 -328 499 145 re f
+BT /F2 8.5 Tf 0.651 0.867 0.831 rg 1 0 0 1 67 485 Tm (WHAT THE DASHBOARD ANSWERS) Tj ET
+BT /F1 9.4 Tf 1 1 1 rg 1 0 0 1 67 459 Tm (How much material will each plant need, when will stock fall short,) Tj ET
+BT /F1 9.4 Tf 1 1 1 rg 1 0 0 1 67 442 Tm (and what replenishment should a planner review?) Tj ET
+BT /F1 8.1 Tf 0.863 0.906 0.957 rg 1 0 0 1 67 404 Tm (This is a recommendation. It does not create or release a purchase order.) Tj ET
+BT /F2 8 Tf 0.651 0.867 0.831 rg 1 0 0 1 48 321 Tm (THE PLANNING FLOW) Tj ET
+0.165 0.322 0.471 rg 48 -545 95 34 re f
+BT /F2 7.2 Tf 1 1 1 rg 1 0 0 1 56 276 Tm (Forecast) Tj ET
+0.165 0.322 0.471 rg 151 -545 95 34 re f
+BT /F2 7.2 Tf 1 1 1 rg 1 0 0 1 159 276 Tm (BOM) Tj ET
+0.165 0.322 0.471 rg 226 -545 95 34 re f
+BT /F2 7.2 Tf 1 1 1 rg 1 0 0 1 234 276 Tm (Stock + receipts) Tj ET
+0.165 0.322 0.471 rg 361 -545 95 34 re f
+BT /F2 7.2 Tf 1 1 1 rg 1 0 0 1 369 276 Tm (Net need) Tj ET
+0.165 0.322 0.471 rg 445 -545 95 34 re f
+BT /F2 7.2 Tf 1 1 1 rg 1 0 0 1 453 276 Tm (Order advice) Tj ET
+BT /F1 9 Tf 0.878 0.918 0.965 rg 1 0 0 1 48 212 Tm (Tenant data + selected forecast -> material demand -> supply netting) Tj ET
+BT /F1 9 Tf 0.878 0.918 0.965 rg 1 0 0 1 48 193 Tm (-> planned orders, release dates, and capacity alerts) Tj ET
+0.365 0.49 0.608 rg 48 -774 499 1 re f
+BT /F1 7.5 Tf 0.718 0.788 0.863 rg 1 0 0 1 48 45 Tm (Purpose  |  inputs  |  formulas  |  outputs  |  current behavior) Tj ET
+BT /F2 8 Tf 0.651 0.867 0.831 rg 1 0 0 1 520 45 Tm (01) Tj ET
+
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 8 0 R >>
+endobj
+8 0 obj
+<< /Length 7974 >>
+stream
+0.973 0.98 0.988 rg 0 0 595 842 re f
+0.086 0.475 0.91 rg 0 0 595 8 re f
+BT /F2 7.5 Tf 0.396 0.478 0.58 rg 1 0 0 1 40 810 Tm (MRP PORTAL  /  FORWARD MRP PLAN GUIDE) Tj ET
+0.851 0.89 0.937 rg 40 -48 515 1 re f
+BT /F1 7 Tf 0.443 0.514 0.604 rg 1 0 0 1 40 20 Tm (Dashboard | Forward MRP Plan | field-by-field guide) Tj ET
+BT /F2 8 Tf 0.086 0.475 0.91 rg 1 0 0 1 538 20 Tm (02) Tj ET
+BT /F2 19 Tf 0.09 0.212 0.365 rg 1 0 0 1 42 764 Tm (Dashboard \(Forward MRP Plan\): field-by-field guide) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 735 Tm (This guide explains the Dashboard's Forward MRP Plan in everyday language: what to select, what each filter changes, how the) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 723.5 Tm (charts and table should be read, what the planner can override, and which parts are stored in the tenant database. It) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 712 Tm (describes the implementation in this project as it exists today.) Tj ET
+BT /F2 13 Tf 0.09 0.212 0.365 rg 1 0 0 1 42 689.5 Tm (??? What this page does) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 667.5 Tm (The page calculates a time-phased material plan for the currently selected tenant. It takes a demand forecast for finished) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 656 Tm (goods, expands that demand through the Bill of Materials \(BOM\), and compares the resulting material needs with stock and) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 644.5 Tm (incoming supply. It then recommends material orders by time bucket and highlights releases that need early attention or stock) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 633 Tm (that exceeds capacity.) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 616.5 Tm (The output is a planning recommendation, not a purchase order, production order, supplier confirmation, or approval. Running) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 605 Tm (MRP stores a run header and result rows in the current tenant database. Running it again creates another saved run; it does) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 593.5 Tm (not overwrite the previous run.) Tj ET
+BT /F2 13 Tf 0.09 0.212 0.365 rg 1 0 0 1 42 571 Tm (??? What data feeds the plan) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 549 Tm (The run uses active tenant data from:) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 532.5 Tm (??? Plant master: active plants and their country.) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 516 Tm (??? Material master: item code, unit, cost, scrap percentage, safety stock, lead time, MOQ, order multiple, and default) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 504.5 Tm (capacity.) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 488 Tm (??? Finished goods: active forecastable products and type.) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 471.5 Tm (??? Bill of materials: plant-specific recipe linking a finished good or MAKE material to component materials and quantities.) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 455 Tm (??? Inventory: opening on-hand, scheduled-receipt balance, in-transit quantity and due date.) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 438.5 Tm (??? Plant constraints: plant/material-specific minimum, capacity, MOQ, and lead-time overrides.) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 422 Tm (??? Demand forecast: either the tenant's regular weekly/monthly forecast table, or one chosen imported workbook scenario.) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 405.5 Tm (All reference codes must match. For example, a forecast's plant and finished-good codes must correspond to active records,) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 394 Tm (and each BOM component must exist in the material master. The tenant selector in the global header scopes the options,) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 382.5 Tm (forecast and saved run.) Tj ET
+BT /F2 13 Tf 0.09 0.212 0.365 rg 1 0 0 1 42 360 Tm (??? Header controls) Tj ET
+0.941 0.961 0.98 rg 40 -496 515 20 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 338 Tm (Label - Meaning and behavior) Tj ET
+0.941 0.961 0.98 rg 40 -511 515 20 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 323 Tm (Planning Workspace / MRP - Section label identifying this page as the forward material planning workspace.) Tj ET
+0.941 0.961 0.98 rg 40 -526 515 20 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 308 Tm (Forward MRP Plan - The page title. ?Forward? means the calculation spans upcoming weekly or monthly periods.) Tj ET
+0.941 0.961 0.98 rg 40 -541 515 30 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 293 Tm (Scenario inputs - Opens a what-if panel. Any forecast or on-hand quantity entered there overrides the saved input for this calculation) Tj ET
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 283 Tm (only. It does not alter the uploaded forecast, inventory, or master records. The recalculation is saved as an MRP run like other runs.) Tj ET
+0.941 0.961 0.98 rg 40 -566 515 30 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 268 Tm (Run MRP - Sends selected tenant, scenario, filters, horizon, buckets, and start date to the server. The server calculates, saves a run) Tj ET
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 258 Tm (and its result rows in a transaction, then returns the results for charts and table. While running it shows Calculating and is disabled.) Tj ET
+0.941 0.961 0.98 rg 40 -591 515 30 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 243 Tm (Error panel / Retry - Shows a returned validation/database/calculation error. Retry calls the run again with current controls. Correct) Tj ET
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 233 Tm (missing masters, mismatched bucket types, or invalid selections before retrying.) Tj ET
+0.941 0.961 0.98 rg 40 -616 515 30 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 218 Tm (No forecast demand found - Informational notice when demand total is zero inside the chosen date range and filters. Check the scenario,) Tj ET
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 208 Tm (date, country, plant/product filters, mapping, and bucket type. A run may still return rows with zero demand.) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 193 Tm (The page loads MRP choices and saved scenarios from the active tenant. It also automatically runs once after master-data) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 181.5 Tm (options load if there is no result yet. Use Run MRP after changing planning controls to refresh the shown output; changing a) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 170 Tm (filter alone does not automatically recalculate the current result.) Tj ET
+BT /F2 13 Tf 0.09 0.212 0.365 rg 1 0 0 1 42 147.5 Tm (??? Planning filters: every field) Tj ET
+0.941 0.961 0.98 rg 40 -708.5 515 20 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 125.5 Tm (Field - Plain-language meaning | Effect / notes) Tj ET
+0.941 0.961 0.98 rg 40 -723.5 515 40 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 110.5 Tm (Demand scenario - Which forecast version should drive this run. | Existing demand forecast reads ordinary uploaded weekly/monthly demand.) Tj ET
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 100.5 Tm (Other choices are saved workbook imports and show scenario name/type, period grain, worksheet, and import time. Each upload is retained) Tj ET
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 90.5 Tm (as a separate version. Actual and previous-year sheets are reference-only and cannot be selected as forecast.) Tj ET
+0.941 0.961 0.98 rg 40 -758.5 515 30 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 75.5 Tm (Refresh list - Reloads available workbook scenario versions for the current tenant. | Use it after importing a scenario if the selector) Tj ET
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 65.5 Tm (was already open or page stayed loaded.) Tj ET
+
+endstream
+endobj
+9 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 10 0 R >>
+endobj
+10 0 obj
+<< /Length 9149 >>
+stream
+0.973 0.98 0.988 rg 0 0 595 842 re f
+0.086 0.475 0.91 rg 0 0 595 8 re f
+BT /F2 7.5 Tf 0.396 0.478 0.58 rg 1 0 0 1 40 810 Tm (MRP PORTAL  /  FORWARD MRP PLAN GUIDE) Tj ET
+0.851 0.89 0.937 rg 40 -48 515 1 re f
+BT /F1 7 Tf 0.443 0.514 0.604 rg 1 0 0 1 40 20 Tm (Dashboard | Forward MRP Plan | field-by-field guide) Tj ET
+BT /F2 8 Tf 0.086 0.475 0.91 rg 1 0 0 1 538 20 Tm (03) Tj ET
+0.941 0.961 0.98 rg 40 -65 515 40 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 769 Tm (Demand aggregation - Which customer hierarchy level to use when imported rows include multiple hierarchy levels. | Shown only for a saved) Tj ET
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 759 Tm (scenario. Choices: Ship To detail, Sold To, Product total. It selects one level to avoid adding parent and child totals together. This is) Tj ET
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 749 Tm (not a summation of all three levels.) Tj ET
+0.941 0.961 0.98 rg 40 -100 515 40 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 734 Tm (Scenario dimension filters - Filters for workbook fields such as customer, channel, region, or other imported dimensions. | Shown only) Tj ET
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 724 Tm (when scenario rows contain dimensions. All includes every value. Each selected dimension narrows matching rows before aggregation.) Tj ET
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 714 Tm (Dimension names originate in the workbook and can vary.) Tj ET
+0.941 0.961 0.98 rg 40 -135 515 30 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 699 Tm (Country - Country whose active plants are planned. | Country selection resets the plant selection to all plants in that country and) Tj ET
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 689 Tm (clears the finished-good selection. Currency for cost charts is taken from the country configuration.) Tj ET
+0.941 0.961 0.98 rg 40 -160 515 30 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 674 Tm (Plant - One or more sites within the country. | All plants is represented by no explicit plant restriction. Selecting plants limits) Tj ET
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 664 Tm (demand and material planning to those plants.) Tj ET
+0.941 0.961 0.98 rg 40 -185 515 30 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 649 Tm (Product type - Restricts demand-driving finished goods by type. | Current configured types are Bulk and Bagged. Empty/all means no type) Tj ET
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 639 Tm (restriction.) Tj ET
+0.941 0.961 0.98 rg 40 -210 515 30 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 624 Tm (Finished good - Restricts which forecasted parent products create component demand. | Options depend on selected country/plants and) Tj ET
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 614 Tm (product type. Empty/all means all eligible finished goods.) Tj ET
+0.941 0.961 0.98 rg 40 -235 515 40 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 599 Tm (Material category - Which result material classes to show and include in the spend/KPI rollups. | Current categories include Raw,) Tj ET
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 589 Tm (Packing, and Intermediate. This is an output visibility filter: the engine calculates supply requirements, then filters visible result) Tj ET
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 579 Tm (rows. Do not treat it as excluding components from BOM explosion.) Tj ET
+0.941 0.961 0.98 rg 40 -270 515 30 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 564 Tm (Material - Which material result rows to show. | Options are active tenant materials. This filters visible result rows after calculation;) Tj ET
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 554 Tm (it does not change the original finished-good forecast or its BOM arithmetic.) Tj ET
+0.941 0.961 0.98 rg 40 -295 515 30 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 539 Tm (Planning Horizon - How far ahead the calculation extends. | 3, 6, or 12 months. With monthly buckets, those are 3/6/12 periods. With) Tj ET
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 529 Tm (weekly buckets, the engine generates weekly periods until the chosen month horizon ends, so a 12-month view is about 52/53 buckets.) Tj ET
+0.941 0.961 0.98 rg 40 -320 515 40 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 514 Tm (Time buckets - How the horizon is split into periods. | Monthly uses calendar months, starting on the first day of the selected month.) Tj ET
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 504 Tm (Weekly uses consecutive 7-day buckets starting on the selected date \(the UI does not force the date to Sunday\). Imported scenario grain) Tj ET
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 494 Tm (must match this selection.) Tj ET
+0.941 0.961 0.98 rg 40 -355 515 40 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 479 Tm (Planning start date - First day from which demand and stock are projected. | The input hint says first day of planning window. Monthly) Tj ET
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 469 Tm (runs normalize it to the first of that calendar month. Weekly runs start on the actual date entered. Forecast rows outside the date range) Tj ET
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 459 Tm (are not included.) Tj ET
+BT /F2 10 Tf 0.086 0.475 0.91 rg 1 0 0 1 42 441 Tm (Workbook scenario notes) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 423 Tm (Workbook import is performed in Demand Planning, not from the Dashboard. The workbook reader lets the planner choose a) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 411.5 Tm (worksheet and scenario name/type, map plant and product columns, choose weekly/monthly period columns, and map codes to the) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 400 Tm (portal's plant and finished-good codes. Extra columns are stored as dimensions. Dashboard then runs one selected scenario) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 388.5 Tm (version at a time.) Tj ET
+BT /F1 7.8 Tf 0.141 0.341 0.537 rg 1 0 0 1 50 372 Tm (Actuals \(reference only\) and Previous year \(reference only\) appear disabled in the selector because they are context for forecast) Tj ET
+BT /F1 7.8 Tf 0.141 0.341 0.537 rg 1 0 0 1 50 361 Tm (comparison, not forecasts to consume. Scenario dimensions and customer aggregation are applied to imported scenario rows; the) Tj ET
+BT /F1 7.8 Tf 0.141 0.341 0.537 rg 1 0 0 1 50 350 Tm (regular demand table does not have this workbook-level customer aggregation behavior.) Tj ET
+BT /F2 13 Tf 0.09 0.212 0.365 rg 1 0 0 1 42 328 Tm (??? Scenario inputs: what-if adjustments) Tj ET
+0.941 0.961 0.98 rg 40 -528 515 20 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 306 Tm (Field - Meaning) Tj ET
+0.941 0.961 0.98 rg 40 -543 515 20 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 291 Tm (Plant - Plant for the temporary forecast/on-hand adjustment. The list is limited to plants selected in the main filters.) Tj ET
+0.941 0.961 0.98 rg 40 -558 515 20 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 276 Tm (Finished Good - Finished good whose forecast quantity will be temporarily replaced in the chosen period.) Tj ET
+0.941 0.961 0.98 rg 40 -573 515 20 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 261 Tm (Forecast bucket - Period in the current displayed horizon to which the temporary forecast applies.) Tj ET
+0.941 0.961 0.98 rg 40 -588 515 30 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 246 Tm (Override forecast quantity - If filled, replaces the saved forecast quantity for that plant + finished good + bucket in this calculation.) Tj ET
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 236 Tm (Zero is allowed. Blank means keep saved demand.) Tj ET
+0.941 0.961 0.98 rg 40 -613 515 20 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 221 Tm (Material - Material whose opening on-hand value will be temporarily replaced.) Tj ET
+0.941 0.961 0.98 rg 40 -628 515 30 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 206 Tm (Override on-hand quantity - If filled, replaces the saved on-hand value for that plant + material for this calculation. Zero is allowed.) Tj ET
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 196 Tm (Blank means keep saved inventory. It does not change receipts/reserved quantities or write an inventory upload.) Tj ET
+0.941 0.961 0.98 rg 40 -653 515 20 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 181 Tm (Recalculate scenario - Runs and saves a new calculation with these temporary overrides.) Tj ET
+0.941 0.961 0.98 rg 40 -668 515 20 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 166 Tm (Cancel / close - Closes the panel without applying the what-if values.) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 151 Tm (Overrides do not persist to Master Data, Inventory, or Demand Planning. A future run without the same override uses the) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 139.5 Tm (stored forecast and stock again.) Tj ET
+BT /F2 13 Tf 0.09 0.212 0.365 rg 1 0 0 1 42 117 Tm (??? KPI cards) Tj ET
+0.941 0.961 0.98 rg 40 -739 515 20 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 95 Tm (KPI - What it tells you | How to interpret it carefully) Tj ET
+
+endstream
+endobj
+11 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 12 0 R >>
+endobj
+12 0 obj
+<< /Length 8418 >>
+stream
+0.973 0.98 0.988 rg 0 0 595 842 re f
+0.086 0.475 0.91 rg 0 0 595 8 re f
+BT /F2 7.5 Tf 0.396 0.478 0.58 rg 1 0 0 1 40 810 Tm (MRP PORTAL  /  FORWARD MRP PLAN GUIDE) Tj ET
+0.851 0.89 0.937 rg 40 -48 515 1 re f
+BT /F1 7 Tf 0.443 0.514 0.604 rg 1 0 0 1 40 20 Tm (Dashboard | Forward MRP Plan | field-by-field guide) Tj ET
+BT /F2 8 Tf 0.086 0.475 0.91 rg 1 0 0 1 538 20 Tm (04) Tj ET
+0.941 0.961 0.98 rg 40 -65 515 40 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 769 Tm (Forecast Demand - Total forecast quantity included in the run after selected country/plant, product and dimension choices. | The current) Tj ET
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 759 Tm (screen appends ?tons? regardless of the finished goods' actual unit. If products have mixed units or use each/kg, treat this label as a) Tj ET
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 749 Tm (display limitation and check product UOMs.) Tj ET
+0.941 0.961 0.98 rg 40 -100 515 30 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 734 Tm (Planned Order Value - Total suggested order quantity ? material unit cost for visible planned-order rows. | It is an estimated value,) Tj ET
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 724 Tm (grouped by configured country currency in the chart/control output. It is not a purchase order commitment.) Tj ET
+0.941 0.961 0.98 rg 40 -125 515 30 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 709 Tm (Raw / Packing Spend - Planned order value split between materials categorized Raw and Packing. | Intermediate category is not part of) Tj ET
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 699 Tm (these two amounts. Values reflect displayed/selected material rows.) Tj ET
+0.941 0.961 0.98 rg 40 -150 515 40 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 684 Tm (Expedite / Stockout Alerts - Number of visible rows with a planned order whose release date is on or before the first bucket. | This is a) Tj ET
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 674 Tm (release-timing alert count, not necessarily a confirmed physical stockout or a count of unique materials. Inspect the row and release) Tj ET
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 664 Tm (date.) Tj ET
+0.941 0.961 0.98 rg 40 -185 515 30 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 649 Tm (Capacity Exceeded Buckets - Count of visible material/time rows whose projected inventory exceeds configured capacity. | This counts) Tj ET
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 639 Tm (material-period instances, not unique materials. Capacity alerts do not cap the planned order quantity.) Tj ET
+BT /F2 13 Tf 0.09 0.212 0.365 rg 1 0 0 1 42 618 Tm (??? Charts and their labels) Tj ET
+BT /F2 10 Tf 0.086 0.475 0.91 rg 1 0 0 1 42 593 Tm (Forward Procurement Projection) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 575 Tm (Shows the estimated planned procurement value by bucket. The bars are the sum of planned order quantity multiplied by unit) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 563.5 Tm (cost for the selected currency. Currency chooses which configured currency to display. Horizontal labels are bucket periods.) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 552 Tm (The y-axis is monetary value in that currency. A tall bar means more order value is planned in that period, not necessarily) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 540.5 Tm (more physical units.) Tj ET
+BT /F2 10 Tf 0.086 0.475 0.91 rg 1 0 0 1 42 521 Tm (Material Consumption & Planned Qty) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 503 Tm (Shows two quantities for the chosen material over time:) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 486.5 Tm (??? Gross material requirement: material quantity needed before stock/inbound supply offsets it.) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 470 Tm (??? Planned order: recommended replenishment quantity.) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 453.5 Tm (The Material selector changes which material is charted. The y-axis uses that material's unit of measure, such as ton, kg, or) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 442 Tm (each. The chart tooltip reports the period, gross requirement, and planned quantity. A planned-order bar can be zero even) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 430.5 Tm (when gross demand is positive if starting stock and receipts cover it.) Tj ET
+BT /F2 10 Tf 0.086 0.475 0.91 rg 1 0 0 1 42 411 Tm (Plant Capacity Utilization) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 393 Tm (For up to eight visible plant/material groups that have a configured maximum, this shows peak projected stock divided by that) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 381.5 Tm (material's capacity during the horizon. 100% means at the limit or above it; a bar styled as exceeded means peak stock is) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 370 Tm (greater than capacity. This is a peak inventory-to-capacity comparison, not factory production-line utilization. If no) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 358.5 Tm (material capacity is configured, the page says no capacity limits are configured.) Tj ET
+BT /F2 13 Tf 0.09 0.212 0.365 rg 1 0 0 1 42 336 Tm (??? Time-Phased Material Plan: every column and row) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 314 Tm (Each main row is one plant + material. Expand the chevron to see the calculation components for each period.) Tj ET
+0.941 0.961 0.98 rg 40 -536.5 515 20 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 297.5 Tm (Column / value - Meaning) Tj ET
+0.941 0.961 0.98 rg 40 -551.5 515 20 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 282.5 Tm (Plant - Site whose stock and demand are being planned.) Tj ET
+0.941 0.961 0.98 rg 40 -566.5 515 20 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 267.5 Tm (Material - Material identifier. Chevron expands/collapses the bucket details.) Tj ET
+0.941 0.961 0.98 rg 40 -581.5 515 20 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 252.5 Tm (Description - Readable name from Material master.) Tj ET
+0.941 0.961 0.98 rg 40 -596.5 515 20 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 237.5 Tm (Category - Raw, Packing, Intermediate, etc., from Material master.) Tj ET
+0.941 0.961 0.98 rg 40 -611.5 515 30 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 222.5 Tm (On Hand - Opening inventory quantity used at the start of the horizon. It is repeated for context and is not the closing balance for each) Tj ET
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 212.5 Tm (future period.) Tj ET
+0.941 0.961 0.98 rg 40 -636.5 515 30 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 197.5 Tm (Min / Max - Effective safety-stock minimum and capacity threshold. Minimum is a replenishment target; max is checked for an over-capacity) Tj ET
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 187.5 Tm (alert.) Tj ET
+0.941 0.961 0.98 rg 40 -661.5 515 30 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 172.5 Tm (M0 / M+1 or W0 / W+1 ... - Period index \(M for month, W for week\) and period start date. W0 is first week, W+1 next week. The number of) Tj ET
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 162.5 Tm (visible buckets equals the output horizon/grain.) Tj ET
+0.941 0.961 0.98 rg 40 -686.5 515 20 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 147.5 Tm (Bold value in a bucket - Projected inventory at the end of that bucket after demand, receipts, and the planned order are applied.) Tj ET
+0.941 0.961 0.98 rg 40 -701.5 515 30 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 132.5 Tm (+N order - Suggested planned order quantity for that period. This quantity is already included in bold projected inventory; do not add it) Tj ET
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 122.5 Tm (again.) Tj ET
+0.941 0.961 0.98 rg 40 -726.5 515 30 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 107.5 Tm (Expedite - Planned order release date is on or before the first period's start. It means release needs attention by the beginning of this) Tj ET
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 97.5 Tm (plan window, not necessarily that it is overdue today.) Tj ET
+0.941 0.961 0.98 rg 40 -751.5 515 20 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 82.5 Tm (Capacity - Projected stock is greater than the configured capacity limit.) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 67.5 Tm (Expanded detail rows:) Tj ET
+
+endstream
+endobj
+13 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 14 0 R >>
+endobj
+14 0 obj
+<< /Length 7960 >>
+stream
+0.973 0.98 0.988 rg 0 0 595 842 re f
+0.086 0.475 0.91 rg 0 0 595 8 re f
+BT /F2 7.5 Tf 0.396 0.478 0.58 rg 1 0 0 1 40 810 Tm (MRP PORTAL  /  FORWARD MRP PLAN GUIDE) Tj ET
+0.851 0.89 0.937 rg 40 -48 515 1 re f
+BT /F1 7 Tf 0.443 0.514 0.604 rg 1 0 0 1 40 20 Tm (Dashboard | Forward MRP Plan | field-by-field guide) Tj ET
+BT /F2 8 Tf 0.086 0.475 0.91 rg 1 0 0 1 538 20 Tm (05) Tj ET
+0.941 0.961 0.98 rg 40 -65 515 20 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 769 Tm (Detail row - Meaning) Tj ET
+0.941 0.961 0.98 rg 40 -80 515 20 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 754 Tm (Gross Requirements - Total material consumption needed in the bucket after BOM explosion and material scrap.) Tj ET
+0.941 0.961 0.98 rg 40 -95 515 30 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 739 Tm (Scheduled Receipts - Inbound supply assigned to the bucket, including inventory scheduled receipt balance \(first bucket\), transit due in) Tj ET
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 729 Tm (the bucket, and any separately dated receipts loaded into the database.) Tj ET
+0.941 0.961 0.98 rg 40 -120 515 20 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 714 Tm (Net Requirements - Shortfall between stock after demand/receipts and the effective minimum, before the new planned order.) Tj ET
+0.941 0.961 0.98 rg 40 -135 515 20 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 699 Tm (Projected Inventory - End-of-bucket quantity after adding the planned order; matches the bold main-row value.) Tj ET
+0.941 0.961 0.98 rg 40 -150 515 20 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 684 Tm (Planned Order Release - Suggested date to release the order after moving the need period earlier by lead-time buckets.) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 669 Tm (Horizontal scroll reveals later buckets. An empty table can mean there is no eligible BOM demand for the horizon or that) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 657.5 Tm (result filters exclude the materials; check inputs and the no-demand notice.) Tj ET
+BT /F2 13 Tf 0.09 0.212 0.365 rg 1 0 0 1 42 635 Tm (??? Calculation in plain language) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 613 Tm (For a finished good and bucket, gross component demand is:) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 596.5 Tm (finished-good forecast quantity) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 580 Tm (? BOM component quantity per finished good) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 563.5 Tm (? \(1 + material scrap percentage\)) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 547 Tm (For a material and bucket:) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 530.5 Tm (stock before planned order = prior projected stock + receipts - gross requirement) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 514 Tm (net requirement = max\(0, minimum stock - stock before planned order\)) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 497.5 Tm (planned order = 0 when net requirement is 0; otherwise max\(net requirement, MOQ\)) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 481 Tm (projected inventory = stock before planned order + planned order) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 464.5 Tm (release date = need bucket moved earlier by lead-time buckets) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 448 Tm (Starting projected stock is on-hand quantity. Current forward calculation does not subtract reserved_qty; although inventory) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 436.5 Tm (shows and stores reserved stock, the MRP engine explicitly nets opening on-hand, receipts, gross demand, and the configured) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 425 Tm (minimum. The current JavaScript forward engine also does not round planned orders to order_multiple, even though the value is) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 413.5 Tm (stored in master data. The SQL planning procedure may have additional policy behavior, but this Dashboard calls the) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 402 Tm (JavaScript forward calculation. Reorder level is stored but not used by this netting formula. Maximum capacity triggers an) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 390.5 Tm (alert; it does not reduce the suggested order quantity.) Tj ET
+BT /F2 13 Tf 0.09 0.212 0.365 rg 1 0 0 1 42 368 Tm (??? Common field keys and data meaning) Tj ET
+0.941 0.961 0.98 rg 40 -488 515 20 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 346 Tm (Key - Plain-language meaning) Tj ET
+0.941 0.961 0.98 rg 40 -503 515 20 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 331 Tm (tenant_id / tenant schema - Workspace boundary. Reads and saved run records belong to the selected tenant.) Tj ET
+0.941 0.961 0.98 rg 40 -518 515 20 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 316 Tm (country_code - Country used to choose eligible active plants and currency.) Tj ET
+0.941 0.961 0.98 rg 40 -533 515 20 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 301 Tm (plant_code - Site key used to join finished goods, BOM, inventory, and forecast.) Tj ET
+0.941 0.961 0.98 rg 40 -548 515 20 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 286 Tm (fg_code - Finished-good key whose forecast is exploded through BOM.) Tj ET
+0.941 0.961 0.98 rg 40 -563 515 20 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 271 Tm (material_code - Component/item key for inventory and replenishment.) Tj ET
+0.941 0.961 0.98 rg 40 -578 515 20 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 256 Tm (bucket_date - Start date identifying a weekly or monthly demand/result bucket.) Tj ET
+0.941 0.961 0.98 rg 40 -593 515 20 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 241 Tm (forecast_qty - Demand quantity for a finished good and bucket.) Tj ET
+0.941 0.961 0.98 rg 40 -608 515 20 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 226 Tm (ratio / quantity_per_fg - Component material quantity required for one unit of parent finished good.) Tj ET
+0.941 0.961 0.98 rg 40 -623 515 20 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 211 Tm (scrap_pct - Fractional loss applied to component consumption; e.g. 0.02 adds 2%.) Tj ET
+0.941 0.961 0.98 rg 40 -638 515 20 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 196 Tm (on_hand_qty - Opening physical inventory.) Tj ET
+0.941 0.961 0.98 rg 40 -653 515 20 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 181 Tm (scheduled_receipts - Undated opening inbound quantity, applied in first bucket.) Tj ET
+0.941 0.961 0.98 rg 40 -668 515 20 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 166 Tm (in_transit_qty + in_transit_due_date - Inbound quantity and its expected planning bucket; blank date is treated as first bucket.) Tj ET
+0.941 0.961 0.98 rg 40 -683 515 20 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 151 Tm (min_stock_qty / safety_stock_min - Stock floor the calculation aims to retain. Plant constraint takes precedence where supplied.) Tj ET
+0.941 0.961 0.98 rg 40 -698 515 20 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 136 Tm (max_storage_capacity / max_capacity - Limit used to flag projected inventory above storage capacity.) Tj ET
+0.941 0.961 0.98 rg 40 -713 515 20 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 121 Tm (lead_time_buckets - Number of weekly/monthly periods to move release date earlier. Plant constraint overrides material default.) Tj ET
+0.941 0.961 0.98 rg 40 -728 515 20 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 106 Tm (moq - Minimum suggested order when any net requirement exists.) Tj ET
+0.941 0.961 0.98 rg 40 -743 515 20 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 91 Tm (unit_cost - Unit value used to estimate procurement spend.) Tj ET
+0.941 0.961 0.98 rg 40 -758 515 20 re f
+BT /F1 7.4 Tf 0.251 0.333 0.431 rg 1 0 0 1 48 76 Tm (run_id - Unique identifier of the saved MRP calculation. Each run is recorded separately.) Tj ET
+
+endstream
+endobj
+15 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 16 0 R >>
+endobj
+16 0 obj
+<< /Length 2620 >>
+stream
+0.973 0.98 0.988 rg 0 0 595 842 re f
+0.086 0.475 0.91 rg 0 0 595 8 re f
+BT /F2 7.5 Tf 0.396 0.478 0.58 rg 1 0 0 1 40 810 Tm (MRP PORTAL  /  FORWARD MRP PLAN GUIDE) Tj ET
+0.851 0.89 0.937 rg 40 -48 515 1 re f
+BT /F1 7 Tf 0.443 0.514 0.604 rg 1 0 0 1 40 20 Tm (Dashboard | Forward MRP Plan | field-by-field guide) Tj ET
+BT /F2 8 Tf 0.086 0.475 0.91 rg 1 0 0 1 538 20 Tm (06) Tj ET
+BT /F2 13 Tf 0.09 0.212 0.365 rg 1 0 0 1 42 769 Tm (??? Upload-to-decision workflow) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 747 Tm (??? Select and verify tenant in the global header.) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 730.5 Tm (??? Upload active Plant master, Material master, Finished goods, complete BOM, and applicable Plant constraints.) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 714 Tm (??? Upload tenant Inventory & stock.) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 697.5 Tm (??? Upload weekly/monthly demand CSV, or import a workbook scenario from Demand Planning.) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 681 Tm (??? On Dashboard, select the scenario \(if using an imported workbook\), aggregation level and any customer/dimension filters.) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 664.5 Tm (??? Choose country, plant, product type, finished goods, material/category, horizon, period grain, and start date.) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 648 Tm (??? Click Run MRP and resolve any validation message.) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 631.5 Tm (??? Review forecast demand, planned order value, alerts, charts, and material-period table.) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 615 Tm (??? Expand unusual order/expedite/capacity rows and check gross need, receipts, net requirement, projected stock, and release) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 603.5 Tm (date.) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 587 Tm (??? Validate recommendations with the planning owner before creating real purchase/production orders in the normal approval) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 575.5 Tm (workflow.) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 559 Tm (For definitions of the underlying master fields use Master Data guide. For stock upload fields use Inventory guide. For) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 547.5 Tm (deeper interpretation of bucket cells, use Time-Phased Material Plan guide. For workbook mapping and scenario types, use) Tj ET
+BT /F1 8.2 Tf 0.251 0.333 0.431 rg 1 0 0 1 42 536 Tm (Demand workbook integration guide.) Tj ET
+
+endstream
+endobj
+xref
+0 17
+0000000000 65535 f 
+0000000019 00000 n 
+0000000068 00000 n 
+0000000158 00000 n 
+0000000255 00000 n 
+0000000357 00000 n 
+0000000493 00000 n 
+0000002564 00000 n 
+0000002700 00000 n 
+0000010726 00000 n 
+0000010863 00000 n 
+0000020065 00000 n 
+0000020203 00000 n 
+0000028674 00000 n 
+0000028812 00000 n 
+0000036825 00000 n 
+0000036963 00000 n 
+trailer
+<< /Size 17 /Root 1 0 R >>
+startxref
+39636
+%%EOF
