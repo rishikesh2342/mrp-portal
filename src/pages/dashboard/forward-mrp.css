@@ -714,7 +714,8 @@
 }
 .forward-filters {
   position: relative;
-  z-index: 4;
+  /* Keep the filter card below the sticky app header while the page scrolls. */
+  z-index: 1;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   align-items: start;
   gap: 12px;
