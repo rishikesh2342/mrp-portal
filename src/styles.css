@@ -83,3 +83,25 @@
     flex-wrap: wrap;
   }
 }
+
+/* Align Inventory and Master Data actions with the bottom of their headings. */
+.inventory-heading,
+.master-heading {
+  align-items: flex-end;
+}
+.inventory-heading-actions,
+.master-heading-actions {
+  align-items: flex-end;
+}
+.inventory-heading-actions > .button,
+.master-heading-actions > .button,
+.inventory-heading-actions .csv-upload > .button,
+.master-heading-actions .csv-upload > .button {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+@media (max-width: 1050px) {
+  .master-heading {
+    align-items: flex-start;
+  }
+}
